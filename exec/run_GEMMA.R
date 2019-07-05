@@ -42,7 +42,7 @@ strains <- strains %>% left_join(a, by="input_name", suffix=c(".orig","")) %>%
   mutate(p1=ifelse(is.na(p1), p1.orig, p1), p2=ifelse(is.na(p2), p2.orig, p2)) %>% select(input_name, p1, p2)
 
 # Translate names to genotype names
-t <- tibble(input_name=character(), gen_name=character())
+t <- tibble(name=character(), gen_name=character())
 for (tr in yamin$translate){
   t <- add_row(t, name=names(tr), gen_name=unlist(tr)[1])
 }
