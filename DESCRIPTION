@@ -15,4 +15,8 @@ Imports:
   R.utils,
   data.table (>= 1.12.2),
   snpStats (>= 1.34.0),
+  readr,
+  dplyr,
+  yaml,
+  argparse
   
