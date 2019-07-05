@@ -57,7 +57,7 @@ valid_strains <- unique(c(strains$p1, strains$p2))
 srdata <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
-  geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE)]
+  geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
   print(geno)
   if (is.null(srdata)){
     srdata <- geno[,.(chr,bp38,rs,major, minor, observed)]
