@@ -79,7 +79,7 @@ for (f in args$genotypes){
   #fwrite(long_form[,.(rs, variable, value, conf)], longfile, append=TRUE, col.names=FALSE)
 }
 print(colSums(is.na(complete.geno)))
-summary(complete.geno)
+print(summary(complete.geno))
 # Arrange the SNPs data
 #setnames(srdata, c("chr", "bp38", "rs", "major", "minor"), c("chromosome", "position", "rname", "A1", "A2"))
 #srdata <- as.data.frame(srdata)
