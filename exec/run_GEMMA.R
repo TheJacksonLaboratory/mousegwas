@@ -79,7 +79,7 @@ for (f in args$genotypes){
 }
 print(colSums(is.na(complete.geno)))
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
-  complete.geno[,cn := ifelse(..cn=='H', 2, ifelse(..cn==major, 1, 3))]
+  complete.geno[,..cn := ifelse(..cn=='H', 2, ifelse(..cn==major, 1, 3))]
 }
 print(head(complete.geno))
 print(summary(complete.geno))
