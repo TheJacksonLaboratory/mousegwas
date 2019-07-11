@@ -70,6 +70,7 @@ for (f in args$genotypes){
     addnames <- intersect(names(geno), valid_strains)
     complete.geno <- cbind(complete.geno, geno[,..addnames])
   }
+  valid_strains <- setdiff(valid_strains, names(complete.geno))
   print(dim(complete.geno))
   print(names(complete.geno))
   #long_form <- melt(geno, id.vars=c("rs", "major"), measure.vars=intersect(valid_strains, setdiff(names(geno), c("chr", "bp38", "rs", "major", "minor", "observed", "dbsnp142annot", "requested"))))
