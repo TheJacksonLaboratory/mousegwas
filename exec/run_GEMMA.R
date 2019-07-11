@@ -9,6 +9,7 @@ library(dplyr)
 library(readr)
 library(R.utils)
 library(data.table)
+library(snpStats)
 
 # create parser object
 parser <- ArgumentParser()
@@ -55,14 +56,42 @@ valid_strains <- unique(c(strains$p1, strains$p2))
 # Read the genotype csv file
 #long_form <- tibble(rs=character(), sample=character(), genotype=integer())
 srdata <- NULL
+longfile <- tempfile()
+complete.geno <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
   print(geno)
   if (is.null(srdata)){
-    srdata <- geno[,.(chr,bp38,rs,major, minor, observed)]
+    srdata <- geno[,.(chr,bp38,rs,major, minor)]
   }
-  long_form <- melt(geno, id.vars=c("rs", "major"), measure.vars=intersect(valid_strains, setdiff(names(geno), c("chr", "bp38", "rs", "major", "minor", "observed", "dbsnp142annot", "requested"))))
-  long_form[,value:=ifelse(value=='H', 2, ifelse(value==major, 1, 3))]
-  fwrite(long_form[,.(rs, variable, value)], "test_long.txt", append=TRUE, col.names=FALSE)
+  if (is.null(complete.geno)){
+    complete.geno <- geno[,intersect(names(geno), valid_strains)]
+  }else{
+    addnames <- intersect(names(geno), valid_strains)
+    complete.geno[, (addnames) := geno[,addnames]]
+  }
+  print(dim(complete.geno))
+  print(names(complete.geno))
+  #long_form <- melt(geno, id.vars=c("rs", "major"), measure.vars=intersect(valid_strains, setdiff(names(geno), c("chr", "bp38", "rs", "major", "minor", "observed", "dbsnp142annot", "requested"))))
+  #long_form[,value:=ifelse(value=='H', 2, ifelse(value==major, 1, 3))]
+  #long_form[,conf=1.00]
+  #fwrite(long_form[,.(rs, variable, value, conf)], longfile, append=TRUE, col.names=FALSE)
 }
+print(colSums(is.na(complete.geno)))
+
+# Arrange the SNPs data
+#setnames(srdata, c("chr", "bp38", "rs", "major", "minor"), c("chromosome", "position", "rname", "A1", "A2"))
+#srdata <- as.data.frame(srdata)
+#rownames(srdata) <- srdata$rname
+#srdata <- srdata[,c("chromosome", "position", "A1", "A2")]
+
+# Read the long file using snpStats
+#snps <- read.long(longfile, fields=c(snp=1, sample=2, genotype=3, confidence=4),
+#                  gcodes=c("1", "2", "3"))
+
+#Impute missing genotypes
+
+
+
+
