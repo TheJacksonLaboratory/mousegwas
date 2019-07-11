@@ -66,7 +66,7 @@ for (f in args$genotypes){
     srdata <- geno[,.(chr,bp38,rs,major, minor)]
   }
   if (is.null(complete.geno)){
-    complete.geno <- geno[,c("chr", "bp38", "rs", "major", "minor", intersect(names(geno), valid_strains))]
+    complete.geno <- geno[,.(chr, bp38, rs, major, minor, intersect(names(geno), valid_strains))]
   }else{
     addnames <- intersect(names(geno), valid_strains)
     complete.geno <- cbind(complete.geno, geno[,..addnames])
