@@ -66,7 +66,7 @@ for (f in args$genotypes){
     srdata <- geno[,.(chr,bp38,rs,major, minor)]
   }
   if (is.null(complete.geno)){
-    complete.geno <- geno[,intersect(names(geno), valid_strains)]
+    complete.geno <- geno[,c("chr", "bp38", "rs", "major", "minor", intersect(names(geno), valid_strains))]
   }else{
     addnames <- intersect(names(geno), valid_strains)
     complete.geno <- cbind(complete.geno, geno[,..addnames])
@@ -79,7 +79,11 @@ for (f in args$genotypes){
   #fwrite(long_form[,.(rs, variable, value, conf)], longfile, append=TRUE, col.names=FALSE)
 }
 print(colSums(is.na(complete.geno)))
+for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
+  complete.geno[,cn := ifelse(..cn=='H', 2, ifelse(..cn==major, 1, 3))]
+}
 print(summary(complete.geno))
+
 # Arrange the SNPs data
 #setnames(srdata, c("chr", "bp38", "rs", "major", "minor"), c("chromosome", "position", "rname", "A1", "A2"))
 #srdata <- as.data.frame(srdata)
