@@ -61,7 +61,6 @@ complete.geno <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
-  print(geno)
   if (is.null(srdata)){
     srdata <- geno[,.(chr,bp38,rs,major, minor)]
   }
@@ -82,6 +81,7 @@ print(colSums(is.na(complete.geno)))
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
   complete.geno[,cn := ifelse(..cn=='H', 2, ifelse(..cn==major, 1, 3))]
 }
+print(head(complete.geno))
 print(summary(complete.geno))
 
 # Arrange the SNPs data
