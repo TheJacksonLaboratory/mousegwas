@@ -69,7 +69,7 @@ for (f in args$genotypes){
     complete.geno <- geno[,intersect(names(geno), valid_strains)]
   }else{
     addnames <- intersect(names(geno), valid_strains)
-    complete.geno[, addnames := geno[,addnames]]
+    complete.geno <- cbind(complete.geno, geno[,addnames])
   }
   print(dim(complete.geno))
   print(names(complete.geno))
