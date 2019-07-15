@@ -66,7 +66,9 @@ for (f in args$genotypes){
   #  srdata <- geno[,.(rs,major, minor)]
   #}
   if (is.null(complete.geno)){
-    complete.geno <- geno[,.(chr, bp38, rs, major, minor, intersect(names(geno), valid_strains))]
+    if (length(intersect(names(geno), valid_strains))>0){
+      complete.geno <- geno[,.(chr, bp38, rs, major, minor, intersect(names(geno), valid_strains))]
+    }
   }else{
     addnames <- c(intersect(names(geno), valid_strains), "chr", "bp38", "rs", "major", "minor")
     geno <- geno[,..addnames]
@@ -75,7 +77,6 @@ for (f in args$genotypes){
     complete.geno <- merge(complete.geno, geno, all=TRUE)
     #complete.geno <- cbind(complete.geno, geno[,..addnames])
   }
-  srdata <- complete.geno[, .(rs, major, minor)]
   valid_strains <- setdiff(valid_strains, names(complete.geno))
   print(dim(complete.geno))
   print(names(complete.geno))
@@ -84,6 +85,7 @@ for (f in args$genotypes){
   #long_form[,conf=1.00]
   #fwrite(long_form[,.(rs, variable, value, conf)], longfile, append=TRUE, col.names=FALSE)
 }
+srdata <- complete.geno[, .(rs, major, minor)]
 print(colSums(is.na(complete.geno)))
 numeric.geno <- complete.geno[, .("chr", "bp38", "rs", "major", "minor")]
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
