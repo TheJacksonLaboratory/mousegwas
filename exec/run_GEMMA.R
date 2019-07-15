@@ -89,7 +89,9 @@ print(summary(complete.geno))
 # Compute the specific strains genomes
 strains_genomes <- srdata
 for (rnum in 1:nrow(strains)){
-  strains_genomes <- cbind(strains_genomes, strains[rnum, "input_name"]=(complete.geno[,strains[rnum, "p1"]] + complete.geno[,strains[rnum, "p2"]])/2)
+  p1n <- strains$p1[rnum]
+  p2n <- strains$p2[rnum]
+  strains_genomes[, eval(strains$input_name[rnum]):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
 }
 fwrite(strains_genomes, "export_strains_genotypes.csv")
 # Arrange the SNPs data
