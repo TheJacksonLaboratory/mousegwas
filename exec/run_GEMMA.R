@@ -62,7 +62,7 @@ for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
   if (is.null(srdata)){
-    srdata <- geno[,.(chr,bp38,rs,major, minor)]
+    srdata <- geno[,.(rs,major, minor)]
   }
   if (is.null(complete.geno)){
     complete.geno <- geno[,.(chr, bp38, rs, major, minor, intersect(names(geno), valid_strains))]
@@ -85,6 +85,13 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
 print(head(complete.geno))
 print(summary(complete.geno))
 
+
+# Compute the specific strains genomes
+strains_genomes <- srdata
+for (rnum in 1:nrow(strains)){
+  strains_genomes <- cbind(strains_genomes, strains[rnum, "input_name"]=(complete.geno[,strains[rnum, "p1"]] + complete.geno[,strains[rnum, "p2"]])/2)
+}
+fwrite(strains_genomes, "export_strains_genotypes.csv")
 # Arrange the SNPs data
 #setnames(srdata, c("chr", "bp38", "rs", "major", "minor"), c("chromosome", "position", "rname", "A1", "A2"))
 #srdata <- as.data.frame(srdata)
