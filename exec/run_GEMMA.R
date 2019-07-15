@@ -89,7 +89,7 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
 }
 print(head(complete.geno))
 print(summary(complete.geno))
-
+fwrite(complete.geno, "export_complete_genotypes.csv")
 
 # Compute the specific strains genomes
 strains_genomes <- srdata
@@ -97,8 +97,6 @@ for (rnum in 1:nrow(strains)){
   p1n <- strains$p1[rnum]
   p2n <- strains$p2[rnum]
   if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
-    print(head(complete.geno[,..p1n]))
-    print(head(complete.geno[,..p2n]))
     strains_genomes[, eval(strains$input_name[rnum]):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
   }else{
     print(paste0("Can't find ", p1n," or ", p2n))
