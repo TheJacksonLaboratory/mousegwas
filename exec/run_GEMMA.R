@@ -74,7 +74,7 @@ for (f in args$genotypes){
     geno <- geno[,..addnames]
     setkey(geno, rs)
     setkey(complete.geno, rs)
-    complete.geno <- merge(complete.geno, geno, all=TRUE)
+    complete.geno <- merge(complete.geno, geno, all=TRUE, by=c("chr", "bp38", "rs", "major", "minor"))
     #complete.geno <- cbind(complete.geno, geno[,..addnames])
   }
   valid_strains <- setdiff(valid_strains, names(complete.geno))
