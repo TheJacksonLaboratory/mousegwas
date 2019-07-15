@@ -68,8 +68,8 @@ for (f in args$genotypes){
   if (is.null(complete.geno)){
     complete.geno <- geno[,.(chr, bp38, rs, major, minor, intersect(names(geno), valid_strains))]
   }else{
-    addnames <- intersect(names(geno), valid_strains)
-    geno <- geno[,.(chr, bp38, rs, major, minor, ..addnames)]
+    addnames <- c(intersect(names(geno), valid_strains), "chr", "bp38", "rs", "major", "minor")
+    geno <- geno[,..addnames]
     setkey(geno, rs)
     setkey(complete.geno, rs)
     complete.geno <- merge(complete.geno, geno, all=TRUE)
