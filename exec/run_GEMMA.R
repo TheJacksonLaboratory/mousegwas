@@ -62,7 +62,7 @@ complete.geno <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
-  if (is.null(srdata) | ){
+  if (is.null(srdata)){
     srdata <- geno[,.(rs,major, minor)]
   }
   if (is.null(complete.geno)){
