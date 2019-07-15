@@ -56,21 +56,26 @@ valid_strains <- unique(c(strains$p1, strains$p2))
 # For each genotype file read it and add to the long file, use only genotypes in the input
 # Read the genotype csv file
 #long_form <- tibble(rs=character(), sample=character(), genotype=integer())
-srdata <- NULL
+#srdata <- NULL
 longfile <- tempfile()
 complete.geno <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
-  if (is.null(srdata)){
-    srdata <- geno[,.(rs,major, minor)]
-  }
+  #if (is.null(srdata)){
+  #  srdata <- geno[,.(rs,major, minor)]
+  #}
   if (is.null(complete.geno)){
     complete.geno <- geno[,.(chr, bp38, rs, major, minor, intersect(names(geno), valid_strains))]
   }else{
     addnames <- intersect(names(geno), valid_strains)
-    complete.geno <- cbind(complete.geno, geno[,..addnames])
+    geno <- geno[,.(chr, bp38, rs, major, minor, ..addnames)]
+    setkey(geno, rs)
+    setkey(complete.geno, rs)
+    complete.geno <- merge(complete.geno, geno, all=TRUE)
+    #complete.geno <- cbind(complete.geno, geno[,..addnames])
   }
+  srdata <- complete.geno[, .(rs, major, minor)]
   valid_strains <- setdiff(valid_strains, names(complete.geno))
   print(dim(complete.geno))
   print(names(complete.geno))
