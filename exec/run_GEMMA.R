@@ -81,9 +81,9 @@ for (f in args$genotypes){
 print(colSums(is.na(complete.geno)))
 numeric.geno <- complete.geno[, .("chr", "bp38", "rs", "major", "minor")]
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
-  complete.geno[..cn=='H',c(cn) := 1]
-  complete.geno[..cn==major, c(cn) := 0]
-  complete.geno[..cn==minor, c(cn) := 2]
+  complete.geno[get(cn)=='H',c(cn) := 1]
+  complete.geno[get(cn)==major, c(cn) := 0]
+  complete.geno[get(cn)==minor, c(cn) := 2]
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
 print(head(complete.geno))
