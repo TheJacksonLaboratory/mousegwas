@@ -60,6 +60,7 @@ valid_strains <- unique(c(strains$p1, strains$p2))
 longfile <- tempfile()
 complete.geno <- NULL
 for (f in args$genotypes){
+  print(valid_strains)
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
   #if (is.null(srdata)){
