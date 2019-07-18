@@ -96,6 +96,7 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[get(cn)==minor, c(cn) := 2]
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
+
 print(head(complete.geno))
 print(summary(complete.geno))
 fwrite(complete.geno, "export_complete_genotypes.csv")
@@ -111,6 +112,8 @@ for (rnum in 1:nrow(strains)){
     print(paste0("Can't find ", p1n," or ", p2n))
   }
 }
+# Remove SNPs with more than 5% missing data
+strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 fwrite(strains_genomes, "export_strains_genotypes.csv")
 # Arrange the SNPs data
 #setnames(srdata, c("chr", "bp38", "rs", "major", "minor"), c("chromosome", "position", "rname", "A1", "A2"))
