@@ -135,6 +135,6 @@ strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains
 fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
 fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
-fwrite(sorder, "export_strains_order.csv")
+write.csv(sorder, "export_strains_order.csv")
 
 
