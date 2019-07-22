@@ -104,7 +104,9 @@ fwrite(complete.geno, "export_complete_genotypes.csv")
 strains_genomes <- srdata
 sorder = c()
 phenos = data.table()
+for (p in pheno_names) phenos <- phenos[, eval(p) := numeric()]
 covars = data.table()
+for (c in covar_names) covars <- covars[, eval(c) := numeric()]
 
 for (comrow in 1:dim(complete_table)[1]){
   sname <- complete_table[comrow, yamin$strain]
