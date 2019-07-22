@@ -119,7 +119,7 @@ for (comrow in 1:dim(complete_table)[1]){
   p2n <- strains$p2[rnum]
   if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
     sorder <- c(sorder, sname)
-    strains_genomes[, eval(comrow):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+    strains_genomes[, eval(complete_table[comrow, NetworkFilename]):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
     # Add the phenotypes to the table
     phenos <- rbind(phenos, complete_table[comrow, pheno_names])
     # Add the covariates to the table
