@@ -95,7 +95,7 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
 
 print(summary(complete.geno))
 fwrite(complete.geno, "export_complete_genotypes.csv")
-
+fwrite(complete.geno[,.(rs, bp38, chr)], "export_snp_data.csv")
 # Compute the specific strains genomes
 strains_genomes <- srdata
 sorder = c()
@@ -126,8 +126,11 @@ for (comrow in 1:dim(complete_table)[1]){
 }
 # Remove SNPs with more than 5% missing data
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
+# Add 1 to covariates matrix
+covars <- cbind(1, covars)
 fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
+fwrite(names(phenos), "export_phenotypes_names.csv")
 print(head(phenos))
 fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
 write.csv(sorder, "export_strains_order.csv")
