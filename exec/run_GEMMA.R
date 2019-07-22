@@ -109,7 +109,7 @@ covars = data.table()
 for (c in covar_names) covars <- covars[, eval(c) := numeric()]
 write_csv(strains, "export_strains.csv")
 for (comrow in 1:dim(complete_table)[1]){
-  sname <- complete_table[comrow, yamin$strain]
+  sname <- as.character(complete_table[comrow, yamin$strain])
   print(sname)
   rnum <- which(strains$input_name==sname)
   print(rnum)
