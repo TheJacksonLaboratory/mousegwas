@@ -31,6 +31,12 @@ args <- parser$parse_args()
 yamin <- yaml.load_file(args$yaml)
 # Read the input table
 complete_table <- read_csv(args$input, col_names=TRUE)
+
+# Generate a list of phenotypes
+pheno_names <- intersect(yaml$phenotypes, names(complete_table))
+# A list of covariates
+covar_names <- setdiff(intersect(yaml$covar, names(complete_table)), pheno_names)
+
 # Get the strain names
 strains <- complete_table %>% select(input_name=one_of(yamin$strain)) %>% unique() %>% mutate(p1=input_name, p2=input_name)
 # Translate F1
@@ -55,17 +61,14 @@ valid_strains <- unique(c(strains$p1, strains$p2))
 
 # For each genotype file read it and add to the long file, use only genotypes in the input
 # Read the genotype csv file
-#long_form <- tibble(rs=character(), sample=character(), genotype=integer())
-#srdata <- NULL
+
 longfile <- tempfile()
 complete.geno <- NULL
 for (f in args$genotypes){
   print(valid_strains)
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
-  #if (is.null(srdata)){
-  #  srdata <- geno[,.(rs,major, minor)]
-  #}
+
   if (is.null(complete.geno)){
     if (length(intersect(names(geno), valid_strains))>0){
       addnames <- c(intersect(names(geno), valid_strains), "chr", "bp38", "rs", "major", "minor")
@@ -77,15 +80,11 @@ for (f in args$genotypes){
     setkey(geno, rs)
     setkey(complete.geno, rs)
     complete.geno <- merge(complete.geno, geno, all=TRUE, by=c("chr", "bp38", "rs", "major", "minor"))
-    #complete.geno <- cbind(complete.geno, geno[,..addnames])
+
   }
   valid_strains <- setdiff(valid_strains, names(complete.geno))
   print(dim(complete.geno))
   print(names(complete.geno))
-  #long_form <- melt(geno, id.vars=c("rs", "major"), measure.vars=intersect(valid_strains, setdiff(names(geno), c("chr", "bp38", "rs", "major", "minor", "observed", "dbsnp142annot", "requested"))))
-  #long_form[,value:=ifelse(value=='H', 2, ifelse(value==major, 1, 3))]
-  #long_form[,conf=1.00]
-  #fwrite(long_form[,.(rs, variable, value, conf)], longfile, append=TRUE, col.names=FALSE)
 }
 srdata <- complete.geno[, .(rs, major, minor)]
 print(colSums(is.na(complete.geno)))
@@ -103,30 +102,31 @@ fwrite(complete.geno, "export_complete_genotypes.csv")
 
 # Compute the specific strains genomes
 strains_genomes <- srdata
-for (rnum in 1:nrow(strains)){
+sorder = c()
+phenos = data.table()
+covars = data.table()
+
+for (comrow in 1:dim(complete_talbe)[1]){
+  sname <- complete_table[comrow, yamin$strain]
+  rnum <- which(strains$input_name==sname)
   p1n <- strains$p1[rnum]
   p2n <- strains$p2[rnum]
   if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
-    strains_genomes[, eval(strains$input_name[rnum]):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+    sorder <- c(sorder, sname)
+    strains_genomes[, eval(comrow):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+    # Add the phenotypes to the table
+    phenos <- rbind(phenos, list(complete_table[comrow, pheno_names]))
+    # Add the covariates to the table
+    covars <- rbind(covars, list(complete_table[comrow, covar_names]))
   }else{
     print(paste0("Can't find ", p1n," or ", p2n))
   }
 }
 # Remove SNPs with more than 5% missing data
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
-fwrite(strains_genomes, "export_strains_genotypes.csv")
-# Arrange the SNPs data
-#setnames(srdata, c("chr", "bp38", "rs", "major", "minor"), c("chromosome", "position", "rname", "A1", "A2"))
-#srdata <- as.data.frame(srdata)
-#rownames(srdata) <- srdata$rname
-#srdata <- srdata[,c("chromosome", "position", "A1", "A2")]
-
-# Read the long file using snpStats
-#snps <- read.long(longfile, fields=c(snp=1, sample=2, genotype=3, confidence=4),
-#                  gcodes=c("1", "2", "3"))
-
-#Impute missing genotypes
-
+fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
+fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
+fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
 
 
 
