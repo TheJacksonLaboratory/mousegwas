@@ -111,7 +111,7 @@ for (c in covar_names) covars <- covars[, eval(c) := numeric()]
 for (comrow in 1:dim(complete_table)[1]){
   sname <- complete_table[comrow, yamin$strain]
   rnum <- which(strains$input_name==sname)
-  if (rnum == 0){
+  if (length(rnum) == 0){
     print(paste0("Can't find strain data", sname, " row ",comrow))
     next
   }
