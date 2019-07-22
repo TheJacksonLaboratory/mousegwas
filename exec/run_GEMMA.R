@@ -33,9 +33,9 @@ yamin <- yaml.load_file(args$yaml)
 complete_table <- read_csv(args$input, col_names=TRUE)
 
 # Generate a list of phenotypes
-pheno_names <- intersect(yaml$phenotypes, names(complete_table))
+pheno_names <- intersect(yamin$phenotypes, names(complete_table))
 # A list of covariates
-covar_names <- setdiff(intersect(yaml$covar, names(complete_table)), pheno_names)
+covar_names <- setdiff(intersect(yamin$covar, names(complete_table)), pheno_names)
 
 # Get the strain names
 strains <- complete_table %>% select(input_name=one_of(yamin$strain)) %>% unique() %>% mutate(p1=input_name, p2=input_name)
