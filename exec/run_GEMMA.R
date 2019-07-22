@@ -130,8 +130,9 @@ strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains
 covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
 fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
-fwrite(names(phenos), "export_phenotypes_names.csv")
+write.csv(names(phenos), "export_phenotypes_names.csv")
 fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
 write.csv(sorder, "export_strains_order.csv")
 
+# Download gemma if not on PATH
 
