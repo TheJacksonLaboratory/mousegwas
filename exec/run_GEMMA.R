@@ -106,7 +106,7 @@ sorder = c()
 phenos = data.table()
 covars = data.table()
 
-for (comrow in 1:dim(complete_talbe)[1]){
+for (comrow in 1:dim(complete_table)[1]){
   sname <- complete_table[comrow, yamin$strain]
   rnum <- which(strains$input_name==sname)
   p1n <- strains$p1[rnum]
@@ -127,6 +127,6 @@ strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains
 fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
 fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
-
+fwrite(sorder, "export_strains_order.csv")
 
 
