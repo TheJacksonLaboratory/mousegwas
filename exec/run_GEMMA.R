@@ -117,9 +117,9 @@ for (comrow in 1:dim(complete_table)[1]){
     sorder <- c(sorder, sname)
     strains_genomes[, eval(comrow):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
     # Add the phenotypes to the table
-    phenos <- rbind(phenos, list(complete_table[comrow, pheno_names]))
+    phenos <- rbind(phenos, complete_table[comrow, pheno_names])
     # Add the covariates to the table
-    covars <- rbind(covars, list(complete_table[comrow, covar_names]))
+    covars <- rbind(covars, complete_table[comrow, covar_names])
   }else{
     print(paste0("Can't find ", p1n," or ", p2n))
   }
