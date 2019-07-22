@@ -65,7 +65,6 @@ valid_strains <- unique(c(strains$p1, strains$p2))
 longfile <- tempfile()
 complete.geno <- NULL
 for (f in args$genotypes){
-  print(valid_strains)
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
 
@@ -83,8 +82,6 @@ for (f in args$genotypes){
 
   }
   valid_strains <- setdiff(valid_strains, names(complete.geno))
-  print(dim(complete.geno))
-  print(names(complete.geno))
 }
 srdata <- complete.geno[, .(rs, major, minor)]
 print(colSums(is.na(complete.geno)))
@@ -96,7 +93,6 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
 
-print(head(complete.geno))
 print(summary(complete.geno))
 fwrite(complete.geno, "export_complete_genotypes.csv")
 
@@ -110,9 +106,7 @@ for (c in covar_names) covars <- covars[, eval(c) := numeric()]
 write_csv(strains, "export_strains.csv")
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
-  print(sname)
   rnum <- which(strains$input_name==sname)
-  print(rnum)
   if (length(rnum) == 0){
     print(paste0("Can't find strain data ", sname, " row ",comrow))
     next
@@ -134,6 +128,7 @@ for (comrow in 1:dim(complete_table)[1]){
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
+print(head(phenos))
 fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
 write.csv(sorder, "export_strains_order.csv")
 
