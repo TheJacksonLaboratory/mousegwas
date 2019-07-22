@@ -56,7 +56,7 @@ for (tr in yamin$translate){
 # Replace relevant names in the strains table
 strains <- strains %>% left_join(t, by=c("p1" = "name")) %>% mutate(p1=ifelse(is.na(gen_name), p1, gen_name)) %>% select(input_name, p1, p2)
 strains <- strains %>% left_join(t, by=c("p2" = "name")) %>% mutate(p2=ifelse(is.na(gen_name), p2, gen_name)) %>% select(input_name, p1, p2)
-write_csv(strains, "export_strains.csv")
+
 valid_strains <- unique(c(strains$p1, strains$p2))
 
 # For each genotype file read it and add to the long file, use only genotypes in the input
@@ -107,7 +107,7 @@ phenos = data.table()
 for (p in pheno_names) phenos <- phenos[, eval(p) := numeric()]
 covars = data.table()
 for (c in covar_names) covars <- covars[, eval(c) := numeric()]
-
+write_csv(strains, "export_strains.csv")
 for (comrow in 1:dim(complete_table)[1]){
   sname <- complete_table[comrow, yamin$strain]
   print(sname)
