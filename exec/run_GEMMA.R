@@ -106,7 +106,7 @@ phenos = data.table()
 for (p in pheno_names) phenos <- phenos[, eval(p) := numeric()]
 covars = data.table()
 for (c in covar_names) covars <- covars[, eval(c) := numeric()]
-write_csv(strains, "export_strains.csv")
+#write_csv(strains, paste0(args$basedir, "/export_strains.csv"))
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
   rnum <- which(strains$input_name==sname)
@@ -132,6 +132,9 @@ strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains
 # Add 1 to covariates matrix
 covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
 
+# Export order of strains used
+write.csv(sorder, paste0(args$basedir, "/export_strains_order.csv"))
+
 # Run gemma using the helper function with loco
 results_file <- execute_lmm(strains_genomes, phenos,
                             complete.geno[,.(rs, bp38, chr)],
@@ -149,7 +152,6 @@ ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf")
 #fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
 #write.csv(names(phenos), "export_phenotypes_names.csv")
 #fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
-#write.csv(sorder, "export_strains_order.csv")
 
 # Download gemma 0.98.1 if not on PATH
 
