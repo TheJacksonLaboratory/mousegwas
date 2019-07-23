@@ -36,7 +36,7 @@ calc_kinship <- function(genotypes, annot, exec, chr, basedir, phenofile){
   loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
   loco_geno <- loco_geno[chr!=chr,names(genotypes)]
   # Write the genotypes without the chr to csv file
-  locofname <- paste0(basedir, "genotypes_LOCO_chr_", chr, ".csv")
+  locofname <- paste0(basedir, "/genotypes_LOCO_chr_", chr, ".csv")
   fwrite(loco_geno, locofname, col.names=FALSE, na="NA")
   # Write a dummy phenotypes file
   # Execute kinship calc in gemma
@@ -65,7 +65,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   # Write files to disk
   dir.create(basedir, recursive = TRUE)
   phenofile <- paste0(basedir, "/phenotypes.csv")
-  fwrite(phenotypes, phenofile, col.names = FALSE, na = "NA", sep="\t")
+  fwrite(phenotypes, phenofile, col.names = FALSE, na = "NA", sep=",")
   anotfile <- paste0(basedir, "/annotations.csv")
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
   covarfile <- paste0(basedir, "/covariates.csv")
