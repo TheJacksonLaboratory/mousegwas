@@ -138,7 +138,7 @@ write.csv(sorder, paste0(args$basedir, "/export_strains_order.csv"))
 
 # Run gemma using the helper function with loco
 results_file <- execute_lmm(strains_genomes, phenos,
-                            complete.geno[,.(rs, bp38, chr)],
+                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
                             covars, args$basedir)
 
 if (!is.null(args$genes)){
