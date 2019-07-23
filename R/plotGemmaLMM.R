@@ -13,7 +13,14 @@
 #' @importFrom readr read_delim
 #' @examples
 plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
-  gwas_results <- read_delim(results_file, "\t", col_names = TRUE)
+  gwas_results <- read_delim(results_file, "\t", col_names = TRUE, col_type = cols(
+    .default = col_double(),
+    chr = col_character(),
+    rs = col_character(),
+    ps = col_double(),
+    n_miss = col_double(),
+    allele1 = col_character(),
+    allele0 = col_character()))
   #chr     rs      ps      n_miss  allele1 allele0 af      beta_1  beta_2  beta_3  Vbeta_1_1       Vbeta_1_2       Vbeta_1_3       Vbeta_2_2       Vbeta_2_3       Vbeta_3_3       p_lrt
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
 
