@@ -86,6 +86,7 @@ for (f in args$genotypes){
   }
   valid_strains <- setdiff(valid_strains, names(complete.geno))
 }
+complete.geno[, chr:=as.character(chr)]
 srdata <- complete.geno[, .(rs, major, minor)]
 print(colSums(is.na(complete.geno)))
 numeric.geno <- complete.geno[, .("chr", "bp38", "rs", "major", "minor")]
