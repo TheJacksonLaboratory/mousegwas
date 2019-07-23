@@ -35,7 +35,7 @@ get_gemma <- function(basedir, version = "0.98.1"){
 calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
   loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
   print(head(loco_geno))
-  loco_geno <- loco_geno[chr!=chrname,names(genotypes)]
+  loco_geno <- loco_geno[chr!=chrname, mget(names(genotypes))]
   # Write the genotypes without the chr to csv file
   locofname <- paste0(basedir, "/genotypes_LOCO_chr_", chrname, ".csv")
   fwrite(loco_geno, locofname, col.names=FALSE, na="NA")
