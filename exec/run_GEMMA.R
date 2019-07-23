@@ -24,7 +24,7 @@ parser$add_argument("--gemma",
                     help="Gemma executable")
 parser$add_argument("-g", "--genotypes", nargs = '+',
                     help="The genotypes csv files as downloaded from phenome.jax.org")
-parser.add_argument("--basedir", default=".",
+parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
 args <- parser$parse_args()
 
