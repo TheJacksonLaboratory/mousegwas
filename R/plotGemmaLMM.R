@@ -12,7 +12,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
+plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results") {
   gwas_results <- read_delim(results_file, "\t", col_names = TRUE, col_type = cols(
     .default = col_double(),
     chr = col_character(),
@@ -25,7 +25,7 @@ plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
 
   gwas_results <- gwas_results %>% dplyr::filter(chr=="X") %>% dplyr::mutate(chr=20)
-  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_lrt)) %>% arrange(chr, ps) %>% left_join(genes)
+  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_lrt)) %>% arrange(chr, ps) %>% left_join(genes, by="rs")
 
   #gwasResults <- left_join(gwasResults, snps, by="RSID") %>% left_join(genes, by="RSID")
 
@@ -71,9 +71,13 @@ plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
   axisdf <- don %>% group_by(chr) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
 
   # Get the RSIDs to put names on
-  toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+  if (!is.null(genes)){
+    toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
     # Select only one gene
-    group_by(rs) %>% summarize(gene_name=gene_name[1])
+      group_by(rs) %>% summarize(gene_name=gene_name[1])
+  }else{
+    toprs = data.frame(rs=NULL)
+  }
   # Prepare text description for each SNP:
   don$text <- paste("SNP: ", don$rs, "\nPosition: ", don$ps, "\nChromosome: ", don$chr, "\nLOD score:", don$P %>% round(2), "\nWhat else do you wanna know", sep="")
   log10P <- don$P
@@ -84,7 +88,7 @@ plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
     # Show all points
     geom_point( aes(color=as.factor(chr + 21 * ((P>8)+0))), alpha=0.8, size=2) +
     scale_color_manual(values = c(rep(c("grey", "skyblue"),10), rep("red", 20) )) +
-    geom_text_repel(data=filter(don, rs %in% toprs$rs, gene_name %in% toprs$gene_name), aes(BPcum, P, label=gene_name) , alpha=0.7) +
+    ggrepel::geom_text_repel(data=filter(don, rs %in% toprs$rs, gene_name %in% toprs$gene_name), aes(BPcum, P, label=gene_name) , alpha=0.7) +
 
     # custom X axis:
     scale_x_continuous( label = axisdf$chr, breaks= axisdf$center ) +

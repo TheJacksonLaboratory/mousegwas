@@ -143,8 +143,6 @@ results_file <- execute_lmm(strains_genomes, phenos,
 
 if (!is.null(args$genes)){
   genes <- read_delim(args$genes, "\t", col_names = c("rs", "gene_name"))
-}else{
-  genes <- tibble(rs=character(0), gene_name=character(0))
 }
 p <- plot_gemma_lmm(results_file, genes)
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf")
