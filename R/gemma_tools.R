@@ -12,7 +12,7 @@ get_gemma <- function(basedir, version = "0.98.1"){
   exec <- Sys.which("gemma")[1]
   if (exec == ""){
     system(paste0("curl -L https://github.com/genetics-statistics/GEMMA/releases/download/",version,"/gemma-",version,"-linux-static.gz |zcat - > ",basedir,"/gemma"))
-    system("chmod a+x ",basedir, "/gemma")
+    system(paste0("chmod a+x ",basedir, "/gemma"))
     exec <- paste0(basedir,"/gemma")
   }
   return(exec)
