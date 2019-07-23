@@ -60,14 +60,14 @@ calc_kinship <- function(loco_geno, exec, chrname, basedir, phenofile){
 #' @return The unified output file
 #' @export
 #'
-#' @importFrom data.table merge fwrite
+#' @importFrom data.table merge fwrite setkey
 #' @examples
 execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
   setkey(genotypes, rs, physical = FALSE)
   setkey(annot, rs, physical = FALSE)
-  loco_geno <- data.table::merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
+  loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
 
   # Write files to disk
   dir.create(basedir, recursive = TRUE)
