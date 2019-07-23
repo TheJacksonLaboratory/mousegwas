@@ -26,6 +26,8 @@ parser$add_argument("-g", "--genotypes", nargs = '+',
                     help="The genotypes csv files as downloaded from phenome.jax.org")
 parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
+parser$add_argument("--genes", default=NULL,
+                    help="a tab delimited table with SNP ID in first column and gene name in second. Might not include all SNPs")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -134,6 +136,14 @@ covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_nam
 results_file <- execute_lmm(strains_genomes, phenos,
                             complete.geno[,.(rs, bp38, chr)],
                             covars, args$basedir)
+
+if (!is.null(args$genes)){
+  genes <- read_delim(args$genes, "\t", col_names = c("rs", "gene_name"))
+}else{
+  genes <- tibble(rs=character(0), gene_name=character(0))
+}
+p <- plot_gemma_lmm(results_file, genes)
+ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf")
 #fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 
 #fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
