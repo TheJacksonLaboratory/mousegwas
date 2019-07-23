@@ -25,7 +25,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results") {
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
 
   gwas_results <- gwas_results %>% dplyr::filter(chr=="X") %>% dplyr::mutate(chr=20)
-  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_lrt)) %>% arrange(chr, ps) %>% left_join(genes, by="rs")
+  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_lrt)) %>% arrange(chr, ps)
 
   #gwasResults <- left_join(gwasResults, snps, by="RSID") %>% left_join(genes, by="RSID")
 
@@ -71,24 +71,16 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results") {
   axisdf <- don %>% group_by(chr) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
 
   # Get the RSIDs to put names on
-  if (!is.null(genes)){
-    toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
-    # Select only one gene
-      group_by(rs) %>% summarize(gene_name=gene_name[1])
-  }else{
-    toprs = data.frame(rs=NULL)
-  }
   # Prepare text description for each SNP:
   don$text <- paste("SNP: ", don$rs, "\nPosition: ", don$ps, "\nChromosome: ", don$chr, "\nLOD score:", don$P %>% round(2), "\nWhat else do you wanna know", sep="")
   log10P <- don$P
   ymax <- 1.25 * max(log10P, na.rm = TRUE)
   # Make the plot
-  p <- ggplot(don, aes(x=BPcum, y=P, text=gene_name)) +
+  p <- ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
     geom_point( aes(color=as.factor(chr + 21 * ((P>8)+0))), alpha=0.8, size=2) +
     scale_color_manual(values = c(rep(c("grey", "skyblue"),10), rep("red", 20) )) +
-    ggrepel::geom_text_repel(data=filter(don, rs %in% toprs$rs, gene_name %in% toprs$gene_name), aes(BPcum, P, label=gene_name) , alpha=0.7) +
 
     # custom X axis:
     scale_x_continuous( label = axisdf$chr, breaks= axisdf$center ) +
@@ -109,6 +101,15 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results") {
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank()
     )
+  if (!is.null(genes)){
+    gwas_results <-  left_join(gwas_results, genes, by="rs")
+    toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+      # Select only one gene
+      group_by(rs) %>% summarize(gene_name=gene_name[1])
+    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs, gene_name %in% toprs$gene_name),
+                                      aes(BPcum, P, label = gene_name), alpha = 0.7)
+  }
+
   print(p)
   return(p)
 }
