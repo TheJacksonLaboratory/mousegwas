@@ -24,7 +24,7 @@ get_gemma <- function(basedir, version = "0.98.1"){
 #' @param genotypes A data.table with genotypes of all mice
 #' @param annot Annotations of markers, including chr column
 #' @param exec gemma executable
-#' @param chr chr for LOCO
+#' @param chrname chr for LOCO
 #' @param basedir base directory to write files to. Will override existing files
 #' @param phenofile a file with phenotypes matching the genotypes table
 #' @return The kinship file name
@@ -32,17 +32,17 @@ get_gemma <- function(basedir, version = "0.98.1"){
 #'
 #' @importFrom data.table merge fwrite
 #' @examples
-calc_kinship <- function(genotypes, annot, exec, chr, basedir, phenofile){
+calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
   loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
-  loco_geno <- loco_geno[chr!=chr,names(genotypes)]
+  loco_geno <- loco_geno[chr!=chrname,names(genotypes)]
   # Write the genotypes without the chr to csv file
-  locofname <- paste0(basedir, "/genotypes_LOCO_chr_", chr, ".csv")
+  locofname <- paste0(basedir, "/genotypes_LOCO_chr_", chrname, ".csv")
   fwrite(loco_geno, locofname, col.names=FALSE, na="NA")
   # Write a dummy phenotypes file
   # Execute kinship calc in gemma
   system(paste0("cd ", basedir, " && ", exec, " -g ", locofname,
-                " -p ", phenofile, " -gk 1 -o kinship_loco_", chr))
-  return(paste0(basedir, "/output/kinship_loco_", chr, ".cXX.txt"))
+                " -p ", phenofile, " -gk 1 -o kinship_loco_", chrname))
+  return(paste0(basedir, "/output/kinship_loco_", chrname, ".cXX.txt"))
 }
 
 
