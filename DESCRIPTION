@@ -20,5 +20,6 @@ Imports:
   argparse,
   magrittr,
   stringr,
-  ggrepel
+  ggrepel,
+  ggplot2
   
