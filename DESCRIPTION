@@ -17,5 +17,6 @@ Imports:
   readr,
   dplyr,
   yaml,
-  argparse
+  argparse,
+  magrittr
   
