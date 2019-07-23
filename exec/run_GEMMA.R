@@ -132,7 +132,7 @@ covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_nam
 
 # Run gemma using the helper function with loco
 results_file <- execute_lmm(strains_genomes, phenos,
-                            complete.geno[rs %in% strains_genomes$rs,.(rs, bp38, chr)],
+                            complete.geno[,.(rs, bp38, chr)],
                             covars, args$basedir)
 #fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 
