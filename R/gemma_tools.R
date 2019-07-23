@@ -80,7 +80,9 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   # Compute kinship to each chromosome and run gemma with loco
   for (chr in unique(annot$chr)){
     ksfile <- calc_kinship(genotypes, annot, exec, chr, basedir, phenofile)
-    system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", genofile,
+    geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chr, ".csv")
+    fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
+    system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
                   " -p ", phenofile, " -loco ", chr, " -a ", anotfile,
                   " -c ", covarfile, " -k ", ksfile, " -o lmm_", chr,
                   " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
