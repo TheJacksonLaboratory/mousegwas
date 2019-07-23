@@ -24,7 +24,8 @@ parser$add_argument("--gemma",
                     help="Gemma executable")
 parser$add_argument("-g", "--genotypes", nargs = '+',
                     help="The genotypes csv files as downloaded from phenome.jax.org")
-
+parser.add_argument("--basedir", default=".",
+                    help="output directory. Will overwrite existing files")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -94,8 +95,8 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
 }
 
 print(summary(complete.geno))
-fwrite(complete.geno, "export_complete_genotypes.csv")
-fwrite(complete.geno[,.(rs, bp38, chr)], "export_snp_data.csv", col.names = FALSE, na="NA")
+#fwrite(complete.geno, "export_complete_genotypes.csv")
+#fwrite(complete.geno[,.(rs, bp38, chr)], "export_snp_data.csv", col.names = FALSE, na="NA")
 # Compute the specific strains genomes
 strains_genomes <- srdata
 sorder = c()
@@ -128,11 +129,17 @@ for (comrow in 1:dim(complete_table)[1]){
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 # Add 1 to covariates matrix
 covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
-fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
-fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
-write.csv(names(phenos), "export_phenotypes_names.csv")
-fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
-write.csv(sorder, "export_strains_order.csv")
 
-# Download gemma if not on PATH
+# Run gemma using the helper function with loco
+results_file <- execute_lmm(strains_genomes, phenos,
+                            complete.geno[rs %in% strains_genomes$rs,.(rs, bp38, chr)],
+                            covars, args$basedir)
+#fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
+
+#fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
+#write.csv(names(phenos), "export_phenotypes_names.csv")
+#fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
+#write.csv(sorder, "export_strains_order.csv")
+
+# Download gemma 0.98.1 if not on PATH
 
