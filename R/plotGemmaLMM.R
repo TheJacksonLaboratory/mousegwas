@@ -71,7 +71,7 @@ plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
   axisdf <- don %>% group_by(chr) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
 
   # Get the RSIDs to put names on
-  toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !str_detect(gene_name, "Rik$"), !str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+  toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
     # Select only one gene
     group_by(rs) %>% summarize(gene_name=gene_name[1])
   # Prepare text description for each SNP:
