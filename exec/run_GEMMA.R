@@ -145,7 +145,7 @@ if (!is.null(args$genes)){
   genes <- read_delim(args$genes, "\t", col_names = c("rs", "gene_name"))
 }
 p <- plot_gemma_lmm(results_file, genes)
-ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf")
+ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
 #fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 
 #fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
