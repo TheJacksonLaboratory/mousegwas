@@ -25,7 +25,7 @@ plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
 
   gwas_results <- gwas_results %>% dplyr::filter(chr=="X") %>% dplyr::mutate(chr=20)
-  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_lrt)) %>% arrange(chr, ps)
+  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_lrt)) %>% arrange(chr, ps) %>% left_join(genes)
 
   #gwasResults <- left_join(gwasResults, snps, by="RSID") %>% left_join(genes, by="RSID")
 
