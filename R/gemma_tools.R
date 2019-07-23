@@ -63,6 +63,7 @@ calc_kinship <- function(genotypes, annot, exec, chr, basedir, phenofile){
 execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   exec <- get_gemma()
   # Write files to disk
+  dir.create(basedir, recursive = TRUE)
   phenofile <- paste0(basedir, "/phenotypes.csv")
   fwrite(phenotypes, phenofile, col.names = FALSE, na = "NA", sep="\t")
   anotfile <- paste0(basedir, "/annotations.csv")
