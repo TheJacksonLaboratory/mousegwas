@@ -82,6 +82,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   }
   # Concatenate all loco files into a single output file
   system(paste0("cd ", basedir,
-         " && cat output/lmm*.assoc.txt > output/all_lmm_associations.assoc.txt"))
+         " && cat output/lmm*.assoc.txt |head -1 > output/all_lmm_associations.assoc.txt",
+         " && cat output/lmm*.assoc.txt |grep -v allele >> output/all_lmm_associations.assoc.txt"))
   return(paste0(basedir, "/output/all_lmm_associations.assoc.txt"))
 }
