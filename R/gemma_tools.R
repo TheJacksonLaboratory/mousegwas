@@ -8,10 +8,10 @@
 #' @export
 #'
 #' @examples
-get_gemma <- function(version = "0.98.1"){
+get_gemma <- function(basedir, version = "0.98.1"){
   exec <- Sys.which("gemma")[1]
   if (exec == ""){
-    system(paste0("curl -L https://github.com/genetics-statistics/GEMMA/releases/download/",version,"/gemma-",version,"-linux-static.gz |zcat - > gemma"))
+    system(paste0("curl -L https://github.com/genetics-statistics/GEMMA/releases/download/",version,"/gemma-",version,"-linux-static.gz |zcat - > ",basedir,"/gemma"))
     system("chmod a+x gemma")
     exec <- "./gemma"
   }
@@ -61,13 +61,13 @@ calc_kinship <- function(genotypes, annot, exec, chr, basedir, phenofile){
 #' @importFrom data.table merge fwrite
 #' @examples
 execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
-  exec <- get_gemma()
+  exec <- get_gemma(basedir)
   # Write files to disk
   dir.create(basedir, recursive = TRUE)
   phenofile <- paste0(basedir, "/phenotypes.csv")
   fwrite(phenotypes, phenofile, col.names = FALSE, na = "NA", sep="\t")
   anotfile <- paste0(basedir, "/annotations.csv")
-  fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=", ")
+  fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
   covarfile <- paste0(basedir, "/covariates.csv")
   fwrite(covars, covarfile, col.names = FALSE, na="NA")
   genofile <- paste0(basedir, "/all_genotypes.csv")
