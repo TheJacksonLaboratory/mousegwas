@@ -9,6 +9,8 @@
 #'
 #' @import dplyr
 #' @import readr
+#' @importFrom magrittr `%>%`
+#' @importFrom readr read_delim
 #' @examples
 plot_gemma_lmm <- function(results_file, genes, name="GWAS results") {
   gwas_results <- read_delim(results_file, "\t", col_names = TRUE)
