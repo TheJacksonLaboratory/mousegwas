@@ -57,7 +57,7 @@ calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
 get_residuals <- function(covars, phenotypes){
   resids <- data.table()
   for (p in names(phenotypes)){
-    lft <- lm(phenotypes[,..p] ~ covars)
+    lft <- lm(phenotypes[,get(p)] ~ covars)
     resids[,eval(p):=resid(lft)]
   }
   return(resids)
