@@ -32,6 +32,9 @@ args <- parser$parse_args()
 
 # Load the yaml
 yamin <- yaml.load_file(args$yaml)
+
+# Make the output directory
+dir.create(args$basedir, recursive = TRUE)
 # Read the input table
 complete_table <- read_csv(args$input, col_names=TRUE)
 
