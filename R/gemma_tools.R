@@ -54,13 +54,13 @@ calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
 #' @param covars covariates data.table
 #' @param exec gemma executable
 #' @param basedir dir to write files to
-#'
+#' @param loco perform LOCO (default FALSE)
 #' @return The unified output file
 #' @export
 #'
 #' @importFrom data.table merge fwrite setkey
 #' @examples
-execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
+execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=FALSE){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
   setkey(genotypes, rs, physical = FALSE)
@@ -77,23 +77,35 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   fwrite(covars, covarfile, col.names = FALSE, na="NA")
   genofile <- paste0(basedir, "/all_genotypes.csv")
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
-  # Compute kinship to each chromosome and run gemma with loco
-  for (chrname in unique(annot$chr)){
-    ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
-    geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
-    fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
-    print(paste0("Executing: cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
-                 " -p ", phenofile, " -a ", anotfile,
-                 " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
-                 " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
-    system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
+
+  # Compute lmm without LOCO
+  if (!loco){
+    system(paste0("cd ", basedir, " && ", exec, " -g ", genofile,
+                  " -p ", phenofile, " -gk 1 -o kinship_all"))
+    system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", genofile,
                   " -p ", phenofile, " -a ", anotfile,
-                  " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
+                  " -c ", covarfile, " -k ", ksfile, " -o lmm_all",
                   " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+    return(paste0(basedir,"/output/lmm_all.assoc.txt"))
+  }else{
+    # Compute kinship to each chromosome and run gemma with loco
+    for (chrname in unique(annot$chr)){
+      ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
+      geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
+      fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
+      print(paste0("Executing: cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
+                   " -p ", phenofile, " -a ", anotfile,
+                   " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
+                   " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+      system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
+                    " -p ", phenofile, " -a ", anotfile,
+                    " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
+                    " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+    }
+    # Concatenate all loco files into a single output file
+    system(paste0("cd ", basedir,
+           " && cat output/lmm*.assoc.txt |head -1 > output/all_lmm_associations.assoc.txt",
+           " && cat output/lmm*.assoc.txt |grep -v allele >> output/all_lmm_associations.assoc.txt"))
+    return(paste0(basedir, "/output/all_lmm_associations.assoc.txt"))
   }
-  # Concatenate all loco files into a single output file
-  system(paste0("cd ", basedir,
-         " && cat output/lmm*.assoc.txt |head -1 > output/all_lmm_associations.assoc.txt",
-         " && cat output/lmm*.assoc.txt |grep -v allele >> output/all_lmm_associations.assoc.txt"))
-  return(paste0(basedir, "/output/all_lmm_associations.assoc.txt"))
 }
