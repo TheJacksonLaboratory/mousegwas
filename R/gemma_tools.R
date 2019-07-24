@@ -82,6 +82,10 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
     ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
     geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
     fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
+    print(paste0("Executing: cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
+                 " -p ", phenofile, " -a ", anotfile,
+                 " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
+                 " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
     system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
                   " -p ", phenofile, " -a ", anotfile,
                   " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
