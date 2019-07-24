@@ -97,7 +97,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=FALS
                    " -p ", phenofile, " -a ", anotfile,
                    " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
                    " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
-      system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
+      system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
                     " -p ", phenofile, " -a ", anotfile,
                     " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
                     " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
