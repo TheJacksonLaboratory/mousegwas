@@ -85,7 +85,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=FALS
 #  loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
 
   # Write files to disk
-  residuals <- get_residuals(phenotypes, covars)
+  residuals <- get_residuals(covars, phenotypes)
   phenofile <- paste0(basedir, "/phenotypes.csv")
   fwrite(residuals, phenofile, col.names = FALSE, na = "NA", sep=",")
   anotfile <- paste0(basedir, "/annotations.csv")
