@@ -34,7 +34,6 @@ get_gemma <- function(basedir, version = "0.98.1"){
 #' @examples
 calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
   loco_geno <- genotypes[genotypes$rs %in% annot[annot$chr!=chrname,"rs"],]
-  print(head(loco_geno))
   # Write the genotypes without the chr to csv file
   locofname <- paste0(basedir, "/genotypes_LOCO_chr_", chrname, ".csv")
   fwrite(loco_geno, locofname, col.names=FALSE, na="NA")
@@ -82,6 +81,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=FALS
   if (!loco){
     system(paste0("cd ", basedir, " && ", exec, " -g ", genofile,
                   " -p ", phenofile, " -gk 1 -o kinship_all"))
+    ksfile <- paste0(basedir, "/output/kinship_all.cXX.txt")
     system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", genofile,
                   " -p ", phenofile, " -a ", anotfile,
                   " -c ", covarfile, " -k ", ksfile, " -o lmm_all",

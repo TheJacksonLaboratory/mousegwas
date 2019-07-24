@@ -91,7 +91,6 @@ for (f in args$genotypes){
 }
 complete.geno[, chr:=as.character(chr)]
 srdata <- complete.geno[, .(rs, major, minor)]
-print(colSums(is.na(complete.geno)))
 numeric.geno <- complete.geno[, .("chr", "bp38", "rs", "major", "minor")]
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
   complete.geno[get(cn)=='H',c(cn) := 1]
@@ -100,7 +99,6 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
 
-print(summary(complete.geno))
 #fwrite(complete.geno, "export_complete_genotypes.csv")
 #fwrite(complete.geno[,.(rs, bp38, chr)], "export_snp_data.csv", col.names = FALSE, na="NA")
 # Compute the specific strains genomes
