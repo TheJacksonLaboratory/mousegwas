@@ -68,7 +68,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
 #  loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
 
   # Write files to disk
-  dir.create(basedir, recursive = TRUE)
+
   phenofile <- paste0(basedir, "/phenotypes.csv")
   fwrite(phenotypes, phenofile, col.names = FALSE, na = "NA", sep=",")
   anotfile <- paste0(basedir, "/annotations.csv")
@@ -78,13 +78,13 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir){
   genofile <- paste0(basedir, "/all_genotypes.csv")
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
   # Compute kinship to each chromosome and run gemma with loco
-  for (chr in unique(annot$chr)){
-    ksfile <- calc_kinship(genotypes, annot, exec, chr, basedir, phenofile)
-    geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chr, ".csv")
+  for (chrname in unique(annot$chr)){
+    ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
+    geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
     fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
     system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
                   " -p ", phenofile, " -a ", anotfile,
-                  " -c ", covarfile, " -k ", ksfile, " -o lmm_", chr,
+                  " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
                   " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
   }
   # Concatenate all loco files into a single output file
