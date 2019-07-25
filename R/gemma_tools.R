@@ -84,14 +84,17 @@ get_residuals <- function(covars, phenotypes){
 execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
-  setkey(genotypes, rs, physical = FALSE)
+  #setkey(genotypes, rs, physical = FALSE)
 #  setkey(annot, rs, physical = FALSE)
 #  loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
 
+  # Convert the phenotypes to residuals and do svd to remove correlation
+  residuals <- get_residuals(covars, phenotypes)
+  resid_comp <- svd(residuals)
+
   # Write files to disk
-  #residuals <- get_residuals(covars, phenotypes)
   phenofile <- paste0(basedir, "/phenotypes.csv")
-  fwrite(phenofile, phenofile, col.names = FALSE, na = "NA", sep=",")
+  fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
   anotfile <- paste0(basedir, "/annotations.csv")
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
   covarfile <- paste0(basedir, "/covariates.csv")
@@ -100,9 +103,9 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
 
   # Write the phenotype files
-  for (n in range(dim(phenotypes)[2])){
-    fwrite(phenotypes[,n,with=FALSE], paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
-  }
+#  for (n in range(dim(phenotypes)[2])){
+#    fwrite(phenotypes[,n,with=FALSE], paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
+#  }
   # Compute lmm without LOCO
   if (!loco){
     system(paste0("cd ", basedir, " && ", exec, " -g ", genofile,
@@ -120,17 +123,19 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE
       ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
-      for (n in range(dim(phenotypes)[2])){
+     # for (n in range(dim(phenotypes)[2])){
 
-        print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
-                     " -p ", basedir, "/phenotype_", n, ".csv -a ", anotfile,
-                     " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname, "_n_", n,
-                     " -n 1"))
-        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
-                      " -p ", basedir, "/phenotype_", n, ".csv -a ", anotfile,
-                      " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname, "_n_", n,
-                      " -n 1"))# do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
-      }
+      print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
+                   " -p ", basedir, "/phenotype_", n, ".csv -a ", anotfile,
+                   " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname, "_n_", n,
+                   " -n 1"))
+      system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
+                    " -p ", phenofile, " -a ", anotfile,
+                    #" -c ", covarfile,
+                    " -k ", ksfile, " -o lmm_", chrname,
+                    " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+                    #" -n 1"))# do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+      #}
     }
     # Concatenate all loco files into a single output file
     system(paste0("cd ", basedir,
