@@ -99,6 +99,10 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE
   genofile <- paste0(basedir, "/all_genotypes.csv")
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
 
+  # Write the phenotype files
+  for (n in range(dim(phenotypes)[2])){
+    fwrite(phenotypes[,n,with=FALSE], paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
+  }
   # Compute lmm without LOCO
   if (!loco){
     system(paste0("cd ", basedir, " && ", exec, " -g ", genofile,
@@ -117,15 +121,17 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
       for (n in range(dim(phenotypes)[2])){
+
         print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
-                     " -p ", phenofile, " -a ", anotfile,
-                     " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname,
-                     " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+                     " -p ", basedir, "/phenotype_", n, ".csv -a ", anotfile,
+                     " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname, "_n_", n,
+                     " -n 1"))
         system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
-                      " -p ", phenofile, " -a ", anotfile,
-                      " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname, "_n_", n
-                      " -n ",n))# do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
-    }}
+                      " -p ", basedir, "/phenotype_", n, ".csv -a ", anotfile,
+                      " -c ", covarfile, " -k ", ksfile, " -o lmm_", chrname, "_n_", n,
+                      " -n 1"))# do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+      }
+    }
     # Concatenate all loco files into a single output file
     system(paste0("cd ", basedir,
            " && cat output/lmm*.assoc.txt |head -1 > output/all_lmm_associations.assoc.txt",
