@@ -75,13 +75,15 @@ get_residuals <- function(covars, phenotypes){
 #' @param covars covariates data.table
 #' @param exec gemma executable
 #' @param basedir dir to write files to
+#' @param eigens Number of eigenvectors to run gemma on
 #' @param loco perform LOCO (default FALSE)
+#'
 #' @return The unified output file
 #' @export
 #'
 #' @importFrom data.table merge fwrite setkey
 #' @examples
-execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE){
+execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
   #setkey(genotypes, rs, physical = FALSE)
@@ -128,12 +130,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, loco=TRUE
       print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
                    " -p ", phenofile, " -a ", anotfile,
                    " -k ", ksfile, " -o lmm_", chrname,
-                   " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+                   " -n ", do.call(paste, c(as.list(1:eigens, sep=" ")))))
       system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
                     " -p ", phenofile, " -a ", anotfile,
                     #" -c ", covarfile,
                     " -k ", ksfile, " -o lmm_", chrname,
-                    " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+                    " -n ", do.call(paste, c(as.list(1:eigens, sep=" ")))))
                     #" -n 1"))# do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
       #}
     }
