@@ -77,7 +77,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results") {
   log10P <- don$P
   ymax <- 1.25 * max(log10P, na.rm = TRUE)
   # Make the plot
-  p <- ggplot(don, aes(x=BPcum, y=P)) +
+  p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
     geom_point( aes(color=as.factor(chr + 21 * ((P>8)+0))), alpha=0.8, size=2) +
