@@ -10,6 +10,7 @@ library(readr)
 library(R.utils)
 library(data.table)
 library(snpStats)
+library(ggplot2)
 
 # create parser object
 parser <- ArgumentParser()
