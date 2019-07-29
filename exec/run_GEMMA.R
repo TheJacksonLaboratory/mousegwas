@@ -109,6 +109,8 @@ phenos = data.table()
 for (p in pheno_names) phenos <- phenos[, eval(p) := numeric()]
 covars = data.table()
 for (c in covar_names) covars <- covars[, eval(c) := numeric()]
+covars <- covars[, isWild := numeric()]
+
 #write_csv(strains, paste0(args$basedir, "/export_strains.csv"))
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
@@ -125,7 +127,7 @@ for (comrow in 1:dim(complete_table)[1]){
     # Add the phenotypes to the table
     phenos <- rbind(phenos, complete_table[comrow, pheno_names])
     # Add the covariates to the table
-    covars <- rbind(covars, complete_table[comrow, covar_names])
+    covars <- rbind(covars, cbind(complete_table[comrow, covar_names], as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
   }else{
     print(paste0("Can't find ", p1n," or ", p2n))
   }
@@ -133,6 +135,7 @@ for (comrow in 1:dim(complete_table)[1]){
 # Remove SNPs with more than 5% missing data
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 # Add 1 to covariates matrix
+covar_names <- c(covar_names, "isWild")
 covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
 
 # Export order of strains used

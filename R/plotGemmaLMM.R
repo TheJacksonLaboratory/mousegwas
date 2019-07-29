@@ -80,7 +80,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results") {
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point( aes(color=as.factor(chr + 21 * ((P>8)+0))), alpha=0.8, size=2) +
+    geom_point( aes(color=as.factor(chr + 21 * ((P>8)+0))), alpha=0.8, size=0.5) +
     scale_color_manual(values = c(rep(c("grey", "skyblue"),10), rep("red", 20) )) +
 
     # custom X axis:
