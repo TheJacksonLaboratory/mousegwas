@@ -127,7 +127,7 @@ for (comrow in 1:dim(complete_table)[1]){
     # Add the phenotypes to the table
     phenos <- rbind(phenos, complete_table[comrow, pheno_names])
     # Add the covariates to the table
-    covars <- rbind(covars, cbind(complete_table[comrow, covar_names], as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
+    covars <- rbind(covars, cbind(complete_table[comrow, mget(covar_names)], data.table(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild))))
   }else{
     print(paste0("Can't find ", p1n," or ", p2n))
   }
