@@ -121,7 +121,7 @@ for (comrow in 1:dim(complete_table)[1]){
   }
   p1n <- strains$p1[rnum]
   p2n <- strains$p2[rnum]
-  if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
+  if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno) & (!p1n %in% ayamin$wild)){
     sorder <- c(sorder, sname)
     strains_genomes[, eval(paste0('X',comrow)):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
     # Add the phenotypes to the table
@@ -135,7 +135,7 @@ for (comrow in 1:dim(complete_table)[1]){
 # Remove SNPs with more than 5% missing data
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 # Add 1 to covariates matrix
-covar_names <- c(covar_names, "isWild")
+#covar_names <- c(covar_names, "isWild")
 covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
 
 # Export order of strains used
