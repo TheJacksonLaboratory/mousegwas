@@ -142,7 +142,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
      # for (n in range(dim(phenotypes)[2])){
-      if (single){
+      if (!single){
         pfiles <- c(phenofile)
         outfiles <- c(paste0("lmm_", chrname, "_allpheno"))
         nns <- do.call(paste, c(as.list(1:eigens, sep=" ")))
