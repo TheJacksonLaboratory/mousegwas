@@ -84,7 +84,7 @@ get_residuals <- function(covars, phenotypes){
 #'
 #' @importFrom data.table merge fwrite setkey
 #' @examples
-execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE){
+execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=FALSE){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
   #setkey(genotypes, rs, physical = FALSE)
