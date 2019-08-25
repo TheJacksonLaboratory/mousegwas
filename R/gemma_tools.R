@@ -115,7 +115,7 @@ combine_metaSOFT <- function(infiles, outfile, version="2.0.1", midfile="metasof
 #' @return The unified output file
 #' @export
 #'
-#' @importFrom data.table merge fwrite setkey
+#' @import data.table
 #' @examples
 execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE){
   exec <- get_gemma(basedir)
