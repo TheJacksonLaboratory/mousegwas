@@ -124,13 +124,8 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #  setkey(annot, rs, physical = FALSE)
 #  loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
 
-  # Convert the phenotypes to residuals and do svd to remove correlation
-  residuals <- get_residuals(covars, phenotypes)
-  resid_comp <- svd(residuals)
 
   # Write files to disk
-  phenofile <- paste0(basedir, "/phenotypes.csv")
-  fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
   anotfile <- paste0(basedir, "/annotations.csv")
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
   covarfile <- paste0(basedir, "/covariates.csv")
@@ -147,6 +142,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       print(head(phenotypes[,n,with=FALSE]))
       fwrite(phenotypes[,n,with=FALSE], paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
     }
+  }else{
+    # Convert the phenotypes to residuals and do svd to remove correlation
+    residuals <- get_residuals(covars, phenotypes)
+    resid_comp <- svd(residuals)
+    phenofile <- paste0(basedir, "/phenotypes.csv")
+    fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
   }
 
   # Compute lmm without LOCO
