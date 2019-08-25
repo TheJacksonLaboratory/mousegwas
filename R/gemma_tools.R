@@ -139,8 +139,8 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
     for (n in 1:dim(phenotypes)[2]){
       print(n)
       print(head(phenotypes))
-      print(head(phenotypes[,n,with=FALSE]))
-      fwrite(phenotypes[,n,with=FALSE], paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
+      print(head(as.dats.table(phenotypes[,n,with=FALSE])))
+      fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
     }
   }else{
     # Convert the phenotypes to residuals and do svd to remove correlation
