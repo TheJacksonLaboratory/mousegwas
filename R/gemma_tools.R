@@ -67,6 +67,39 @@ get_residuals <- function(covars, phenotypes){
   return(resids)
 }
 
+#' Combine phenotypes using metasoft
+#'
+#' @param infiles a vector of input files, each for one phenotype
+#' @param outfile
+#' @param version
+#'
+#' @return Write the unified p_lrt into the outfile
+#' @export
+#'
+#' @examples
+combine_metaSOFT <- function(infiles, outfile, version="2.0.1", midfile="metasoft_tmp.txt"){
+  # Download Metasoft snd extracts
+  # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
+  hasmeta <- file.exists(paste0(basedir, "/Metasoft.jar"))
+  if (!hasmeta){
+    system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > ",basedir,"/Metasoft.zip"))
+    system(paste0("unzip ",basedir, "/Metasoft.zip"))
+  }
+
+  # Read all the input files and write in the desired format
+  # chr     rs      ps      n_miss  allele1 allele0 af      beta_1  Vbeta_1_1   p_lrt
+  cmass <- fread(infiles[1])
+  cmass <- cmass[,.(rs, beta, Vbeta)]
+  for (n in 2:length(infiles)){
+    ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, beta, Vbeta)]
+    cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", n)))
+  }
+  fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
+
+  # Run metasoft
+  system(paste0("java -jar ", basedir, "/Metasoft.jar -mvalue -input ",midfile, " -output ", outfile))
+}
+
 #' Run lmm 2 (LRT) on the data with LOCO
 #'
 #' @param genotypes the genotypes data.table
