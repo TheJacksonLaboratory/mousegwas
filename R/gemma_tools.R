@@ -140,6 +140,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 
   if (single){
     # Write the phenotype files
+    print(dim(phenotypes)[2])
     for (n in 1:dim(phenotypes)[2]){
       fwrite(phenotypes[,n,with=FALSE], paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
     }
