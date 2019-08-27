@@ -69,6 +69,7 @@ get_residuals <- function(covars, phenotypes){
 
 #' Combine phenotypes using metasoft
 #'
+#' @param basedir
 #' @param infiles a vector of input files, each for one phenotype
 #' @param outfile
 #' @param version
@@ -77,7 +78,7 @@ get_residuals <- function(covars, phenotypes){
 #' @export
 #'
 #' @examples
-combine_metaSOFT <- function(infiles, outfile, version="2.0.1", midfile="metasoft_tmp.txt"){
+combine_metaSOFT <- function(basedir, infiles, outfile, version="2.0.1", midfile="metasoft_tmp.txt"){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
   hasmeta <- file.exists(paste0(basedir, "/Metasoft.jar"))
@@ -88,10 +89,10 @@ combine_metaSOFT <- function(infiles, outfile, version="2.0.1", midfile="metasof
 
   # Read all the input files and write in the desired format
   # chr     rs      ps      n_miss  allele1 allele0 af      beta_1  Vbeta_1_1   p_lrt
-  cmass <- fread(infiles[1])
+  cmass <- fread(paste0(basedir, "/output/", infiles[1], ".assoc.txt"))
   cmass <- cmass[,.(rs, beta, Vbeta)]
   for (n in 2:length(infiles)){
-    ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, beta, Vbeta)]
+    ctmp <- fread(paste0(basedir, "/output/", outfiles[n], ".assoc.txt"))[,.(rs, beta, Vbeta)]
     cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", n)))
   }
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
@@ -205,14 +206,15 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
       # If singles combine the results to one file
       if (length(pfiles)>1){
-        cmass <- fread(paste0(outfiles[1], ".assoc.txt"))
-        for (n in 2:length(outfiles)){
-          ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, p_lrt)]
+        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/", output, "lmm_", chrname, "_allpheno.assoc.txt"))
+  #      cmass <- fread(paste0(outfiles[1], ".assoc.txt"))
+  #      for (n in 2:length(outfiles)){
+  #        ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, p_lrt)]
 
-          cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", outfiles[n])))
-        }
-        cmass[paste0("p_lrt.", outfiles[1]) := p_lrt]
-        fwrite(cmass, file=paste0(basedir, "/", output, "lmm_", chrname, "_allpheno.assoc.txt"))
+  #        cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", outfiles[n])))
+  #      }
+  #      cmass[paste0("p_lrt.", outfiles[1]) := p_lrt]
+  #      fwrite(cmass, file=paste0(basedir, "/", output, "lmm_", chrname, "_allpheno.assoc.txt"))
       }
     }
     # Concatenate all loco files into a single output file
