@@ -85,13 +85,14 @@ combine_metaSOFT <- function(basedir, infiles, outfile, version="2.0.1", midfile
   hasmeta <- file.exists(paste0(basedir, "/Metasoft.jar"))
   if (!hasmeta){
     system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > ",basedir,"/Metasoft.zip"))
-    system(paste0("unzip ",basedir, "/Metasoft.zip"))
+    system(paste0("unzip -f ",basedir, "/Metasoft.zip"))
   }
 
   # Read all the input files and write in the desired format
   # chr     rs      ps      n_miss  allele1 allele0 af      beta_1  Vbeta_1_1   p_lrt
   cmass <- fread(paste0(basedir, "/output/", infiles[1], ".assoc.txt"))
-  cmass <- cmass[,.(rs, beta, Vbeta)]
+  print(head(cmass))
+  cmass <- cmass[,.(rs, beta, se)]
   for (n in 2:length(infiles)){
     ctmp <- fread(paste0(basedir, "/output/", outfiles[n], ".assoc.txt"))[,.(rs, beta, Vbeta)]
     cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", n)))
@@ -161,7 +162,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
     if (single){
       for (n in 1:dim(phenotypes)[2]){
         pfile <- paste0(basedir,"/phenotype_",n,".csv")
-        system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", genofile,
+        system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
                       " -p ", pfile, " -a ", anotfile,
                       " -c ", covarfile,
                       " -k ", ksfile, " -o lmm_all_phenotype_", n,
@@ -169,7 +170,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
 
     }else{
-      system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", genofile,
+      system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
                     " -p ", phenofile, " -a ", anotfile,
                     " -c ", covarfile,
                     " -k ", ksfile, " -o lmm_all",
@@ -195,11 +196,11 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
 
       for (n in 1:length(pfiles)){
-        print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
+        print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
                      " -p ", pfiles[n], " -a ", anotfile,
                      " -k ", ksfile, " -o ", outfiles[n],
                      " -n ", nns))
-        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 2 -g ", geno_sfile,
+        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
                       " -p ", pfiles[n], " -a ", anotfile,
                       #" -c ", covarfile,
                       " -k ", ksfile, " -o ", outfiles[n],
