@@ -146,7 +146,7 @@ results_file <- execute_lmm(strains_genomes, phenos,
                             as.data.table(complete.geno[,.(rs, bp38, chr)]),
                             covars, args$basedir, yamin$eigens)
 
-p <- plot_gemma_lmm(results_file)
+p <- plot_gemma_lmm(results_file, metasoft=TRUE, annotations=paste0(basedir, "/annotations.csv"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
 #fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 
