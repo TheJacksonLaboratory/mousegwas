@@ -79,7 +79,7 @@ get_residuals <- function(covars, phenotypes){
 #' @export
 #'
 #' @examples
-combine_metaSOFT <- function(basedir, infiles, outfile, version="2.0.1", midfile="metasoft_tmp.txt"){
+combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
   hasmeta <- file.exists(paste0(basedir, "/Metasoft.jar"))
@@ -208,7 +208,8 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
       # If singles combine the results to one file
       if (length(pfiles)>1){
-        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
+        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.pasted.txt"),
+                                                   paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
   #      cmass <- fread(paste0(outfiles[1], ".assoc.txt"))
   #      for (n in 2:length(outfiles)){
   #        ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, p_lrt)]
