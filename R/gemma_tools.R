@@ -92,7 +92,7 @@ combine_metaSOFT <- function(basedir, infiles, outfile, version="2.0.1", midfile
   # chr     rs      ps      n_miss  allele1 allele0 af      beta_1  Vbeta_1_1   p_lrt
   cmass <- fread(paste0(basedir, "/output/", infiles[1], ".assoc.txt"))
   print(head(cmass))
-  cmass <- cmass[,.(rs, beta, se)]
+  cmass <- cmass[, list(rs, beta, se)]
   for (n in 2:length(infiles)){
     ctmp <- fread(paste0(basedir, "/output/", outfiles[n], ".assoc.txt"))[,.(rs, beta, Vbeta)]
     cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", n)))
