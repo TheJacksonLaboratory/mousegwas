@@ -183,12 +183,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
      # for (n in range(dim(phenotypes)[2])){
       if (!single){
         pfiles <- c(phenofile)
-        outfiles <- c(paste0("lmm_", chrname, "_allpheno"))
+        outfiles <- c(paste0(basedir, "/output/lmm_", chrname, "_allpheno"))
         nns <- do.call(paste, c(as.list(1:eigens, sep=" ")))
       }else{
         pfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(basedir,"/phenotype_",n,".csv"))
         outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
-          "lmm_", chrname, "_pheno_", n))
+          basedir, "/output/lmm_", chrname, "_pheno_", n))
         nns <- "1"
       }
 
@@ -212,7 +212,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
           cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", outfiles[n])))
         }
         cmass[paste0("p_lrt.", outfiles[1]) := p_lrt]
-        fwrite(cmass, file=paste0("lmm_", chrname, "_allpheno.assoc.txt"))
+        fwrite(cmass, file=paste0(basedir, "/", output, "lmm_", chrname, "_allpheno.assoc.txt"))
       }
     }
     # Concatenate all loco files into a single output file
