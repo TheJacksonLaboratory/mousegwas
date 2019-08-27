@@ -94,7 +94,7 @@ combine_metaSOFT <- function(basedir, infiles, outfile, version="2.0.1", midfile
   print(head(cmass))
   cmass <- cmass[, c("rs", "beta", "se")]
   for (n in 2:length(infiles)){
-    ctmp <- fread(paste0(basedir, "/output/", outfiles[n], ".assoc.txt"))[,.(rs, beta, Vbeta)]
+    ctmp <- fread(paste0(basedir, "/output/", infiles[n], ".assoc.txt"))[,c("rs", "beta", "se")]
     cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", n)))
   }
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
