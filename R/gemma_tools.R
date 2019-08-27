@@ -85,7 +85,7 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
   hasmeta <- file.exists(paste0(basedir, "/Metasoft.jar"))
   if (!hasmeta){
     system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > ",basedir,"/Metasoft.zip"))
-    system(paste0("unzip -f ",basedir, "/Metasoft.zip"))
+    system(paste0("unzip -uo ",basedir, "/Metasoft.zip -d ", basedir))
   }
 
   # Read all the input files and write in the desired format
