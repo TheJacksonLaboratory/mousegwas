@@ -17,9 +17,9 @@
 #' @examples
 plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metasoft=FALSE, annotations=NULL) {
   if (metasoft){
-    gwas_results <- read_delim(results_file, "\t", col_names = FALSE, guess_max = Inf)
+    gwas_results <- read_delim(results_file, "\t", col_names = FALSE)
     gwas_results <- gwas_results %>% select(rs=X1, p_wald=X9)  # RSID and PVALUE_RE2
-    anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"))
+    anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else{
     gwas_results <- read_delim(results_file, "\t", col_names = TRUE, col_type = cols(
