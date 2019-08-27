@@ -75,6 +75,7 @@ get_residuals <- function(covars, phenotypes){
 #' @param version
 #'
 #' @return Write the unified p_lrt into the outfile
+#' @import data.table
 #' @export
 #'
 #' @examples
