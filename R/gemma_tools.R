@@ -183,12 +183,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
      # for (n in range(dim(phenotypes)[2])){
       if (!single){
         pfiles <- c(phenofile)
-        outfiles <- c(paste0(basedir, "/output/lmm_", chrname, "_allpheno"))
+        outfiles <- c(paste0("lmm_", chrname, "_allpheno"))
         nns <- do.call(paste, c(as.list(1:eigens, sep=" ")))
       }else{
         pfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(basedir,"/phenotype_",n,".csv"))
         outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
-          basedir, "/output/lmm_", chrname, "_pheno_", n))
+          "lmm_", chrname, "_pheno_", n))
         nns <- "1"
       }
 
