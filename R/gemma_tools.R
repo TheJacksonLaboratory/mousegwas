@@ -208,7 +208,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
       # If singles combine the results to one file
       if (length(pfiles)>1){
-        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/", output, "lmm_", chrname, "_allpheno.assoc.txt"))
+        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
   #      cmass <- fread(paste0(outfiles[1], ".assoc.txt"))
   #      for (n in 2:length(outfiles)){
   #        ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, p_lrt)]
