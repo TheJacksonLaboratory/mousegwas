@@ -142,10 +142,10 @@ covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_nam
 write.csv(sorder, paste0(args$basedir, "/export_strains_order.csv"))
 
 # Run gemma using the helper function with loco
-results_file <- execute_lmm(strains_genomes, phenos,
-                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                            covars, args$basedir, yamin$eigens)
-
+#results_file <- execute_lmm(strains_genomes, phenos,
+#                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
+#                            covars, args$basedir, yamin$eigens)
+results_file <- paste0(args$basedir, "/output/all_lmm_associations.assoc.txt")
 p <- plot_gemma_lmm(results_file, metasoft=TRUE, annotations=paste0(args$basedir, "/annotations.csv"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
 #fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
