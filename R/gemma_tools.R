@@ -232,3 +232,29 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
     return(paste0(basedir, "/output/all_lmm_associations.assoc.txt"))
   }
 }
+
+#' Return the beta of each strain. Strains are similar if identical in SNPs
+#'
+#' @param strains_genomes A table of mice genotypes
+#' @param phenotypes A table of mice phenotypes
+#' @param covars Covariates to include in lm
+#'
+#' @return A list with $genotypes and $phenotypes
+#'
+#' @export
+#'
+#' @examples
+average_strain <- function(strains_genomes, phenotypes, covars){
+  # Recognize similar genomes
+  genidx <- match(strains_genomes, strains_genomes)
+  gret <- strains_genomes[,which(!duplicated(genidx)), with=F]
+  phen2 <- cbind(phenotypes, covars[,-1])
+  phen2$strain <- factor(genidx)
+  pret <- NULL
+  for (pn in colnames(phenotypes)){
+    lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(names(covars)[-1]), sep="+")), " + strain ")), phen2)
+    pret <- cbind(pret, lmout$coefficients[grepl("^strain", names(lmout$coefficients))])
+  }
+  pret <- setNames(as.data.frame(pret), colnames(phenotypes))
+  return(list(genotypes = gret, phenotypes = pret))
+}
