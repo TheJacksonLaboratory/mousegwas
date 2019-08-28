@@ -168,6 +168,11 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
                       " -k ", ksfile, " -o lmm_all_phenotype_", n,
                       " -n 1"))
       }
+      outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
+        "lmm_all_phenotype_", n))
+      combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_allpheno.assoc.pasted.txt"),
+                       paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
+      return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
 
     }else{
       system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
