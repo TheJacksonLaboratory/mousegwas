@@ -29,8 +29,10 @@ parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
 parser$add_argument("--genes", default=NULL,
                     help="a tab delimited table with SNP ID in first column and gene name in second. Might not include all SNPs")
-parser$add_argument("--combined", action='store_true',
+sing_com <- parser$add_mutually_exclusive_group()
+sing_com$add_argument("--combined", action='store_true',
                     help="Run all the phenotypes combined. Perform svd and use the first X eigen vectors as defined in the yaml file")
+sing_com$add_argument("--single", action='store_false', help="Run each phenotype and combine with metaSOFT")
 args <- parser$parse_args()
 
 # Load the yaml
