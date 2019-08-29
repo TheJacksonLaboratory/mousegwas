@@ -148,7 +148,7 @@ b <- average_strain(strains_genomes, phenos, covars)
 #results_file <- execute_lmm(strains_genomes, phenos,
 #                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
 #                            covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
-results_file <- execute_lmm(b$genotypes, b$phenotypes,
+results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                             as.data.table(complete.geno[,.(rs, bp38, chr)]),
                             NULL, args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
 
