@@ -243,13 +243,18 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #'
 #' @export
 #'
+#' @importFrom fastmatch fmatch
 #' @examples
 average_strain <- function(strains_genomes, phenotypes, covars){
   # Recognize similar genomes
-  genidx <- match(strains_genomes, strains_genomes)
+
+  # Select random rows to compare, saves time
+  set.seed(100)
+  grows <- sample(nrow(strains_genomes), 1000)
+  genidx <- fmatch(strains_genomes[grows,], strains_genomes[grows,])
   gret <- strains_genomes[,which(!duplicated(genidx)), with=F]
   phen2 <- cbind(phenotypes, covars[,-1])
-  phen2$strain <- factor(genidx)
+  phen2$strain <- factor(genidx[-1:-3])
   pret <- NULL
   for (pn in colnames(phenotypes)){
     lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(names(covars)[-1]), sep="+")), " + strain ")), phen2)
