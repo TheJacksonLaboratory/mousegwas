@@ -253,6 +253,7 @@ average_strain <- function(strains_genomes, phenotypes, covars){
   pret <- NULL
   for (pn in colnames(phenotypes)){
     lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(names(covars)[-1]), sep="+")), " + strain ")), phen2)
+    print(summary(lmout))
     pret <- cbind(pret, lmout$coefficients[grepl("^strain", names(lmout$coefficients))])
   }
   pret <- setNames(as.data.frame(pret), colnames(phenotypes))
