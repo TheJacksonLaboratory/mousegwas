@@ -55,6 +55,9 @@ calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
 #'
 #' @examples
 get_residuals <- function(covars, phenotypes){
+  if (is.null(covars)){
+    return (phenotypes)
+  }
   resids <- NULL
   for (p in names(phenotypes)){
     lft <- lm(as.data.frame(phenotypes)[,p] ~ covars)
@@ -131,8 +134,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
   # Write files to disk
   anotfile <- paste0(basedir, "/annotations.csv")
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
-  covarfile <- paste0(basedir, "/covariates.csv")
-  fwrite(covars, covarfile, col.names = FALSE, na="NA")
+  covar_flg <- ""
+  if (! is.null(covars)){
+    covarfile <- paste0(basedir, "/covariates.csv")
+    fwrite(covars, covarfile, col.names = FALSE, na="NA")
+    covar_flg <- paste0(" -c ", covarfile)
+  }
   genofile <- paste0(basedir, "/all_genotypes.csv")
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
 
@@ -164,7 +171,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
         pfile <- paste0(basedir,"/phenotype_",n,".csv")
         system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
                       " -p ", pfile, " -a ", anotfile,
-                      " -c ", covarfile,
+                      covar_flg,
                       " -k ", ksfile, " -o lmm_all_phenotype_", n,
                       " -n 1"))
       }
@@ -177,7 +184,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
     }else{
       system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
                     " -p ", phenofile, " -a ", anotfile,
-                    " -c ", covarfile,
+                    covar_flg,
                     " -k ", ksfile, " -o lmm_all",
                     " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
       return(paste0(basedir,"/output/lmm_all.assoc.txt"))
