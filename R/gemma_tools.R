@@ -243,7 +243,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #'
 #' @export
 #'
-#' @importFrom fastmatch fmatch
+#' @import fastmatch
 #' @examples
 average_strain <- function(strains_genomes, phenotypes, covars){
   # Recognize similar genomes
