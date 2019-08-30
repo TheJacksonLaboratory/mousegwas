@@ -29,6 +29,8 @@ parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
 parser$add_argument("--genes", default=NULL,
                     help="a tab delimited table with SNP ID in first column and gene name in second. Might not include all SNPs")
+parser$add_argument("--downsample", default=0,
+                    help="Downsample strains to have at most this number of representatives. If 0 (default) average each strain")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -142,7 +144,7 @@ covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_nam
 write.csv(sorder, paste0(args$basedir, "/export_strains_order.csv"))
 
 # Take the betas of each strain and use it to run GEMMA
-b <- average_strain(strains_genomes, phenos, covars)
+b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 
 # Run gemma using the helper function with loco
 #results_file <- execute_lmm(strains_genomes, phenos,

@@ -245,28 +245,44 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #' @param strains_genomes A table of mice genotypes
 #' @param phenotypes A table of mice phenotypes
 #' @param covars Covariates to include in lm
+#' @param downsample Maximal number of representatives. If 0 use average
 #'
 #' @return A list with $genotypes and $phenotypes
 #'
 #' @export
 #'
 #' @examples
-average_strain <- function(strains_genomes, phenotypes, covars){
-  # Recognize similar genomes
+average_strain <- function(strains_genomes, phenotypes, covars, downsample){
 
   # Select random rows to compare, saves time
   set.seed(100)
   grows <- sample(nrow(strains_genomes), 1000)
+  # Find similar genomes
   genidx <- match(strains_genomes[grows,], strains_genomes[grows,])
-  gret <- strains_genomes[,which(!duplicated(genidx)), with=F]
-  phen2 <- cbind(phenotypes, covars[,-1])
-  phen2$strain <- factor(genidx[-1:-3])
-  pret <- NULL
-  for (pn in colnames(phenotypes)){
-    lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(names(covars)[-1]), sep="+")), " + strain ")), phen2)
-    print(summary(lmout))
-    pret <- cbind(pret, lmout$coefficients[grepl("^strain", names(lmout$coefficients))])
+
+  if (downsample > 0){ # sample from each strain
+    miceidx = 1:3 # 1:3 is rs, minor, major
+    for (i in 4:max(genidx)){
+      miceidx = c(miceidx, sample(which(genidx==i), downsample))
+    }
+  }else{ # Pick the first one of each genome
+    miceidx = which(!duplicated(genidx))
   }
-  pret <- setNames(as.data.frame(pret), colnames(phenotypes))
+  gret <- strains_genomes[,miceidx, with=F]
+
+  # Compute the phenotypes
+  if (downsample == 0){ # average with lm
+    phen2 <- cbind(phenotypes, covars[,-1])
+    phen2$strain <- factor(genidx[-1:-3])
+    pret <- NULL
+    for (pn in colnames(phenotypes)){
+      lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(names(covars)[-1]), sep="+")), " + strain ")), phen2)
+      print(summary(lmout))
+      pret <- cbind(pret, lmout$coefficients[grepl("^strain", names(lmout$coefficients))])
+    }
+    pret <- setNames(as.data.frame(pret), colnames(phenotypes))
+  }else{ # Use the miceidx above
+    pret <- phenotypes[miceidx[-1:-3],]
+  }
   return(list(genotypes = gret, phenotypes = pret))
 }
