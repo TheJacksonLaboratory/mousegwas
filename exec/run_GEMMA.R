@@ -17,7 +17,7 @@ parser <- ArgumentParser()
 
 # specify our desired options
 # by default ArgumentParser will add an help option
-parser$add_argument("--downsample", default=0,
+parser$add_argument("--downsample", '-d', default=0,
                     help="Downsample strains to have at most this number of representatives. If 0 (default) average each strain")
 parser$add_argument("-i", "--input",
                     help="Input csv file, assume column names. Definitions for which columns to use and how are in the yaml file")
