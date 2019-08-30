@@ -263,12 +263,13 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
     for (i in unique(genidx[-1:-3])){
-      print(i)
-      print(sum(genidx==i))
-      print(which(genidx==i))
       if (sum(genidx==i)<=downsample){
         miceidx <- c(miceidx, which(genidx==i))
       }else{
+        print(i)
+        print(sum(genidx==i))
+        print(which(genidx==i))
+
         miceidx = c(miceidx, sample(which(genidx==i), downsample))
       }
     }
