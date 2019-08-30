@@ -17,6 +17,8 @@ parser <- ArgumentParser()
 
 # specify our desired options
 # by default ArgumentParser will add an help option
+parser$add_argument("--downsample", default=0,
+                    help="Downsample strains to have at most this number of representatives. If 0 (default) average each strain")
 parser$add_argument("-i", "--input",
                     help="Input csv file, assume column names. Definitions for which columns to use and how are in the yaml file")
 parser$add_argument("-y", "--yaml",
@@ -29,8 +31,6 @@ parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
 parser$add_argument("--genes", default=NULL,
                     help="a tab delimited table with SNP ID in first column and gene name in second. Might not include all SNPs")
-parser$add_argument("--downsample", default=0,
-                    help="Downsample strains to have at most this number of representatives. If 0 (default) average each strain")
 args <- parser$parse_args()
 
 # Load the yaml
