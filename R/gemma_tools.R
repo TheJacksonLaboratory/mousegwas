@@ -262,8 +262,8 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
 
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
-    for (i in 4:max(genidx)){
-      miceidx = c(miceidx, sample(which(genidx==i), downsample))
+    for (i in unique(genidx[-1:-3])){
+      miceidx = c(miceidx, sample(which(genidx==i), min(downsample, sum(genidx==i))))
     }
   }else{ # Pick the first one of each genome
     miceidx = which(!duplicated(genidx))
