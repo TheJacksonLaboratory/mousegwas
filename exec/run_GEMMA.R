@@ -152,7 +152,7 @@ b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 #                            covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
 results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                             as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                            NULL, args$basedir, yamin$eigens, loco=TRUE, single=!(yamin$eigens>0))
+                            NULL, args$basedir, yamin$eigens, loco=TRUE, single=is.null(yamin$eigens) || (yamin$eigens==0))
 
 #results_file <- paste0(args$basedir, "/output/all_lmm_associations.assoc.txt")
 p <- plot_gemma_lmm(results_file, metasoft=!(yamin$eigens>0), annotations=paste0(args$basedir, "/annotations.csv"))
