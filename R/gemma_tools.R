@@ -283,7 +283,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
     }
     pret <- setNames(as.data.frame(pret), colnames(phenotypes))
   }else{ # Use the miceidx above
-    pret <- phenotypes[miceidx[-1:-3],]
+    pret <- phenotypes[miceidx[-1:-3]-3,]
   }
   return(list(genotypes = gret, phenotypes = pret))
 }
