@@ -264,9 +264,9 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
     miceidx = 1:3 # 1:3 is rs, minor, major
     save(genidx, file="genout.Rdata")
     for (i in unique(genidx[-1:-3])){
-      print(paste(i, length(which(genidx==i)), min(downsample, length(which(genidx==i))), sep="-"))
+      print(paste(i, sum(genidx==i)+1, min(downsample+1, sum(genidx==i)+1)-1, sep="-"))
       print(genidx==i)
-      miceidx = c(miceidx, sample(which(genidx==i), min(downsample, length(which(genidx==i)))))
+      miceidx = c(miceidx, sample(which(genidx==i), min(downsample+1, sum(genidx==i)+1)-1))
     }
   }else{ # Pick the first one of each genome
     miceidx = which(!duplicated(genidx))
