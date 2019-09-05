@@ -162,7 +162,7 @@ if (args$method == "GEMMA"){
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
                               NULL, args$basedir, yamin$eigens, loco=TRUE, single=is.null(yamin$eigens) || (yamin$eigens==0))
 }else if (args$method == "pyLMM"){
-  results_file <- execute_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
+  results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
                                 NULL, args$basedir, args$pylmm, args$pylmmkinship, loco=TRUE)
 }
