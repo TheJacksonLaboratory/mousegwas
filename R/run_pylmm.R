@@ -13,7 +13,7 @@
 #'
 #' @import data.table
 #' @export
-run_pylmm <- function(genotypes, phenotypes, covars, annot, basedir, pylmm, pylmm_kinship, loco=TRUE){
+run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylmm_kinship, loco=TRUE){
   # Write the phenotypes
   if (!is.null(covars)){
     phenotypes <- get_residuals(covars, phenotypes)
