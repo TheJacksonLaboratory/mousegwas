@@ -11,6 +11,7 @@
 #'
 #' @return the output file
 #'
+#' @import data.table
 #' @export
 run_pylmm <- function(genotypes, phenotypes, covars, annot, basedir, pylmm, pylmm_kinship, loco=TRUE){
   # Write the phenotypes
@@ -46,6 +47,19 @@ run_pylmm <- function(genotypes, phenotypes, covars, annot, basedir, pylmm, pylm
 }
 
 
+#' Calculate kinship using PyLMM
+#'
+#' @param genotypes
+#' @param annot
+#' @param pylmm_kinship
+#' @param chrname
+#' @param basedir
+#'
+#' @return
+#' @export
+#'
+#' @import data.table
+#' @examples
 calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir){
   loco_geno <- genotypes[genotypes$rs %in% annot[annot$chr!=chrname,"rs"],]
   # Write the genotypes without the chr to csv file
@@ -72,6 +86,7 @@ calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir
 #' @return The combined output file
 #' @export
 #'
+#' @import data.table
 #' @examples
 run_pylmm_exec <- function(pylmm, geno_sfile, annot_file, phenofile, ksfile, nphen, output_head){
   # Run each phenotype (1:nphen)
@@ -91,6 +106,18 @@ run_pylmm_exec <- function(pylmm, geno_sfile, annot_file, phenofile, ksfile, nph
 }
 
 
+#' Title
+#'
+#' @param infiles
+#' @param midfile
+#' @param outfile
+#' @param version
+#'
+#' @return
+#' @export
+#'
+#' @import data.table
+#' @examples
 combine_metaSOFT_pylmm <- function(infiles, midfile, outfile, version="2.0.1"){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
