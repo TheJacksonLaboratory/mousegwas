@@ -27,7 +27,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".txt")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], -1:-3], geno_sfile, col.names=FALSE, na="NA", sep=" ")
       annot_file <- paste0(basedir, "/SNPs_only_chr_", chrname, ".txt")
-      fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1], annot_file, col.names=TRUE, na="NA", sep=" ")
+      fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], annot_file, col.names=TRUE, na="NA", sep=" ")
       # Run pylmm on the chromosome
       run_pylmm_exec(pylmm, geno_sfile, annot_file, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname))
     }
