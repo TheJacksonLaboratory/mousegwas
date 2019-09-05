@@ -155,7 +155,7 @@ results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                             NULL, args$basedir, yamin$eigens, loco=TRUE, single=is.null(yamin$eigens) || (yamin$eigens==0))
 
 #results_file <- paste0(args$basedir, "/output/all_lmm_associations.assoc.txt")
-p <- plot_gemma_lmm(results_file, metasoft=!(yamin$eigens>0), annotations=paste0(args$basedir, "/annotations.csv"))
+p <- plot_gemma_lmm(results_file, metasoft=is.null(yamin$eigens) || (yamin$eigens==0), annotations=paste0(args$basedir, "/annotations.csv"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
 #fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
 

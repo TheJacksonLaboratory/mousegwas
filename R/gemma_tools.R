@@ -222,14 +222,6 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       if (length(pfiles)>1){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.pasted.txt"),
                                                    paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
-  #      cmass <- fread(paste0(outfiles[1], ".assoc.txt"))
-  #      for (n in 2:length(outfiles)){
-  #        ctmp <- fread(paste0(outfiles[n], ".assoc.txt"))[,.(rs, p_lrt)]
-
-  #        cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes("", paste0(".", outfiles[n])))
-  #      }
-  #      cmass[paste0("p_lrt.", outfiles[1]) := p_lrt]
-  #      fwrite(cmass, file=paste0(basedir, "/", output, "lmm_", chrname, "_allpheno.assoc.txt"))
       }
     }
     # Concatenate all loco files into a single output file
@@ -262,7 +254,6 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
 
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
-    save(genidx, file="genout.Rdata")
     for (i in unique(genidx[-1:-3])){
       miceidx = c(miceidx, sample(which(genidx==i), min(downsample, sum(genidx==i))))
     }
