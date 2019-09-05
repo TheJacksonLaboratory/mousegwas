@@ -96,7 +96,7 @@ run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, o
     system(paste0(pylmm, " --emmaPHENO=", phenofile, " --emmaSNP=", geno_sfile, " --kfile=", ksfile, " -p ", i-1, " ", output_head, "_", i, ".pyLMM.tmp"))
     pout <- fread(paste0(output_head, "_", i, ".pyLMM.tmp"))
     pout$SNP_ID <- annot$rs
-    fwrite(pout, paste0(output_head, "_", i, ".pyLMM"), sep = "\t", NA="nan")
+    fwrite(pout, paste0(output_head, "_", i, ".pyLMM"), sep = "\t", na="nan")
   }
 
   # Run metaSOFT
