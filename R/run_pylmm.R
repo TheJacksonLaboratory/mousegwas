@@ -102,8 +102,7 @@ run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, o
   # Run metaSOFT
   if (nphen > 1){
     outfiles <- sapply(1:nphen, function(n) paste0(output_head, "_", n, ".pyLMM"))
-    combine_metaSOFT_pylmm(outfiles, paste0(output_head, "_pasted.txt"), paste0(output_head, "_metasoft.txt"))
-    #system(paste0("paste ", annot_file, " ", output_head, "_metasoft.txt > ", output_head, "_combined.txt"))
+    combine_metaSOFT_pylmm(outfiles, paste0(output_head, "_pasted.txt"), paste0(output_head, "_combined.txt"))
   }else{
     system(paste0("cp ", output_head, "_1.pyLMM ", output_head, "_combined.txt"))
   }
