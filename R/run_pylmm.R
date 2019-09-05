@@ -67,8 +67,8 @@ calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir
   fwrite(loco_geno[,-1:-3], locofname, col.names=FALSE, na="NA", sep=" ")
   # Write a dummy phenotypes file
   # Execute kinship calc in gemma
-  system(paste0("cd ", basedir, " && ", pylmm_kinship, " --emmaSNP ", locofname,
-                "--emmaNumSNPs", nrow(loco_geno),  "kinship_loco_", chrname, ".txt"))
+  system(paste0("cd ", basedir, " && ", pylmm_kinship, " --emmaSNP=", locofname,
+                "--emmaNumSNPs=", nrow(loco_geno),  "kinship_loco_", chrname, ".txt"))
   return(paste0(basedir, "/output/kinship_loco_", chrname, ".txt"))
 }
 
