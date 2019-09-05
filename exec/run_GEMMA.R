@@ -37,6 +37,8 @@ parser$add_argument("--pylmmkinship", "-k", default="pylmmKinship.py",
                     help="pylmmKinship.py executable")
 parser$add_argument("--method", "-m", default="GEMMA",
                     help="Which GWAS software to use, possible values: GEMMA|pyLMM")
+parser$add_argument("--noloco", default=FALSE, action="store_true",
+                    help="Do not use LOCO")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -143,7 +145,6 @@ for (comrow in 1:dim(complete_table)[1]){
 # Remove SNPs with more than 5% missing data
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 # Add 1 to covariates matrix
-#covar_names <- c(covar_names, "isWild")
 covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
 
 # Export order of strains used
@@ -153,28 +154,17 @@ write.csv(sorder, paste0(args$basedir, "/export_strains_order.csv"))
 b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 
 # Run gemma using the helper function with loco
-#results_file <- execute_lmm(strains_genomes, phenos,
-#                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
-#                            covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
 
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                              NULL, args$basedir, yamin$eigens, loco=TRUE, single=is.null(yamin$eigens) || (yamin$eigens==0))
+                              NULL, args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                NULL, args$basedir, args$pylmm, args$pylmmkinship, loco=TRUE)
+                                NULL, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
 }
 
-#results_file <- paste0(args$basedir, "/output/all_lmm_associations.assoc.txt")
+
 p <- plot_gemma_lmm(results_file, metasoft=is.null(yamin$eigens) || (yamin$eigens==0), annotations=paste0(args$basedir, "/annotations.csv"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
-#fwrite(strains_genomes, "export_strains_genotypes.csv", col.names=FALSE, na="NA")
-
-#fwrite(phenos, "export_phenotypes.csv", col.names = FALSE, na="NA")
-#write.csv(names(phenos), "export_phenotypes_names.csv")
-#fwrite(covars, "export_covariates.csv", col.names = FALSE, na="NA")
-
-# Download gemma 0.98.1 if not on PATH
-
