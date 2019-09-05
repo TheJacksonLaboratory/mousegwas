@@ -29,7 +29,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
       annot_file <- paste0(basedir, "/SNPs_only_chr_", chrname, ".txt")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], annot_file, col.names=TRUE, na="NA", sep=" ")
       # Run pylmm on the chromosome
-      run_pylmm_exec(pylmm, geno_sfile, annot_file, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname))
+      run_pylmm_exec(pylmm, geno_sfile, annot, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname))
     }
     # Combine all results
     system(paste0("cd ", basedir, " && head -1 output_chr_1_combined.txt > output_all_chrs_combined.txt && cat output_chr_*_combined.txt | grep -iv beta >> output_all_chrs_combined.txt"))
@@ -41,7 +41,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
     fwrite(genotypes[,-1:-3], genofile, col.names = FALSE, na = "NA", sep=" ")
     annot_file <- paste0(basedir, "/SNPs.txt")
     fwrite(genotypes[, 1], annot_file, col.names=FALSE, na="NA", sep=" ")
-    run_pylmm_exec(pylmm, genofile, annot_file, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"))
+    run_pylmm_exec(pylmm, genofile, annot, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"))
     return(paste0(basedir, "/output_all_chrs_combined.txt"))
   }
 }
@@ -79,7 +79,7 @@ calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir
 #'
 #' @param pylmm pylmmGWAS.py executable
 #' @param geno_sfile the genotypes file
-#' @param annot_file the SNPs names file, to be pasted to the results
+#' @param annot SNP names in the same order in geno_sfile. Names will be replaced in the output file
 #' @param phenofile the phenotypes file
 #' @param ksfile kinship matrix file
 #' @param nphen number of phenotypes
@@ -90,19 +90,22 @@ calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir
 #'
 #' @import data.table
 #' @examples
-run_pylmm_exec <- function(pylmm, geno_sfile, annot_file, phenofile, ksfile, nphen, output_head){
+run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, output_head){
   # Run each phenotype (1:nphen)
   for (i in 1:nphen){
-    system(paste0(pylmm, " --emmaPHENO=", phenofile, " --emmaSNP=", geno_sfile, " --kfile=", ksfile, " -p ", i-1, " ", output_head, "_", i, ".pyLMM"))
+    system(paste0(pylmm, " --emmaPHENO=", phenofile, " --emmaSNP=", geno_sfile, " --kfile=", ksfile, " -p ", i-1, " ", output_head, "_", i, ".pyLMM.tmp"))
+    pout <- fread(paste0(output_head, "_", i, ".pyLMM.tmp"))
+    pout$SNP_ID <- annot$rs
+    fwrite(pout, paste0(output_head, "_", i, ".pyLMM"), sep = "\t", NA="nan")
   }
 
   # Run metaSOFT
   if (nphen > 1){
     outfiles <- sapply(1:nphen, function(n) paste0(output_head, "_", n, ".pyLMM"))
     combine_metaSOFT_pylmm(outfiles, paste0(output_head, "_pasted.txt"), paste0(output_head, "_metasoft.txt"))
-    system(paste0("paste ", annot_file, " ", output_head, "_metasoft.txt > ", output_head, "_combined.txt"))
+    #system(paste0("paste ", annot_file, " ", output_head, "_metasoft.txt > ", output_head, "_combined.txt"))
   }else{
-    system(paste0("paste ", annot_file, " ", output_head, "_1.pyLMM > ", output_head, "_combined.txt"))
+    system(paste0("cp ", output_head, "_1.pyLMM ", output_head, "_combined.txt"))
   }
   return(paste0(output_head, "_combined.txt"))
 }
