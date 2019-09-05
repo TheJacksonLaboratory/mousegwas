@@ -31,6 +31,12 @@ parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
 parser$add_argument("--genes", default=NULL,
                     help="a tab delimited table with SNP ID in first column and gene name in second. Might not include all SNPs")
+parser$add_argument("--pylmm", "-p", default="pylmmGWAS.py",
+                    help="pylmmGWAS.py executable")
+parser$add_argument("--pylmmkinship", "-k", default="pylmmKinship.py",
+                    help="pylmmKinship.py executable")
+parser$add_argument("--method", "-m", default="GEMMA",
+                    help="Which GWAS software to use, possible values: GEMMA|pyLMM")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -150,9 +156,16 @@ b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 #results_file <- execute_lmm(strains_genomes, phenos,
 #                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
 #                            covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
-results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
-                            as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                            NULL, args$basedir, yamin$eigens, loco=TRUE, single=is.null(yamin$eigens) || (yamin$eigens==0))
+
+if (args$method == "GEMMA"){
+  results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
+                              as.data.table(complete.geno[,.(rs, bp38, chr)]),
+                              NULL, args$basedir, yamin$eigens, loco=TRUE, single=is.null(yamin$eigens) || (yamin$eigens==0))
+}else if (args$method == "pyLMM"){
+  results_file <- execute_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
+                                as.data.table(complete.geno[,.(rs, bp38, chr)]),
+                                NULL, args$basedir, args$pylmm, args$pylmmkinship, loco=TRUE)
+}
 
 #results_file <- paste0(args$basedir, "/output/all_lmm_associations.assoc.txt")
 p <- plot_gemma_lmm(results_file, metasoft=is.null(yamin$eigens) || (yamin$eigens==0), annotations=paste0(args$basedir, "/annotations.csv"))
