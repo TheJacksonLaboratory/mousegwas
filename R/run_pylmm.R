@@ -29,7 +29,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
       annot_file <- paste0(basedir, "/SNPs_only_chr_", chrname, ".txt")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], annot_file, col.names=TRUE, na="NA", sep=" ")
       # Run pylmm on the chromosome
-      run_pylmm_exec(pylmm, geno_sfile, annot, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname))
+      run_pylmm_exec(pylmm, geno_sfile, genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname))
     }
     # Combine all results
     system(paste0("cd ", basedir, " && head -1 output_chr_1_combined.txt > output_all_chrs_combined.txt && cat output_chr_*_combined.txt | grep -iv beta >> output_all_chrs_combined.txt"))
@@ -41,7 +41,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
     fwrite(genotypes[,-1:-3], genofile, col.names = FALSE, na = "NA", sep=" ")
     annot_file <- paste0(basedir, "/SNPs.txt")
     fwrite(genotypes[, 1], annot_file, col.names=FALSE, na="NA", sep=" ")
-    run_pylmm_exec(pylmm, genofile, annot, phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"))
+    run_pylmm_exec(pylmm, genofile, genotypes[,1,drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"))
     return(paste0(basedir, "/output_all_chrs_combined.txt"))
   }
 }
