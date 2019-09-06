@@ -4,6 +4,7 @@
 #' @param genes A tibble with the columns rs and gene_name linking genes to SNPs
 #' @param name The title
 #' @param metasoft set TRUE if the input is metaSOFT output
+#' @param pyLMM TRUE if the input is pyLMM output with rs ID in the first column SNP_ID
 #' @param annotations If metasoft is TRUE then annoattions file should be given
 #'
 #' @return A plot
@@ -15,10 +16,15 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metasoft=FALSE, annotations=NULL) {
+plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% select(rs=X1, p_wald=X9)  # RSID and PVALUE_RE2
+    anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
+    gwas_results <- left_join(gwas_results, anno, by="rs")
+  }else if (pyLMM){
+    gwas_results <- read_delim(results_file, "\t", col_names = TRUE, guess_max = Inf)
+    gwas_results <- gwas_results %>% select(rs=SNP_ID, p_wald=P_VALUE)  # RSID and PVALUE_RE2
     anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else{
