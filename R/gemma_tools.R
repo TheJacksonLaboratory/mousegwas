@@ -219,9 +219,11 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
                       " -n ", nns))
       }
       # If singles combine the results to one file
-      if (length(pfiles)>1){
+      if (single & length(pfiles)>1){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.pasted.txt"),
                                                    paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
+      }else if (single){
+        system(paste0("cp ", basedir, "/output/lmm_",chrname, "_pheno_1.assoc.txt ", basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
       }
     }
     # Concatenate all loco files into a single output file
