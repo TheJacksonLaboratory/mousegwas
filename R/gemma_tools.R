@@ -252,13 +252,9 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
   grows <- sample(nrow(strains_genomes), 1000)
   # Find similar genomes
   genidx <- match(strains_genomes[grows,], strains_genomes[grows,])
-  print(head(strains_genomes))
-  print(genidx)
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
     for (i in unique(genidx[-1:-3])){
-      print(i)
-      print(which(genidx==i))
       if (sum(genidx==i) > 1){
         miceidx = c(miceidx, sample(which(genidx==i), min(downsample, sum(genidx==i))))
       }else{
@@ -282,7 +278,6 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
     }
     pret <- setNames(as.data.frame(pret), colnames(phenotypes))
   }else{ # Use the miceidx above
-    print(miceidx)
     pret <- phenotypes[miceidx[-1:-3]-3,]
     cret <- covars[miceidx[-1:-3]-3,]
   }
