@@ -39,9 +39,9 @@ parser$add_argument("--method", "-m", default="GEMMA",
                     help="Which GWAS software to use, possible values: GEMMA|pyLMM")
 parser$add_argument("--noloco", default=FALSE, action="store_true",
                     help="Do not use LOCO")
-parser$add_argument("--missing", default=0.05, type="numeric",
+parser$add_argument("--missing", default=0.05, type="double",
                     help="Maximal fraction of missing data for marker")
-parser$add_argument("--MAF", default=0.05, type="numeirc",
+parser$add_argument("--MAF", default=0.05, type="double",
                     help="Minimal value for minor allele frequency")
 args <- parser$parse_args()
 
