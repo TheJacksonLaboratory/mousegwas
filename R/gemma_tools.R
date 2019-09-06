@@ -252,7 +252,8 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
   grows <- sample(nrow(strains_genomes), 1000)
   # Find similar genomes
   genidx <- match(strains_genomes[grows,], strains_genomes[grows,])
-
+  print(head(strains_genomes))
+  print(genidx)
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
     for (i in unique(genidx[-1:-3])){
