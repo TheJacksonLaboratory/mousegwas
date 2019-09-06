@@ -177,6 +177,6 @@ if (args$method == "GEMMA"){
 }
 
 
-p <- plot_gemma_lmm(results_file, metasoft=(is.null(yamin$eigens) || (yamin$eigens==0)) && ncol(d$phenotypes)>1, pyLMM=args$method=="pyLMM" && ncol(d$phenotypes)==1,
+p <- plot_gemma_lmm(results_file, metasoft=(is.null(yamin$eigens) || (yamin$eigens==0)) && ncol(b$phenotypes)>1, pyLMM=args$method=="pyLMM" && ncol(d$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
