@@ -144,17 +144,17 @@ for (comrow in 1:dim(complete_table)[1]){
 }
 # Remove SNPs with more than 5% missing data
 strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
-# Add 1 to covariates matrix
-covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars) #cbind(1, covars)
 
-# Export order of strains used
-write.csv(sorder, paste0(args$basedir, "/export_strains_order.csv"))
+# Compute the covariate matrix
+covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars)
 
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 
-# Run gemma using the helper function with loco
+# Export order of strains used
+write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), quote = '', col.names = FALSE)
 
+# Run gemma/pylmm using the helper function
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
