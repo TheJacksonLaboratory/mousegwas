@@ -33,7 +33,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
     }
     # Combine all results
     system(paste0("cd ", basedir, " && head -1 output_chr_1_combined.txt > output_all_chrs_combined.txt && cat output_chr_*_combined.txt | grep -iv beta >> output_all_chrs_combined.txt"))
-    return(paste0(basedir,"/otuput_all_chrs_combined.txt"))
+    return(paste0(basedir,"/output_all_chrs_combined.txt"))
   }else{
     # Write the genotypes
     ksfile <- calc_pylmm_kinship(genotypes, annot, pylmm_kinship, NULL, basedir)
