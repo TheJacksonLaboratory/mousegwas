@@ -20,6 +20,8 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
   }
   phenofile <- paste0(basedir, "/phenotypes.txt")
   fwrite(base::t(phenotypes), phenofile, col.names = FALSE, na = "NA", sep=" ")
+  anotfile <- paste0(basedir, "/annotations.csv")
+  fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
 
   if (loco) {
     for (chrname in unique(annot$chr)){
