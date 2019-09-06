@@ -152,7 +152,7 @@ covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_nam
 b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 
 # Export order of strains used
-write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), quote = '', col.names = FALSE)
+write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), quote = FALSE, col.names = FALSE)
 
 # Run gemma/pylmm using the helper function
 if (args$method == "GEMMA"){
