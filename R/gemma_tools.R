@@ -248,6 +248,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
 
   # Select random rows to compare, saves time
   set.seed(100)
+  cret <- NULL
   grows <- sample(nrow(strains_genomes), 1000)
   # Find similar genomes
   genidx <- match(strains_genomes[grows,], strains_genomes[grows,])
@@ -275,6 +276,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
     pret <- setNames(as.data.frame(pret), colnames(phenotypes))
   }else{ # Use the miceidx above
     pret <- phenotypes[miceidx[-1:-3]-3,]
+    cret <- covars[miceidx[-1:-3]-3,]
   }
-  return(list(genotypes = gret, phenotypes = pret, indices = miceidx[-1:-3]-3))
+  return(list(genotypes = gret, phenotypes = pret, indices = miceidx[-1:-3]-3, covars = cret))
 }

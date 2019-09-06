@@ -39,6 +39,10 @@ parser$add_argument("--method", "-m", default="GEMMA",
                     help="Which GWAS software to use, possible values: GEMMA|pyLMM")
 parser$add_argument("--noloco", default=FALSE, action="store_true",
                     help="Do not use LOCO")
+parser$add_argument("--missing", default=0.05, type="numeric",
+                    help="Maximal fraction of missing data for marker")
+parser$add_argument("--MAF", default=0.05, type="numeirc",
+                    help="Minimal value for minor allele frequency")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -142,14 +146,21 @@ for (comrow in 1:dim(complete_table)[1]){
     print(paste0("Can't find ", p1n," or ", p2n))
   }
 }
-# Remove SNPs with more than 5% missing data
-strains_genomes <- strains_genomes[rowSums(is.na(strains_genomes))<(ncol(strains_genomes)-3)/20,]
 
 # Compute the covariate matrix
-covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars)
+if (length(covar_names) > 0){
+  covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars)
+}else{
+  covars = NULL
+}
 
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample)
+
+# Remove SNPs with more than 5% missing data and 5% MAF
+b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<(ncol(b$genotypes)-3)*args$missing &
+                             rowSums(b$genotypes==0)>(ncol(b$genotypes)-3)*args$MAF &
+                             rowSums(b$genotypes==2)>(ncol(b$genotypes)-3)*args$MAF,]
 
 # Export order of strains used
 write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), quote = FALSE, col.names = FALSE)
@@ -158,11 +169,11 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                              NULL, args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
+                              b$covars, args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                NULL, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
+                                b$covars, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
 }
 
 
