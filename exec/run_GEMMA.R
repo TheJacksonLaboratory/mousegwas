@@ -177,10 +177,10 @@ if (args$method == "GEMMA"){
 }
 
 is.metasoft <- TRUE
-if (method=="GEMMA"){
+if (args$method=="GEMMA"){
   if (!is.null(args$eigens) && args$eigens>0) is.metasoft=FALSE
   if (ncol(b$phenotypes)==1) is.metasoft=FALSE
-}else if (method=="pyLMM"){
+}else if (args$method=="pyLMM"){
   if (ncol(b$phenotypes)==1) is.metasoft=FALSE
 }
 p <- plot_gemma_lmm(results_file, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(d$phenotypes)==1,
