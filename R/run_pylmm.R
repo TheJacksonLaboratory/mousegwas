@@ -42,7 +42,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
     genofile <- paste0(basedir, "/all_genotypes.csv")
     fwrite(genotypes[,-1:-3], genofile, col.names = FALSE, na = "NA", sep=" ")
     annot_file <- paste0(basedir, "/SNPs.txt")
-    fwrite(genotypes[, 1], annot_file, col.names=FALSE, na="NA", sep=" ")
+    fwrite(genotypes[, 1,drop=F], annot_file, col.names=FALSE, na="NA", sep=" ")
     run_pylmm_exec(pylmm, genofile, genotypes[,1,drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"))
     return(paste0(basedir, "/output_all_chrs_combined.txt"))
   }
