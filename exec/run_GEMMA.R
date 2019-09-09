@@ -167,9 +167,9 @@ if (length(covar_names) > 0){
 b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 
 # Remove SNPs with more than 5% missing data and 5% MAF
-b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<(ncol(b$genotypes)-3)*args$missing &
-                             rowSums(b$genotypes==0)>(ncol(b$genotypes)-3)*args$MAF &
-                             rowSums(b$genotypes==2)>(ncol(b$genotypes)-3)*args$MAF,]
+b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
+                             rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
+                             rowSums(b$genotypes==2)>=(ncol(b$genotypes)-3)*args$MAF,]
 
 # Export order of strains used
 write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), quote = FALSE, col.names = FALSE)
@@ -177,11 +177,11 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 # Run gemma/pylmm using the helper function
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
-                              as.data.table(complete.geno[,.(rs, bp38, chr)]),
+                              as.data.table(complete.geno[b$indices,.(rs, bp38, chr)]),
                               b$covars, args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
-                                as.data.table(complete.geno[,.(rs, bp38, chr)]),
+                                as.data.table(complete.geno[b$indices,.(rs, bp38, chr)]),
                                 b$covars, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
 }
 
