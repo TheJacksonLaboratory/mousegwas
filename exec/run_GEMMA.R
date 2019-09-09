@@ -177,11 +177,11 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 # Run gemma/pylmm using the helper function
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
-                              as.data.table(complete.geno[b$indices,.(rs, bp38, chr)]),
+                              as.data.table(complete.geno[,.(rs, bp38, chr)]),
                               b$covars, args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
-                                as.data.table(complete.geno[b$indices,.(rs, bp38, chr)]),
+                                as.data.table(complete.geno[,.(rs, bp38, chr)]),
                                 b$covars, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
 }
 
