@@ -114,8 +114,6 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
 
-#fwrite(complete.geno, "export_complete_genotypes.csv")
-#fwrite(complete.geno[,.(rs, bp38, chr)], "export_snp_data.csv", col.names = FALSE, na="NA")
 # Compute the specific strains genomes
 strains_genomes <- srdata
 sorder = c()
@@ -125,7 +123,8 @@ covars = data.table()
 for (c in covar_names) covars <- covars[, eval(c) := numeric()]
 covars <- covars[, isWild := numeric()]
 
-#write_csv(strains, paste0(args$basedir, "/export_strains.csv"))
+# Keep old not found strains to not repeat error messages
+notfounds = c()
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
   rnum <- which(strains$input_name==sname)
@@ -143,7 +142,17 @@ for (comrow in 1:dim(complete_table)[1]){
     # Add the covariates to the table
     covars <- rbind(covars, cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild))))
   }else{
-    print(paste0("Can't find ", p1n," or ", p2n))
+    if (p1n==p2n){
+      if (!p1n %in% notfounds){
+        print(paste0("Can't find strain ",p1n))
+        notfounds <- c(notfounds, p1n)
+      }
+    }else{
+      if (!(p1n %in% notfounds & p2n %in% notfounds)){
+        print(paste0("Can't find ", p1n," or ", p2n))
+        notfounds <- c(notfounds, p1n, p2n)
+      }
+    }
   }
 }
 
