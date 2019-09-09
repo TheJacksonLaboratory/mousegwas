@@ -38,7 +38,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
     return(paste0(basedir,"/output_all_chrs_combined.txt"))
   }else{
     # Write the genotypes
-    ksfile <- calc_pylmm_kinship(genotypes, annot, pylmm_kinship, NULL, basedir)
+    ksfile <- calc_pylmm_kinship(genotypes, annot, pylmm_kinship, "all", basedir)
     genofile <- paste0(basedir, "/all_genotypes.csv")
     fwrite(genotypes[,-1:-3], genofile, col.names = FALSE, na = "NA", sep=" ")
     annot_file <- paste0(basedir, "/SNPs.txt")
