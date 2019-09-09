@@ -85,10 +85,10 @@ get_residuals <- function(covars, phenotypes){
 combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
-  hasmeta <- file.exists(paste0(basedir, "/Metasoft.jar"))
+  hasmeta <- file.exists(paste0("/Metasoft.jar"))
   if (!hasmeta){
-    system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > ",basedir,"/Metasoft.zip"))
-    system(paste0("unzip -uo ",basedir, "/Metasoft.zip -d ", basedir))
+    system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > Metasoft.zip"))
+    system(paste0("unzip -uo Metasoft.zip -d ", basedir))
   }
 
   # Read all the input files and write in the desired format
@@ -101,9 +101,9 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
     cmass <- merge(cmass, ctmp, by="rs", all=T, suffixes = c("", paste0(".", n)))
   }
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
-
+  Sys.sleep(1)
   # Run metasoft
-  system(paste0("java -jar ", basedir, "/Metasoft.jar -mvalue -input ",midfile, " -output ", outfile))
+  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile))
 }
 
 #' Run lmm 2 (LRT) on the data with LOCO

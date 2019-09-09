@@ -144,7 +144,7 @@ combine_metaSOFT_pylmm <- function(infiles, midfile, outfile, version="2.0.1"){
     cmass <- merge(cmass, ctmp, by="SNP_ID", all=T, suffixes = c("", paste0(".", n)))
   }
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
-
+  Sys.sleep(1)
   # Run metasoft
   system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile))
 }
