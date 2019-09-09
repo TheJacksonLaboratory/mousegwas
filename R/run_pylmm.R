@@ -95,7 +95,7 @@ calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir
 run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, output_head){
   # Run each phenotype (1:nphen)
   for (i in 1:nphen){
-    system(paste0(pylmm, " --emmaPHENO=", phenofile, " --emmaSNP=", geno_sfile, " --kfile=", ksfile, " -p ", i-1, " ", output_head, "_", i, ".pyLMM.tmp"))
+    system(paste0(pylmm, " --verbose --emmaPHENO=", phenofile, " --emmaSNP=", geno_sfile, " --kfile=", ksfile, " -p ", i-1, " ", output_head, "_", i, ".pyLMM.tmp"))
     pout <- fread(paste0(output_head, "_", i, ".pyLMM.tmp"))
     pout$SNP_ID <- annot$rs
     fwrite(pout, paste0(output_head, "_", i, ".pyLMM"), sep = "\t", na="nan")
