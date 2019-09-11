@@ -25,7 +25,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
 
   if (loco) {
     for (chrname in unique(annot$chr)){
-      if (length(annot[annot$chr==chrname,"rs"])==0) next
+      if (length(intersect(genotypes$rs, annot[annot$chr==chrname,"rs"]))==0) next
       ksfile <- calc_pylmm_kinship(genotypes, annot, pylmm_kinship, chrname, basedir)
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".txt")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], -1:-3], geno_sfile, col.names=FALSE, na="NA", sep=" ")

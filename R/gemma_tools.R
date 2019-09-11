@@ -196,7 +196,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
     # Compute kinship to each chromosome and run gemma with loco
     for (chrname in unique(annot$chr)){
       # Avoid empty chromosomes (like MT)
-      if (length(annot[annot$chr==chrname,"rs"])==0) next
+      if (length(intersect(genotypes$rs, annot[annot$chr==chrname,"rs"]))==0) next
       ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
