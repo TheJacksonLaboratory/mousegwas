@@ -252,7 +252,9 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #'
 #' @examples
 average_strain <- function(strains_genomes, phenotypes, covars, downsample){
-
+  print(dim(covars))
+  print(dim(phenotypes))
+  print(dim(strains_genomes))
   # Select random rows to compare, saves time
   set.seed(100)
   cret <- NULL
