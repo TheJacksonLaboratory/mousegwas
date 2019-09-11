@@ -60,10 +60,7 @@ get_residuals <- function(covars, phenotypes){
   }
   resids <- NULL
   for (p in names(phenotypes)){
-    print(p)
-    print(length(as.data.frame(phenotypes)[,p]))
     lft <- lm(as.data.frame(phenotypes)[,p] ~ covars, na.action=na.exclude)
-    print(length(resid(lft)))
     if (is.null(resids)){
       resids <- data.frame(p=resid(lft))
     }else{
@@ -252,9 +249,6 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #'
 #' @examples
 average_strain <- function(strains_genomes, phenotypes, covars, downsample){
-  print(dim(covars))
-  print(dim(phenotypes))
-  print(dim(strains_genomes))
   # Select random rows to compare, saves time
   set.seed(100)
   cret <- NULL
@@ -287,7 +281,6 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample){
     }
     pret <- setNames(as.data.frame(pret), colnames(phenotypes))
   }else{ # Use the miceidx above
-    print(miceidx)
     pret <- phenotypes[miceidx[-1:-3]-3,,drop=F]
     cret <- covars[miceidx[-1:-3]-3,,drop=F]
   }
