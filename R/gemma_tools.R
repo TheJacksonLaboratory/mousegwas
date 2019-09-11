@@ -150,7 +150,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       print(n)
       print(head(phenotypes))
       print(head(as.data.table(phenotypes[,n,with=FALSE])))
-      fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",")
+      fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",", na="NA")
     }
     phenofile <- paste0(basedir,"/phenotype_",1,".csv")
   }else{
