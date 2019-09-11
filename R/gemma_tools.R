@@ -85,10 +85,10 @@ get_residuals <- function(covars, phenotypes){
 combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
-  hasmeta <- file.exists(paste0("/Metasoft.jar"))
+  hasmeta <- file.exists(paste0("Metasoft.jar"))
   if (!hasmeta){
     system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > Metasoft.zip"))
-    system(paste0("unzip -uo Metasoft.zip -d ", basedir))
+    system(paste0("unzip -uo Metasoft.zip "))
   }
 
   # Read all the input files and write in the desired format
