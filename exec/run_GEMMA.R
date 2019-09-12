@@ -43,6 +43,10 @@ parser$add_argument("--missing", default=0.05, type="double",
                     help="Maximal fraction of missing data for marker")
 parser$add_argument("--MAF", default=0.05, type="double",
                     help="Minimal value for minor allele frequency")
+parser$add_argument("--genes", default=NULL,
+                    help="A file with rs name and gene name")
+parser$add_argument("--header", default="GWAS results",
+                    help="Manhattan plot header")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -192,6 +196,12 @@ if (args$method=="GEMMA"){
 }else if (args$method=="pyLMM"){
   if (ncol(b$phenotypes)==1) is.metasoft=FALSE
 }
-p <- plot_gemma_lmm(results_file, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
+
+# Read the genes file
+genes = NULL
+if (!is.null(args$genes)){
+  genes <- fread(file=args$genes, col.names = c("rs", "gene_name"))
+}
+p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
