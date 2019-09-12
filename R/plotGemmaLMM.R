@@ -122,7 +122,8 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     toprs <- gwas_results %>% filter(P>8, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
       # Select only one gene
       group_by(rs) %>% summarize(gene_name=gene_name[1])
-    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs, gene_name %in% toprs$gene_name),
+    # Add gene_name to don
+    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
                                       aes(BPcum, P, label = gene_name), alpha = 0.7)
   }
 

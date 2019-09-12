@@ -198,7 +198,7 @@ if (args$method=="GEMMA"){
 # Read the genes file
 genes = NULL
 if (!is.null(args$genes)){
-  genes <- fread(file=args$genes, col.names = c("rs", "gene_name"))
+  genes <- fread(file=args$genes, col.names = c("rs", "gene_name"), header = FALSE)
 }
 p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"))
