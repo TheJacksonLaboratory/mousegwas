@@ -41,7 +41,7 @@ parser$add_argument("--noloco", default=FALSE, action="store_true",
                     help="Do not use LOCO")
 parser$add_argument("--missing", default=0.05, type="double",
                     help="Maximal fraction of missing data for marker")
-parser$add_argument("--MAF", default=0.05, type="double",
+parser$add_argument("--MAF", default=0.1, type="double",
                     help="Minimal value for minor allele frequency")
 parser$add_argument("--header", default="GWAS results",
                     help="Manhattan plot header")
