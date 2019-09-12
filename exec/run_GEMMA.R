@@ -43,8 +43,6 @@ parser$add_argument("--missing", default=0.05, type="double",
                     help="Maximal fraction of missing data for marker")
 parser$add_argument("--MAF", default=0.05, type="double",
                     help="Minimal value for minor allele frequency")
-parser$add_argument("--genes", default=NULL,
-                    help="A file with rs name and gene name")
 parser$add_argument("--header", default="GWAS results",
                     help="Manhattan plot header")
 args <- parser$parse_args()
