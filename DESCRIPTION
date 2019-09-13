@@ -22,5 +22,7 @@ Imports:
   stringr,
   ggrepel,
   ggplot2,
-  fastmatch
+  fastmatch,
+  gtools,
+  mvtnorm
   
