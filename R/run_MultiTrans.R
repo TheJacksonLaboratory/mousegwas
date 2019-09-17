@@ -7,14 +7,25 @@
 #'
 #' @examples
 get_multi <- function(multilink="http://genetics.cs.ucla.edu/multiTrans/MultiTrans.zip",
-                      slidelink="http://slide.cs.ucla.edu/data/slide.1.0.4.intel64.tar.gz"){
+                      slidelinux="http://slide.cs.ucla.edu/data/slide.1.0.4.intel64.tar.gz",
+                      slidemac="http://slide.cs.ucla.edu/data/slide.1.0.4.MAC.64bit.tar.gz"){
   if (! file.exists("MultiTrans")){
     system(paste0("curl -L ", multilink, " > MultiTrans.zip"))
     system("unzip MultiTrans.zip")
   }
-  if (! file.exists("slide.1.0.4.intel64.tar.gz")){
-    system(paste0("curl -L ", slidelink, " > slide.1.0.4.intel64.tar.gz"))
-    system("tar xvzf slide.1.0.4.intel64.tar.gz")
+  if (! file.exists("slide.1.0")){
+    # Determine platform
+    if (Sys.info()["sysname"] == "Linux"){
+      system(paste0("curl -L ", slidelinux, " > slide.1.0.4.intel64.tar.gz"))
+      system("tar xvzf slide.1.0.4.intel64.tar.gz")
+    }else if (Sys.info()["sysname"] == "Darwin"){
+      system(paste0("curl -L ", slidemac, " > slide.1.0.4.MAC.64bit.tar.gz"))
+      system("tar xvzf slide.1.0.4.MAC.64bit.tar.gz")
+      system("mv slide.1.0.64bit slide.1.0")
+    }else{
+      print("Can't determine system or not Linux/OSX")
+      return(FALSE)
+    }
   }
   if (! file.exists("MultiTrans/generateR.R")){
     print("Error: Can't find generateR.R, MultiTrans couldn't be downloaded")
@@ -42,18 +53,18 @@ get_sigmas <- function(logfile){
   con <- file(logfile, "r")
   vg = NULL
   ve = NULL
-  while(is.null(ve) & is.null(vg)){
+  while(is.null(ve) | is.null(vg)){
     line <- readLines(con, n=1)
     if (grepl("^## vg estimate", line)) vg <- as.numeric(strsplit(line, " = ")[[1]][2])
     if (grepl("^## ve estimate", line)) ve <- as.numeric(strsplit(line, " = ")[[1]][2])
   }
-  return (vg, ve)
+  return (list(vg=vg, ve=ve))
 }
 
 #' Wrap generateR.R
 #'
-#' @param genotypes The genotypes matrix (just the values)
-#' @param kinship The kinship matrix
+#' @param genotypes_file The genotypes matrix (just the values)
+#' @param kinship_file The kinship matrix
 #' @param vg_med median Vg value
 #' @param ve_med median Ve value
 #' @param basedir dir to write r.txt to
@@ -62,19 +73,13 @@ get_sigmas <- function(logfile){
 #' @export
 #'
 #' @examples
-run_R <- function(genotypes, kinship, vg_med, ve_med, basedir){
+run_R <- function(genotypes, kinship_file, vg_med, ve_med, basedir){
+  # Write the genotypes, transposed
+  write.table(base::t(genotypes), file=paste0(basedir, "/gmatrix.txt"), col.names = F, row.names = F, quote = F)
   # Load the source code to use the functions
-  source("MultiTrans/generateR.R")
-
-  # This code was modified from generateR.R
-  snpNum <- dim(genotypes)[2]
-  indiNum <- dim(genotypes)[1]
-  I<-matrix(0,nrow=indiNum, ncol=indiNum);
-  I[row(I)==col(I)]<-1;
-  sigmaM = vg_med*kinship + ve_med*I;
-  UX = rotate(genotypes,sigmaM)
-  Ur=cor(UX,UX)
-  write.table(Ur,paste0(basedir,"/r.txt"),row.names=FALSE, col.names=FALSE, quote=FALSE)
+  write.table(data.frame(vg=c(vg_med), ve=c(ve_med)), file = paste0(basedir, "/VC.txt") ,col.names = FALSE, row.names = FALSE, quote=FALSE)
+  #"Usage: R CMD BATCH --args -Xpath= -Kpath= -VGpath= -outputPath= generateR.R generateR.log
+  system(paste0("R CMD BATCH --args -Xpath=",basedir, "/gmatrix.txt -Kpath=", kinship_file, " -VCpath=", basedir, "/VC.txt -outputPath=", basedir, " MultiTrans/generateR.R" ))
 }
 
 #' Run java generateC
@@ -106,14 +111,18 @@ run_C <- function(basedir, windowSize=1000){
 #' @examples
 run_slide <- function(basedir, nsnp, pval=0.05, windowSize=1000, samps=10000000, seed=100){
   exec1 <- paste0("slide.1.0/slide_1prep -C ", basedir, "/c.txt ", windowSize, " ", basedir, "/slide_prep.out")
+  print(exec1)
   system(exec1)
-  exec2 <- paste0("slide.1.0/slide_2run ", basedir, "/slide_prep.out ", basedir, "/slide_run.out ", samps, " ", seed)
+  exec2 <- paste0("slide.1.0/slide_2run ", basedir, "/slide_prep.out ", basedir, "/slide_run.out ", sprintf("%d", samps), " ", seed)
+  print(exec2)
   system(exec2)
   exec3 <- paste0("slide.1.0/slide_3sort ", basedir,"/slide_sort.out ", basedir, "/slide_run.out")
+  print(exec3)
   system(exec3)
   # Write a file with `nsnp` pvals
-  write.table(matrix(pval, snps, 1),paste0(basedir, "/pval_base.txt"),row.names=FALSE, col.names=FALSE, quote=FALSE)
+  write.table(matrix(pval, nsnp, 1),paste0(basedir, "/pval_base.txt"),row.names=FALSE, col.names=FALSE, quote=FALSE)
   exec4 <- paste0("slide.1.0/slide_4correct -t ", basedir, "/slide_sort.out ", basedir, "/pval_base.txt ", basedir, "/pval_thresholds.txt")
+  print(exec4)
   system(exec4)
   return(paste0(basedir, "/pval_thresholds.txt"))
 }
