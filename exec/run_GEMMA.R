@@ -210,7 +210,7 @@ if (args$method == "GEMMA"){
   for (fn in Sys.glob(paste0(args$basedir, "/output/lmm*.log.txt"))){
     res <- get_sigmas(fn)
     allvgs <- c(allvgs, res$vg)
-    allves <- c(allegs, res$ve)
+    allves <- c(allves, res$ve)
   }
   kinfile <- Sys.glob(paste0(args$basedir, "/output/kinship*cXX.txt"))[1]
   # Compute R
