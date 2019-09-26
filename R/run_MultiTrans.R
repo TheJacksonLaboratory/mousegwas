@@ -109,7 +109,7 @@ run_C <- function(basedir, windowSize=1000){
 #' @export
 #'
 #' @examples
-run_slide <- function(basedir, nsnp, pval=0.05, windowSize=1000, samps=10000000, seed=100){
+run_slide <- function(basedir, nsnp, pval=0.05, windowSize=1000, samps=100000, seed=100){
   exec1 <- paste0("slide.1.0/slide_1prep -C ", basedir, "/c.txt ", windowSize, " ", basedir, "/slide_prep.out")
   print(exec1)
   system(exec1)
