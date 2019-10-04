@@ -202,7 +202,7 @@ if (!is.null(args$genes)){
 
 pval_thr <- 5
 # Compute FDR using SLIDE if we used GEMMA only
-if (args$method == "GEMMA"){
+if (FALSE){#(args$method == "GEMMA"){
   get_multi()
   # Read the variances from the log files
   allvgs = c()

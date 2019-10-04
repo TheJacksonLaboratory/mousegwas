@@ -79,8 +79,9 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     #mutate( is_highlight=ifelse(SNP_ID %in% snpsOfInterest, "yes", "no")) %>%
 
     # Filter SNP to make the plot lighter
-    filter(P>0.5)
-
+    filter(P>0, ! is.na(chr))
+    # Replace chr 20 to X
+ # don[don$chr==20, "chr"] = "X"
 
 
   # Prepare X axis
@@ -91,20 +92,21 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   don$text <- paste("SNP: ", don$rs, "\nPosition: ", don$ps, "\nChromosome: ", don$chr, "\nLOD score:", don$P %>% round(2), "\nWhat else do you wanna know", sep="")
   log10P <- don$P
   ymax <- 1.25 * max(log10P, na.rm = TRUE)
+  chr_label <- axisdf$chr
+  chr_label[chr_label==20] = "X"
   # Make the plot
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point( aes(color=as.factor(chr + 21 * ((P>redthr)+0))), alpha=0.8, size=0.5) +
+    geom_point( aes(color=as.factor(chr + 21 * ((P>redthr)+0))), alpha=0.8, size=0.8) +
     scale_color_manual(values = c(rep(c("grey", "skyblue"),10), rep("red", 20) )) +
 
     # custom X axis:
-    scale_x_continuous( label = axisdf$chr, breaks= axisdf$center ) +
+    scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
     scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
     ylim(0,ymax) +
     xlab(name) +
     ylab("-log(P-value)") +
-
     # Add highlighted points
     #geom_point(data=subset(don, is_highlight=="yes"), color="orange", size=2) +
 
@@ -129,4 +131,24 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
 
   print(p)
   return(p)
+}
+
+#' Title
+#'
+#' @param snps snps table
+#' @param chr chromosome to plot
+#' @param from_mb from position in mega bp
+#' @param to_mb to position in mega bp
+#'
+#' @return
+#' @export
+#' @import qtl2
+#' @examples
+plot_zoom <- function(snps, chr, from_mb, to_mb, width=1){
+  # Download the genes data if not found
+  if (!file.exists("mouse_genes_mgi.sqlite")){
+    download.file("https://ndownloader.figshare.com/files/17609252", "mouse_genes_mgi.sqlite")
+  }
+  query_genes <- create_gene_query_func("mouse_genes_mgi.sqlite")
+  genes_reg <- query_genes(chr, from_mb, to_mb)
 }
