@@ -253,7 +253,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex)
   # Select random rows to compare, saves time
   set.seed(100)
   cret <- NULL
-  sgs <- rbind(as.list(c(1,1,1, sex)), strains_genomes)
+  sgs <- rbind(as.list(c(1,1,1, sex)), strains_genomes, use.names=FALSE)
   grows <- c(1, sample(nrow(sgs), min(nrow(sgs), 1000)))
 
   # Find similar genomes
