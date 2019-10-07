@@ -98,8 +98,8 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point( aes(color=as.factor(chr + 21 * ((P>redthr)+0))), alpha=0.8, size=0.8) +
-    scale_color_manual(values = c(rep(c("grey", "skyblue"),10), rep("red", 20) )) +
+    geom_point( aes(color=as.factor(chr + 21 * ((P>redthr)+0))), alpha=1, size=1) +
+    scale_color_manual(values = c(rep(c("slategrey4", "steeleblue3"),10), rep("red", 20) )) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +

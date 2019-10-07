@@ -242,19 +242,22 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 #' @param phenotypes A table of mice phenotypes
 #' @param covars Covariates to include in lm
 #' @param downsample Maximal number of representatives. If 0 use average
+#' @param sex A vector which assign sex to each individual, to be crossed with strain
 #'
 #' @return A list with $genotypes and $phenotypes
 #'
 #' @export
 #'
 #' @examples
-average_strain <- function(strains_genomes, phenotypes, covars, downsample){
+average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex){
   # Select random rows to compare, saves time
   set.seed(100)
   cret <- NULL
-  grows <- sample(nrow(strains_genomes), 1000)
+  sgs <- rbind(as.list(c(1,1,1, sex)), strains_genomes)
+  grows <- c(1, sample(nrow(sgs), min(nrow(sgs), 1000)))
+
   # Find similar genomes
-  genidx <- match(strains_genomes[grows,], strains_genomes[grows,])
+  genidx <- match(sgs[grows,], sgs[grows,])
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
     for (i in unique(genidx[-1:-3])){

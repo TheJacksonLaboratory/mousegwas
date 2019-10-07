@@ -164,6 +164,9 @@ if (length(covar_names) > 0){
   covars = NULL
 }
 
+# Normalize the phenotypes
+phenos <- scale(phenos)
+
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample)
 
