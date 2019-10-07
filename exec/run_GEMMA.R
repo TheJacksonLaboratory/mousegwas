@@ -123,6 +123,7 @@ for (p in pheno_names) phenos <- phenos[, eval(p) := numeric()]
 covars = data.table()
 for (c in covar_names) covars <- covars[, eval(c) := numeric()]
 covars <- covars[, isWild := numeric()]
+sexvec <- c()
 
 # Keep old not found strains to not repeat error messages
 notfounds = c()
@@ -142,6 +143,7 @@ for (comrow in 1:dim(complete_table)[1]){
     phenos <- rbind(phenos, complete_table[comrow, pheno_names])
     # Add the covariates to the table
     covars <- rbind(covars, cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild))))
+    sexvec <- c(sexvec, complete_table[comrow, yamin$sex])
   }else{
     if (p1n==p2n){
       if (!p1n %in% notfounds){
@@ -168,7 +170,7 @@ if (length(covar_names) > 0){
 phenos <- scale(phenos)
 
 # Take the betas of each strain and use it to run GEMMA
-b <- average_strain(strains_genomes, phenos, covars, args$downsample)
+b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
 
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
