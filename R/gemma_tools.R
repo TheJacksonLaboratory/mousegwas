@@ -254,13 +254,10 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex)
   set.seed(100)
   cret <- NULL
   sgs <- rbind(as.list(c(1,1,1, sex)), strains_genomes, use.names=FALSE)
-  print(head(sgs))
-  print(head(strains_genomes))
   grows <- c(1, sample(nrow(sgs), min(nrow(sgs), 1000)))
 
   # Find similar genomes
   genidx <- match(sgs[grows,], sgs[grows,])
-  print(genidx)
   if (downsample > 0){ # sample from each strain
     miceidx = 1:3 # 1:3 is rs, minor, major
     for (i in unique(genidx[-1:-3])){
@@ -278,14 +275,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex)
   # Compute the phenotypes
   if (downsample == 0){ # average with lm
     phen2 <- cbind(as.data.frame(phenotypes), as.data.frame(covars[,-1, drop=FALSE]) )
-    print(head(phen2))
-    print(head(covars))
-
     phen2$strain <- factor(genidx[-1:-3])
-    print(factor(genidx[-1:-3]))
-    print(head(phen2))
-    print(colnames(covars))
-    print(colnames(phenotypes))
     pret <- NULL
     for (pn in colnames(phenotypes)){
       lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(colnames(covars)[-1]), sep="+")), " + strain ")), phen2)
