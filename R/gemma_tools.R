@@ -278,8 +278,10 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex)
   # Compute the phenotypes
   if (downsample == 0){ # average with lm
     phen2 <- cbind(phenotypes, covars[,-1])
-    print(head(phen2))
     phen2$strain <- factor(genidx[-1:-3])
+    print(head(phen2))
+    print(names(covars))
+    print(names(phenotypes))
     pret <- NULL
     for (pn in colnames(phenotypes)){
       lmout <- lm(as.formula(paste0(pn, " ~ 0 + ", do.call(paste, c(as.list(names(covars)[-1]), sep="+")), " + strain ")), phen2)
