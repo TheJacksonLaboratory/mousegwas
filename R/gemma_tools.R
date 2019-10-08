@@ -277,7 +277,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex)
 
   # Compute the phenotypes
   if (downsample == 0){ # average with lm
-    phen2 <- cbind(as.data.frame(phenotypes), covars[,-1])
+    phen2 <- cbind(as.data.frame(phenotypes), as.data.frame(covars[,-1]))
     print(head(phen2))
     print(head(covars))
 
