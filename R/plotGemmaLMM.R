@@ -99,7 +99,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
 
     # Show all points
     geom_point( aes(color=as.factor(chr + 21 * ((P>redthr)+0))), alpha=1, size=1) +
-    scale_color_manual(values = c(rep(c("grey27", "steeleblue3"),10), rep("red", 20) )) +
+    scale_color_manual(values = c(rep(c("grey27", "steelblue3"),10), rep("red", 20) )) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
