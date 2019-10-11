@@ -175,7 +175,7 @@ if (length(covar_names) > 0){
 # Normalize the phenotypes
 if (args$qqnorm){
   for (r in 1:ncol(phenos)){
-    phenos[,r] <- qqnorm(phenos[,r], plot=F)$x
+    phenos[,r, with=F] <- qqnorm(phenos[,r, with=F], plot=F)$x
   }
 }else{ # If not QQnorm just scale to have mean=0 var=1
   phenos <- scale(phenos)
