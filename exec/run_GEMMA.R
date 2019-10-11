@@ -48,6 +48,8 @@ parser$add_argument("--shuffle", default=FALSE, action="store_true",
                     help="Shuffle the phenotypes between the different individuals")
 parser$add_argument("--seed", type="integer", default=100,
                     help="If shuffle is true, set the seed to avoid repeating the same results but have the option to rerun")
+parser$add_argument("--qqnorm", default=FALSE, action="store_true",
+                    help="QQNORM each phenotype before analyzing")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -171,7 +173,13 @@ if (length(covar_names) > 0){
 }
 
 # Normalize the phenotypes
-phenos <- scale(phenos)
+if (args$qqnorm){
+  for (r in 1:ncol(phenos)){
+    phenos[,r] <- qqnorm(phenos[,r], plot=F)$x
+  }
+}else{ # If not QQnorm just scale to have mean=0 var=1
+  phenos <- scale(phenos)
+}
 if (args$shuffle){
   set.seed(args$seed)
   phenos <- phenos[sample(nrow(phenos)),]
