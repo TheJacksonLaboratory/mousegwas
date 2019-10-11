@@ -172,14 +172,9 @@ if (length(covar_names) > 0){
   covars = NULL
 }
 
-# Normalize the phenotypes
-if (args$qqnorm){
-  for (r in 1:ncol(phenos)){
-    phenos[,r] <- qqnorm(as.data.frame(phenos[,r, with=F], plot=F)[,1])$x
-  }
-}else{ # If not QQnorm just scale to have mean=0 var=1
-  phenos <- scale(phenos)
-}
+# scale to have mean=0 var=1
+phenos <- scale(phenos)
+
 if (args$shuffle){
   set.seed(args$seed)
   phenos <- phenos[sample(nrow(phenos)),]
@@ -193,6 +188,12 @@ b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*ar
                              rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
                              rowSums(b$genotypes==2)>=(ncol(b$genotypes)-3)*args$MAF,]
 
+# Normalize the phenotypes
+if (args$qqnorm){
+  for (r in 1:ncol(b$phenotypes)){
+    b$phenotypes[,r] <- qqnorm(as.data.frame(b$phenotypes)[,r], plot=F)$x
+  }
+}
 # Export order of strains used
 write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), quote = FALSE, col.names = FALSE)
 
