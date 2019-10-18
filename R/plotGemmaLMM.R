@@ -49,7 +49,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
         allele1 = col_character(),
         allele0 = col_character()))
       jres <- gwas_results %>% left_join(select(difres, c(rs, p_wald)), by="rs", suffix = c("", ".d"))
-      gwas_results <- jres %>% mutate(p_wald = p_wald-p_wald.d) %>% select(-p_wald.d)
+      gwas_results <- jres %>% mutate(p_wald = p_wald/p_wald.d) %>% select(-p_wald.d)
     }
   }
   #chr     rs      ps      n_miss  allele1 allele0 af      beta_1  beta_2  beta_3  Vbeta_1_1       Vbeta_1_2       Vbeta_1_3       Vbeta_2_2       Vbeta_2_3       Vbeta_3_3       p_lrt
