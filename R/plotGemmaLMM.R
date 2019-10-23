@@ -145,8 +145,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
                                       aes(BPcum, P, label = gene_name), alpha = 0.7)
   }
 
-  #print(p)
-  return(plot=p, gwas=gwas_results)
+  return(list(plot=p, gwas=gwas_results))
 }
 
 #' Title
