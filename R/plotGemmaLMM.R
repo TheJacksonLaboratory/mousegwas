@@ -48,7 +48,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
         n_miss = col_double(),
         allele1 = col_character(),
         allele0 = col_character()))
-      jres <- gwas_results %>% left_join(select(difres, c(rs, p_wald)), by="rs", suffix = c("", ".d"))
+      jres <- gwas_results %>% inner_join(select(difres, c(rs, p_wald)), by="rs", suffix = c("", ".d"))
       gwas_results <- jres %>% mutate(p_wald = p_wald/p_wald.d) %>% select(-p_wald.d)
     }
   }
@@ -94,7 +94,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     #mutate( is_highlight=ifelse(SNP_ID %in% snpsOfInterest, "yes", "no")) %>%
 
     # Filter SNP to make the plot lighter
-    filter(P>0, ! is.na(chr))
+    filter(! is.na(chr))
     # Replace chr 20 to X
  # don[don$chr==20, "chr"] = "X"
 
@@ -107,6 +107,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   don$text <- paste("SNP: ", don$rs, "\nPosition: ", don$ps, "\nChromosome: ", don$chr, "\nLOD score:", don$P %>% round(2), "\nWhat else do you wanna know", sep="")
   log10P <- don$P
   ymax <- 1.25 * max(log10P, na.rm = TRUE)
+  ymin <- 1.25 * min(log10P, na.rm = TRUE)
   chr_label <- axisdf$chr
   chr_label[chr_label==20] = "X"
   # Make the plot
@@ -119,7 +120,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
     scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
-    ylim(0,ymax) +
+    ylim(ymin,ymax) +
     xlab(name) +
     ylab("-log(P-value)") +
     # Add highlighted points
@@ -144,8 +145,8 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
                                       aes(BPcum, P, label = gene_name), alpha = 0.7)
   }
 
-  print(p)
-  return(p)
+  #print(p)
+  return(plot=p, gwas=gwas_results)
 }
 
 #' Title

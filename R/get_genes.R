@@ -2,7 +2,7 @@
 
 #' Retrieve genes from biomaRt and return the intersecting genes
 #'
-#' @param snps A list of SNPs with chr, bp38 and P columns
+#' @param snps A list of SNPs with chr, ps columns
 #' @param dist Distance of genes from SNPs
 #'
 #' @return
