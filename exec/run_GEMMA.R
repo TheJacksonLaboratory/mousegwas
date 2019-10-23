@@ -50,6 +50,8 @@ parser$add_argument("--seed", type="integer", default=100,
                     help="If shuffle is true, set the seed to avoid repeating the same results but have the option to rerun")
 parser$add_argument("--qqnorm", default=FALSE, action="store_true",
                     help="QQNORM each phenotype before analyzing")
+parser$add_argument("--genedist", default=1000000, type="integer",
+                    help="gene distance from SNP, for gene reporting")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -243,6 +245,12 @@ if (FALSE){#(args$method == "GEMMA"){
   a <- fread(pvals_file, header=F, skip=2)
   pval_thr <- log10(a[1,3])
 }
+
+# Manhattan plot
 p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"), namethr=pval_thr, redthr=pval_thr)
-ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p, device="pdf", width=16, height=8, units="in")
+ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
+
+# Read the significant SNPs and grab their related genes
+affgen <- get_genes(p$gwas[p$gwas$P>5,], dist=args$genedist)
+fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$dist, ".csv"))
