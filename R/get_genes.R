@@ -18,13 +18,10 @@ get_genes <- function(snps, dist=1000000){
                  "gene_biotype"), mart=ensembl)
   # There should probably be a better solution but let's do it with a for loop
   affgene <- data.frame(rs=character(), gene=character())
-  print(snps)
   for (s in 1:nrow(snps)){
-    print(s)
-    sum((annot$chromosome_name==as.character(snps[s, "chr", drop=T])) & (annot$start_position>snps[s, "ps", drop=T]-dist) & (annot$end_position<snps[s, "ps", drop=T]+dist))
      fg <- annot[(annot$chromosome_name==as.character(snps[s, "chr", drop=T])) & (annot$start_position>snps[s, "ps", drop=T]-dist) & (annot$end_position<snps[s, "ps", drop=T]+dist), "ensembl_gene_id"]
      for (f in fg){
-       affgene <- rbind(data.frame(rs=snps[s, "rs"], gene=f))
+       affgene <- rbind(affgene, data.frame(rs=snps[s, "rs"], gene=f))
      }
   }
   return(affgene)
