@@ -22,7 +22,7 @@ get_genes <- function(snps, dist=1000000){
   for (s in 1:nrow(snps)){
     print(s)
     sum((annot$chromosome_name==as.character(snps[s, "chr", drop=T])) & (annot$start_position>snps[s, "ps", drop=T]-dist) & (annot$end_position<snps[s, "ps", drop=T]+dist))
-     fg <- annot[(annot$chromosome_name==as.character(snps[s, "chr"])) & (annot$start_position>snps[s, "ps"]-dist) & (annot$end_position<snps[s, "ps"]+dist), "ensembl_gene_id"]
+     fg <- annot[(annot$chromosome_name==as.character(snps[s, "chr", drop=T])) & (annot$start_position>snps[s, "ps", drop=T]-dist) & (annot$end_position<snps[s, "ps", drop=T]+dist), "ensembl_gene_id"]
      for (f in fg){
        affgene <- rbind(data.frame(rs=snps[s, "rs"], gene=f))
      }
