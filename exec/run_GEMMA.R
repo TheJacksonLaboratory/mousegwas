@@ -226,7 +226,7 @@ if (!is.null(args$genes)){
   genes <- fread(file=args$genes, col.names = c("rs", "gene_name"), header = FALSE)
 }
 
-pval_thr <- snpthr
+pval_thr <- args$snpthr
 # Compute FDR using SLIDE if we used GEMMA only
 if (FALSE){#(args$method == "GEMMA"){
   get_multi()
