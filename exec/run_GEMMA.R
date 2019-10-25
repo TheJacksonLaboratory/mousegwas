@@ -52,6 +52,8 @@ parser$add_argument("--qqnorm", default=FALSE, action="store_true",
                     help="QQNORM each phenotype before analyzing")
 parser$add_argument("--genedist", default=1000000, type="integer",
                     help="gene distance from SNP, for gene reporting")
+parser$add_argument("--snpthr", default=3, type="double",
+                    help="P threshold for gene reporting")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -224,7 +226,7 @@ if (!is.null(args$genes)){
   genes <- fread(file=args$genes, col.names = c("rs", "gene_name"), header = FALSE)
 }
 
-pval_thr <- 5
+pval_thr <- snpthr
 # Compute FDR using SLIDE if we used GEMMA only
 if (FALSE){#(args$method == "GEMMA"){
   get_multi()
@@ -252,5 +254,5 @@ p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.met
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
 
 # Read the significant SNPs and grab their related genes
-affgen <- get_genes(p$gwas[p$gwas$P>5,], dist=args$genedist)
+affgen <- get_genes(p$gwas[p$gwas$P>snpthr,], dist=args$genedist)
 fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$dist, ".csv"))
