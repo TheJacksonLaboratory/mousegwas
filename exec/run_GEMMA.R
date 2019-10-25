@@ -254,5 +254,5 @@ p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.met
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
 
 # Read the significant SNPs and grab their related genes
-affgen <- get_genes(p$gwas[p$gwas$P>snpthr,], dist=args$genedist)
-fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$dist, ".csv"))
+affgen <- get_genes(p$gwas[p$gwas$P>args$snpthr,], dist=args$genedist)
+fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$genedist,, "_pval_", args$snpthr, ".csv"))
