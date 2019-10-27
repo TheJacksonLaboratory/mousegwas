@@ -255,4 +255,4 @@ ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="p
 
 # Read the significant SNPs and grab their related genes
 affgen <- get_genes(p$gwas[p$gwas$P>args$snpthr,], dist=args$genedist)
-fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$genedist,, "_pval_", args$snpthr, ".csv"))
+fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$genedist, "_pval_", args$snpthr, ".csv"))
