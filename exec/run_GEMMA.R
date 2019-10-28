@@ -54,6 +54,8 @@ parser$add_argument("--genedist", default=1000000, type="integer",
                     help="gene distance from SNP, for gene reporting")
 parser$add_argument("--snpthr", default=3, type="double",
                     help="P threshold for gene reporting")
+parser$add_argument("--namethr", default=7, type="double",
+                    help="Print gene names above this threshold")
 args <- parser$parse_args()
 
 # Load the yaml
@@ -250,7 +252,7 @@ if (FALSE){#(args$method == "GEMMA"){
 
 # Manhattan plot
 p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
-                    annotations=paste0(args$basedir, "/annotations.csv"), namethr=pval_thr, redthr=pval_thr)
+                    annotations=paste0(args$basedir, "/annotations.csv"), namethr=args$namethr, redthr=pval_thr)
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
 
 # Read the significant SNPs and grab their related genes
