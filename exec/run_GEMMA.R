@@ -52,9 +52,9 @@ parser$add_argument("--qqnorm", default=FALSE, action="store_true",
                     help="QQNORM each phenotype before analyzing")
 parser$add_argument("--genedist", default=1000000, type="integer",
                     help="gene distance from SNP, for gene reporting")
-parser$add_argument("--snpthr", default=3, type="double",
+parser$add_argument("--snpthr", default=5, type="double",
                     help="P threshold for gene reporting")
-parser$add_argument("--namethr", default=7, type="double",
+parser$add_argument("--namethr", default=10, type="double",
                     help="Print gene names above this threshold")
 args <- parser$parse_args()
 

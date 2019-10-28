@@ -316,7 +316,7 @@ get_sigmas <- function(logfile){
   while(is.null(ve) | is.null(vg)){
     line <- readLines(con, n=1)
     if (grepl("^## pve estimate", line)) pve <- as.numeric(strsplit(line, " = ")[[1]][2])
-    if (grepl("^## se(pve) ", line)) pvese <- as.numeric(strsplit(line, " = ")[[1]][2])
+    if (grepl("^## se\\(pve\\) ", line)) pvese <- as.numeric(strsplit(line, " = ")[[1]][2])
     if (grepl("^## vg estimate", line)) vg <- as.numeric(strsplit(line, " = ")[[1]][2])
     if (grepl("^## ve estimate", line)) ve <- as.numeric(strsplit(line, " = ")[[1]][2])
   }
