@@ -177,9 +177,13 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
       outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
         "lmm_all_phenotype_", n))
-      combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_allpheno.assoc.pasted.txt"),
-                       paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
-      return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
+      if (length(outfiles)>1){
+        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_allpheno.assoc.pasted.txt"),
+                         paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
+        return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
+      }else{
+        return(paste0(basedir, "/output/lmm_all_phenotype_1.assoc.txt"))
+      }
 
     }else{
       system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
@@ -289,3 +293,33 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex)
   }
   return(list(genotypes = gret, phenotypes = pret, indices = miceidx[-1:-3]-3, covars = cret))
 }
+
+#' Extract Vg and Ve from GEMMA log file
+#'
+#' @param logfile GEMMA log file
+#'
+#' @return Vg and Ve
+#' @export
+#'
+#' @examples
+get_sigmas <- function(logfile){
+  ## pve estimate in the null model = 0.0253116
+  ## se(pve) in the null model = 0.0525698
+  ## vg estimate in the null model = 0.0625506
+  ## ve estimate in the null model = 1.63363
+
+  con <- file(logfile, "r")
+  vg = NULL
+  ve = NULL
+  pve = NULL
+  pvese = NULL
+  while(is.null(ve) | is.null(vg)){
+    line <- readLines(con, n=1)
+    if (grepl("^## pve estimate", line)) pve <- as.numeric(strsplit(line, " = ")[[1]][2])
+    if (grepl("^## se(pve) ", line)) pvese <- as.numeric(strsplit(line, " = ")[[1]][2])
+    if (grepl("^## vg estimate", line)) vg <- as.numeric(strsplit(line, " = ")[[1]][2])
+    if (grepl("^## ve estimate", line)) ve <- as.numeric(strsplit(line, " = ")[[1]][2])
+  }
+  return (list(PVE=pve, PVESE=pvese, Vg=vg, Ve=ve))
+}
+

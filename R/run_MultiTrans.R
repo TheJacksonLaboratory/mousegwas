@@ -47,7 +47,7 @@ get_multi <- function(multilink="http://genetics.cs.ucla.edu/multiTrans/MultiTra
 #' @export
 #'
 #' @examples
-get_sigmas <- function(logfile){
+get_sigmas_dep <- function(logfile){
   ## vg estimate in the null model = 0.00981952
   ## ve estimate in the null model = 0.0178361
   con <- file(logfile, "r")

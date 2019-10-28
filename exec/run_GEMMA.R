@@ -208,6 +208,20 @@ if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
                               b$covars, args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
+  # Run no LOCO to get the unified heritability for each phenotype
+  if (!args$noloco){
+    all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
+                                as.data.table(complete.geno[,.(rs, bp38, chr)]),
+                                b$covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
+    # Extract the VPE values for each phenotype
+  }
+  allVPE = data.table(PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
+  for (n in 1:dim(p$phenotypes)[2]){
+    fname <- paste0(args$basedir, "/output/lmm_all_phenotype_", n, ".log.txt")
+    sigs <- get_sigmas(fname)
+    allVPE <- rbind(allVPE, sigs)
+  }
+  fwrite(allVPE, file=paste0(args$basedir, "/PVE_GEMMA_estimates.txt"))
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
