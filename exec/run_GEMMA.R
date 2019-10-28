@@ -243,26 +243,6 @@ if (!is.null(args$genes)){
 }
 
 pval_thr <- args$snpthr
-# Compute FDR using SLIDE if we used GEMMA only
-if (FALSE){#(args$method == "GEMMA"){
-  get_multi()
-  # Read the variances from the log files
-  allvgs = c()
-  allves = c()
-  for (fn in Sys.glob(paste0(args$basedir, "/output/lmm*.log.txt"))){
-    res <- get_sigmas(fn)
-    allvgs <- c(allvgs, res$vg)
-    allves <- c(allves, res$ve)
-  }
-  kinfile <- Sys.glob(paste0(args$basedir, "/output/kinship*cXX.txt"))[1]
-  # Compute R
-  run_R(b$genotypes[,-1:-3], kinfile, median(allvgs), median(allves), args$basedir)
-  # Compute C
-  run_C(args$basedir)
-  pvals_file <- run_slide(args$basedir, nrow(b$genotypes))
-  a <- fread(pvals_file, header=F, skip=2)
-  pval_thr <- log10(a[1,3])
-}
 
 # Manhattan plot
 p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
