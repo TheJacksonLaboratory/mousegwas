@@ -216,7 +216,7 @@ if (args$method == "GEMMA"){
     # Extract the VPE values for each phenotype
   }
   allVPE = data.table(PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
-  for (n in 1:dim(p$phenotypes)[2]){
+  for (n in 1:dim(b$phenotypes)[2]){
     fname <- paste0(args$basedir, "/output/lmm_all_phenotype_", n, ".log.txt")
     sigs <- get_sigmas(fname)
     allVPE <- rbind(allVPE, sigs)
