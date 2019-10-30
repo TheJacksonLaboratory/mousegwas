@@ -168,7 +168,7 @@ for (comrow in 1:dim(complete_table)[1]){
     strains_genomes[, eval(paste0('X',comrow)):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
     # Add the phenotypes to the table
 
-    ct <- if (p1n==p2n) as.character(coat_table %>% filter(strain==p1n) %>% selcet(coat)) else as.character(coat_table %>% filter(strain==sname) %>% select(coat))
+    ct <- if (p1n==p2n) as.character(coat_table %>% filter(strain==p1n) %>% select(coat)) else as.character(coat_table %>% filter(strain==sname) %>% select(coat))
     if (is.null(ct) & (args$coat_phenotype | args$coat_covar)){
       print(paste0("Can't find coat color for ", p1n, " or ", sname))
     }
