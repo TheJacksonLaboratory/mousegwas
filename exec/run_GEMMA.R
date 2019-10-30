@@ -56,6 +56,11 @@ parser$add_argument("--snpthr", default=7, type="double",
                     help="P threshold for gene reporting")
 parser$add_argument("--namethr", default=10, type="double",
                     help="Print gene names above this threshold")
+parser$add_argument("--coat_covar", default=FLASE, action="store_true",
+                    help="Use coat color as defined in yaml file as a covariate")
+parser$add_argument("--coat_phenotype", default=FLASE, action="store_true",
+                    help="Use coat color as defined in yaml file as a phenotype")
+
 args <- parser$parse_args()
 
 # Load the yaml
@@ -139,6 +144,8 @@ sexvec <- c()
 
 # Keep old not found strains to not repeat error messages
 notfounds = c()
+
+# Read the input phenotypic data, write the genotypes and phenotypes in the proper tables
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
   rnum <- which(strains$input_name==sname)
@@ -148,13 +155,26 @@ for (comrow in 1:dim(complete_table)[1]){
   }
   p1n <- strains$p1[rnum]
   p2n <- strains$p2[rnum]
-  if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno) & (!p1n %in% yamin$wild)){
+  if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
     sorder <- c(sorder, sname)
     strains_genomes[, eval(paste0('X',comrow)):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
     # Add the phenotypes to the table
-    phenos <- rbind(phenos, complete_table[comrow, pheno_names])
+
+    ct <- if (p1n==p2n) yamin$coat$p1n else yamin$coat$sname
+    if (is.na(ct) & (args$coat_phenotype | args$coat_covar)){
+      print(paste0("Can't find coat color for ", p1n, " or ", sname))
+    }
+    prow <- complete_table[comrow, pheno_names]
+    if (args$coat_phenotype){
+      prow <- cbind(complete_table[comrow, pheno_names], coat = ct)
+    }
+    phenos <- rbind(phenos, prow)
     # Add the covariates to the table
-    covars <- rbind(covars, cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild))))
+    crow <- cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
+    if (args$coat_cpvar){
+      crow <- cbind(crow, coat=ct)
+    }
+    covars <- rbind(covars, crow)
     sexvec <- c(sexvec, complete_table[comrow, yamin$sex])
   }else{
     if (p1n==p2n){
@@ -250,5 +270,5 @@ p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.met
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
 
 # Read the significant SNPs and grab their related genes
-affgen <- get_genes(p$gwas[p$gwas$P>args$snpthr,], dist=args$genedist)
-fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$genedist, "_pval_", args$snpthr, ".csv"))
+#affgen <- get_genes(p$gwas[p$gwas$P>args$snpthr,], dist=args$genedist)
+#fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$genedist, "_pval_", args$snpthr, ".csv"))
