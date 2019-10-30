@@ -56,9 +56,9 @@ parser$add_argument("--snpthr", default=7, type="double",
                     help="P threshold for gene reporting")
 parser$add_argument("--namethr", default=10, type="double",
                     help="Print gene names above this threshold")
-parser$add_argument("--coat_covar", default=FLASE, action="store_true",
+parser$add_argument("--coat_covar", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a covariate")
-parser$add_argument("--coat_phenotype", default=FLASE, action="store_true",
+parser$add_argument("--coat_phenotype", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a phenotype")
 
 args <- parser$parse_args()
