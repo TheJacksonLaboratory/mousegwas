@@ -176,10 +176,7 @@ for (comrow in 1:dim(complete_table)[1]){
     if (args$coat_phenotype){
       prow <- cbind(complete_table[comrow, pheno_names], coat = ct)
     }
-    print(ct)
-    print(prow)
     phenos <- rbind(phenos, prow, fill=TRUE)
-    print(phenos)
     # Add the covariates to the table
     crow <- cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
     if (args$coat_covar){
@@ -210,7 +207,7 @@ if (length(covar_names) > 0){
 }
 
 # scale to have mean=0 var=1
-phenos <- scale(phenos)
+#phenos <- scale(phenos)
 
 if (args$shuffle){
   set.seed(args$seed)
