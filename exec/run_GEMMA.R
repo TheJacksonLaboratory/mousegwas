@@ -176,7 +176,8 @@ for (comrow in 1:dim(complete_table)[1]){
     }
     prow <- complete_table[comrow, pheno_names]
     if (args$coat_phenotype){
-      prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[(if (p1n==p2n) p1n else sname),])
+      cname <- if (p1n==p2n) p1n else sname
+      prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[cname,])
     }
     phenos <- rbind(phenos, prow, fill=TRUE)
     # Add the covariates to the table
