@@ -104,6 +104,8 @@ if (args$coat_phenotype |args$coat_covar){
   for (ct in yamin$coat){
     coat_table <- add_row(coat_table, strain=names(ct), coat=unlist(ct)[1])
   }
+  coat_table_mm <- model.matrix(~coat, coat_table)[,-1]
+  row.names(coat_table_mm) <- coat_table$strain
 }
 
 # For each genotype file read it and add to the long file, use only genotypes in the input
@@ -174,7 +176,7 @@ for (comrow in 1:dim(complete_table)[1]){
     }
     prow <- complete_table[comrow, pheno_names]
     if (args$coat_phenotype){
-      prow <- cbind(complete_table[comrow, pheno_names], coat = ct)
+      prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[(if (p1n==p2n) p1n else sname),])
     }
     phenos <- rbind(phenos, prow, fill=TRUE)
     # Add the covariates to the table
@@ -201,13 +203,16 @@ for (comrow in 1:dim(complete_table)[1]){
 
 # Compute the covariate matrix
 if (length(covar_names) > 0){
+  if (args$coat_covar){
+    covar_names <- c(covar_names, "coat")
+  }
   covars <- model.matrix(as.formula(paste0("~", do.call(paste, c(as.list(covar_names), sep="+")))), covars)
 }else{
   covars = NULL
 }
 
 # scale to have mean=0 var=1
-#phenos <- scale(phenos)
+phenos <- scale(phenos)
 
 if (args$shuffle){
   set.seed(args$seed)
