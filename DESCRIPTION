@@ -24,6 +24,6 @@ Imports:
   ggplot2,
   fastmatch,
   gtools,
-  biomaRt (>= 2.34.1)
+  biomaRt (>= 2.34.1),
   fuzzyjoin
   
