@@ -177,7 +177,7 @@ for (comrow in 1:dim(complete_table)[1]){
       prow <- cbind(complete_table[comrow, pheno_names], coat = ct)
     }
     print(ct)
-    print(crow)
+    print(prow)
     phenos <- rbind(phenos, prow)
     # Add the covariates to the table
     crow <- cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
