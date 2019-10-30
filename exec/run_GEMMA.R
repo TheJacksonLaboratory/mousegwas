@@ -161,7 +161,7 @@ for (comrow in 1:dim(complete_table)[1]){
     # Add the phenotypes to the table
 
     ct <- if (p1n==p2n) yamin$coat$p1n else yamin$coat$sname
-    if (is.na(ct) & (args$coat_phenotype | args$coat_covar)){
+    if (is.null(ct) & (args$coat_phenotype | args$coat_covar)){
       print(paste0("Can't find coat color for ", p1n, " or ", sname))
     }
     prow <- complete_table[comrow, pheno_names]
