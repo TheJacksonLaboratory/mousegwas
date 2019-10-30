@@ -177,6 +177,8 @@ for (comrow in 1:dim(complete_table)[1]){
     prow <- complete_table[comrow, pheno_names]
     if (args$coat_phenotype){
       cname <- if (p1n==p2n) p1n else sname
+      print(cname)
+      print(coat_table_mm[cname,])
       prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[cname,])
     }
     phenos <- rbind(phenos, prow, fill=TRUE)
