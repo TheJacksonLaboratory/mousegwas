@@ -238,7 +238,7 @@ colnames(b$phenotypes) <- gsub("OFA_Groom", "", colnames(b$phenotypes))
 ppr <- ggpairs(as.data.frame(b$phenotypes))
 ggsave(paste0(args$basedir, "/phenotype_correlations.pdf"), plot=ppr, device="pdf", width=16, height=16, units="in")
 
-pdf(paste0(args$basedir, "/phenotype_correlations_corrgram.pdf"))
+pdf(paste0(args$basedir, "/phenotype_correlations_corrgram.pdf"), width = 16, height = 16)
 corrgram(as.data.frame(b$phenotypes), order=TRUE, upper.panel=panel.conf, lower.panel=panel.shade, diag.panel=panel.density)
 dev.off()
 
