@@ -229,7 +229,7 @@ if (args$shuffle){
 }
 
 # Take the betas of each strain and use it to run GEMMA
-b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
+b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec, used_strains)
 used_strains <- used_strains[b$indices]
 
 # Print the phenotypes order
