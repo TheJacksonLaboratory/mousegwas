@@ -185,9 +185,7 @@ for (comrow in 1:dim(complete_table)[1]){
     if (args$coat_covar){
       crow <- cbind(crow, coat=ct)
     }
-    print(crow)
     covars <- rbind(covars, crow, fill=TRUE)
-    print(covars)
     sexvec <- c(sexvec, complete_table[comrow, yamin$sex])
   }else{
     if (p1n==p2n){
@@ -229,7 +227,7 @@ if (args$shuffle){
 b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
 
 # Print the phenotypes order
-write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"))
+write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"), quote = FALSE, col.names = FALSE, row.names = FALSE)
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
                              rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
