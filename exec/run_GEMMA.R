@@ -237,7 +237,8 @@ write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.t
 
 # Plot correlations between phenotypes
 
-ppr <- ggpairs(cbind(tibble(Strain=used_strains), tibble(b$phenotypes)))
+#ppr <- ggpairs(cbind(tibble(Strain=used_strains), tibble(b$phenotypes)))
+ppr <- ggpairs(b$phenotypes)
 ggsave(paste0(args$basedir, "/phenotype_correlations.pdf"), plot=ppr, device="pdf", width=16, height=16, units="in")
 
 # Remove SNPs with more than 5% missing data and 5% MAF
