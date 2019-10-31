@@ -218,7 +218,7 @@ if (length(covar_names) > 0){
 phenos <- scale(phenos)
 
 # Remove columns with NaNs
-for (c in 1:ncol(phenos)){ if (all(is.na(phenos[,c]))) phenos <- phenos[,-c, drop=F]}
+for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]))) phenos <- phenos[,-c, drop=F]}
 
 if (args$shuffle){
   set.seed(args$seed)
