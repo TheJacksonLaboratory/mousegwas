@@ -219,10 +219,10 @@ if (args$shuffle){
   set.seed(args$seed)
   phenos <- phenos[sample(nrow(phenos)),]
 }
-print(phenos)
+
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
-print(b$phenotypes)
+
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
                              rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
@@ -252,8 +252,10 @@ if (args$method == "GEMMA"){
   allVPE = data.table(PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
   for (n in 1:dim(b$phenotypes)[2]){
     fname <- paste0(args$basedir, "/output/lmm_all_phenotype_", n, ".log.txt")
-    sigs <- get_sigmas(fname)
-    allVPE <- rbind(allVPE, sigs)
+    if (file.exists(fname)){
+      sigs <- get_sigmas(fname)
+      allVPE <- rbind(allVPE, sigs)
+    }
   }
   fwrite(allVPE, file=paste0(args$basedir, "/PVE_GEMMA_estimates.txt"))
 }else if (args$method == "pyLMM"){
