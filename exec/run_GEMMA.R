@@ -217,6 +217,9 @@ if (length(covar_names) > 0){
 # scale to have mean=0 var=1
 phenos <- scale(phenos)
 
+# Remove columns with NaNs
+for (c in 1:ncol(phenos)){ if (all(is.na(phenos[,c]))) phenos <- phenos[,-c, drop=F]}
+
 if (args$shuffle){
   set.seed(args$seed)
   phenos <- phenos[sample(nrow(phenos)),]
@@ -225,6 +228,8 @@ if (args$shuffle){
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
 
+# Print the phenotypes order
+write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"))
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
                              rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
