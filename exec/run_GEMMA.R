@@ -10,6 +10,7 @@ library(readr)
 library(R.utils)
 library(data.table)
 library(ggplot2)
+library(GGally)
 
 # create parser object
 parser <- ArgumentParser()
@@ -155,6 +156,9 @@ sexvec <- c()
 # Keep old not found strains to not repeat error messages
 notfounds = c()
 
+# List of strains in the same order of phenotypes and genotypes
+used_strains <- c()
+
 # Read the input phenotypic data, write the genotypes and phenotypes in the proper tables
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
@@ -187,6 +191,7 @@ for (comrow in 1:dim(complete_table)[1]){
     }
     covars <- rbind(covars, crow, fill=TRUE)
     sexvec <- c(sexvec, complete_table[comrow, yamin$sex])
+    used_strains <- c(used_strains, sname)
   }else{
     if (p1n==p2n){
       if (!p1n %in% notfounds){
@@ -225,9 +230,16 @@ if (args$shuffle){
 
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
+used_strains <- used_strains[b$indices]
 
 # Print the phenotypes order
 write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"), quote = FALSE, col.names = FALSE, row.names = FALSE)
+
+# Plot correlations between phenotypes
+
+ppr <- ggpairs(cbind(tibble(Strain=used_strains), tibble(b$phenotypes)))
+ggsave(paste0(args$basedir, "/phenotype_correlations.pdf"), plot=ppr, device="pdf", width=16, height=16, units="in")
+
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
                              rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
