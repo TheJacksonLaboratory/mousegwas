@@ -237,8 +237,9 @@ print(head(b$phenotypes))
 ppr <- ggpairs(as.data.frame(b$phenotypes))
 ggsave(paste0(args$basedir, "/phenotype_correlations.pdf"), plot=ppr, device="pdf", width=16, height=16, units="in")
 
-ppg <- corrgram(cor(b$phenotypes, use="pair"), order=TRUE, upper.panel=panel.conf, lower.panel=panel.shade, diag.panel=panel.density)
-ggsave(paste0(args$basedir, "/phenotype_correlations_corrgram.pdf"), plot=ppg, device="pdf", width=16, height=16, units="in")
+pdf(paste0(args$basedir, "/phenotype_correlations_corrgram.pdf"))
+ppg <- corrgram(as.data.frame(b$phenotypes), order=TRUE, upper.panel=panel.conf, lower.panel=panel.shade, diag.panel=panel.density)
+dev.off()
 
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
