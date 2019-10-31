@@ -25,5 +25,6 @@ Imports:
   fastmatch,
   gtools,
   biomaRt (>= 2.34.1),
-  fuzzyjoin
+  fuzzyjoin,
+  GGally
   
