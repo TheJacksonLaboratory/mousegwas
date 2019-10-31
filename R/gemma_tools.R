@@ -90,11 +90,19 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
     system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > Metasoft.zip"))
     system(paste0("unzip -uo Metasoft.zip "))
   }
-
+  infiles2 = c()
+  for (f in infiles){
+    if (file.exists(paste0(basedir, "/output/", f, ".assoc.txt"))){
+      infiles2 <- c(infiles2, f)
+    }else{
+      print(paste0("Warning: Can't find file ", f))
+    }
+  }
+  infiles <- infiles2
   # Read all the input files and write in the desired format
   # chr     rs      ps      n_miss  allele1 allele0 af      beta_1  Vbeta_1_1   p_lrt
   cmass <- fread(paste0(basedir, "/output/", infiles[1], ".assoc.txt"))
-  print(head(cmass))
+  #print(head(cmass))
   cmass <- cmass[, c("rs", "beta", "se")]
   for (n in 2:length(infiles)){
     ctmp <- fread(paste0(basedir, "/output/", infiles[n], ".assoc.txt"))[,c("rs", "beta", "se")]
