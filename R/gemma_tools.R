@@ -273,7 +273,7 @@ average_strain <- function(strains_genomes, phenotypes, covars, downsample, sex,
     # Find similar genomes
     genidx <- match(sgs[grows,], sgs[grows,])
   }else{
-    sgs <- paste(c(1,1,1, strain), c(1,1,1, sex))
+    sgs <- paste(c(1,2,3, strain), c(1,2,3, sex))
     genidx <- match(sgs, sgs)
   }
   if (downsample > 0){ # sample from each strain

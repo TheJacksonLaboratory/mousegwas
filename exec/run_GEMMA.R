@@ -156,9 +156,6 @@ sexvec <- c()
 # Keep old not found strains to not repeat error messages
 notfounds = c()
 
-# List of strains in the same order of phenotypes and genotypes
-used_strains <- c()
-
 # Read the input phenotypic data, write the genotypes and phenotypes in the proper tables
 for (comrow in 1:dim(complete_table)[1]){
   sname <- as.character(complete_table[comrow, yamin$strain])
@@ -191,7 +188,6 @@ for (comrow in 1:dim(complete_table)[1]){
     }
     covars <- rbind(covars, crow, fill=TRUE)
     sexvec <- c(sexvec, complete_table[comrow, yamin$sex])
-    used_strains <- c(used_strains, sname)
   }else{
     if (p1n==p2n){
       if (!p1n %in% notfounds){
@@ -229,8 +225,7 @@ if (args$shuffle){
 }
 
 # Take the betas of each strain and use it to run GEMMA
-b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec, used_strains)
-used_strains <- used_strains[b$indices]
+b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec, sorder)
 
 # Print the phenotypes order
 write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"), quote = FALSE, col.names = FALSE, row.names = FALSE)
