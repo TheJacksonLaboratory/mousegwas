@@ -177,8 +177,6 @@ for (comrow in 1:dim(complete_table)[1]){
     prow <- complete_table[comrow, pheno_names]
     if (args$coat_phenotype){
       cname <- if (p1n==p2n) p1n else sname
-      print(cname)
-      print(coat_table_mm[cname,])
       prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[cname,])
     }
     phenos <- rbind(phenos, prow, fill=TRUE)
@@ -221,10 +219,10 @@ if (args$shuffle){
   set.seed(args$seed)
   phenos <- phenos[sample(nrow(phenos)),]
 }
-
+print(phenos)
 # Take the betas of each strain and use it to run GEMMA
 b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec)
-
+print(b$phenotypes)
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
                              rowSums(b$genotypes==0)>=(ncol(b$genotypes)-3)*args$MAF &
