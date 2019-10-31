@@ -185,7 +185,9 @@ for (comrow in 1:dim(complete_table)[1]){
     if (args$coat_covar){
       crow <- cbind(crow, coat=ct)
     }
-    covars <- rbind(covars, crow)
+    print(crow)
+    covars <- rbind(covars, crow, fill=TRUE)
+    print(covars)
     sexvec <- c(sexvec, complete_table[comrow, yamin$sex])
   }else{
     if (p1n==p2n){
