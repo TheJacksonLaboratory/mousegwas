@@ -106,7 +106,7 @@ if (args$coat_phenotype |args$coat_covar){
   for (ct in yamin$coat){
     coat_table <- add_row(coat_table, strain=names(ct), coat=unlist(ct)[1])
   }
-  coat_table_mm <- model.matrix(~coat, coat_table)[,-1]
+  coat_table_mm <- model.matrix(~coat+0, coat_table)
   row.names(coat_table_mm) <- coat_table$strain
 }
 
