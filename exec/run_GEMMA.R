@@ -217,7 +217,10 @@ if (length(covar_names) > 0){
 # scale to have mean=0 var=1 if there are more than 2 values (0,1)
 if (!all(phenos==0 | phenos==1)){
   phenos <- scale(phenos)
+}else{
+  phenos <- as.matrix(phenos)
 }
+
 # Remove columns with NaNs
 for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]))) phenos <- phenos[,-c, drop=F]}
 
