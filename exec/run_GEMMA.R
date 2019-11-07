@@ -222,7 +222,7 @@ if (!all(phenos==0 | phenos==1)){
 }
 
 # Remove columns with NaNs
-for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]))) phenos <- phenos[,-c, drop=F]}
+for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]) | phenos[,c]==0)) phenos <- phenos[,-c, drop=F]}
 
 if (args$shuffle){
   set.seed(args$seed)
