@@ -108,6 +108,9 @@ if (args$coat_phenotype |args$coat_covar){
   }
   coat_table_mm <- model.matrix(~coat+0, coat_table)
   row.names(coat_table_mm) <- coat_table$strain
+  coat_table_mm <- coat_table_mm[,"coatalbino", drop=F]-coat_table_mm[,"coatblack", drop=F]
+  coat_table_mm[coat_table_mm==0] = NA
+  coat_table_mm[coat_table_mm==-1] = 0
 }
 
 # For each genotype file read it and add to the long file, use only genotypes in the input
