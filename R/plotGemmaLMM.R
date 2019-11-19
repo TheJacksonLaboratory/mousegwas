@@ -69,7 +69,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
       srt_pv[nr, "ispeak"] = TRUE
       peaknum = peaknum + 1
     }
-    return(srt_pv %>% select(rs, choose))
+    return(srt_pv %>% select(rs, choose, ispeak))
   }
 
   #chr     rs      ps      n_miss  allele1 allele0 af      beta_1  beta_2  beta_3  Vbeta_1_1       Vbeta_1_2       Vbeta_1_3       Vbeta_2_2       Vbeta_2_3       Vbeta_3_3       p_lrt
