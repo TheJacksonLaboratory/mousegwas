@@ -312,6 +312,7 @@ pval_thr <- args$snpthr
 p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"), namethr=args$namethr, redthr=pval_thr,
                     genotypes = paste0(args$basedir, "/all_genotypes.csv"))
+save(p, file=paste0(args$basedir, "/gwas_object_output.Rdata"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
 
 # Read the significant SNPs and grab their related genes
