@@ -55,17 +55,18 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   }
 
   # Remove correlated peaks
-  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.5, pthr=1e-10){
+  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.6, pthr=1e-20){
     tmat <- base::t(genotypes)
-    srt_pv <- gwas_pvs %>% select(rs, p_wald) %>% arrange(p_wald) %>% mutate(choose = 0)
+    srt_pv <- gwas_pvs %>% select(rs, p_wald) %>% arrange(p_wald) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
     while (any(srt_pv$choose[srt_pv$p_wald<=pthr] == 0)){
       nr <- which(srt_pv$choose == 0 & srt_pv$p_wald <= pthr)[1]
       rs <- srt_pv$rs[nr]
       cvec <- cor(tmat[,rs], tmat)
-      rel_rs <- colnames(cvec)[cvec[1,]^2 >= rs_thr]
-      srt_pv[srt_pv$rs %in% rel_rs, "choose"] = peaknum
+      rel_rs <- intersect(colnames(cvec)[cvec[1,]^2 >= rs_thr], gwas_pvs$rs[gwas_pvs$chr==gwas_pvs$chr[gwas_pvs$rs==rs]])
+      srt_pv[srt_pv$rs %in% rel_rs & srt_pv$choose==0, "choose"] = peaknum
       srt_pv[nr, "choose"] = peaknum
+      srt_pv[nr, "ispeak"] = TRUE
       peaknum = peaknum + 1
     }
     return(srt_pv %>% select(rs, choose))
@@ -80,7 +81,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     pnums <- rep_peaks(allgeno, gwas_results, pthr=10^-redthr)
     gwas_results <- gwas_results %>% left_join(pnums, by="rs")
   }else{
-    gwas_results <- gwas_results %>% mutate(choose=0)
+    gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
   }
 
   ret_gwas <- gwas_results
@@ -151,7 +152,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     )
   if (!is.null(genes)){
     gwas_results <-  left_join(gwas_results, genes, by="rs")
-    toprs <- gwas_results %>% filter(P>namethr, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+    toprs <- gwas_results %>% filter(P>namethr, ispeak=TRUE, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
       # Select only one gene
       group_by(rs) %>% summarize(gene_name=gene_name[1])
     # Add gene_name to don
@@ -159,7 +160,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
                                       aes(BPcum, P, label = gene_name), alpha = 0.7)
   }
 
-  return(list(plot=p, gwas=ret_gwas))
+  return(list(plot=p, gwas=ret_gwas, pwas=don))
 }
 
 #' Title
