@@ -241,7 +241,9 @@ write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.t
 # Generate a covar table based on the confounding SNPs provided in the yaml file
 snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
+  print(yamin$confSNPs)
   snpcovar <- b$genotypes[b$genotypes[,1] %in% yamin$confSNPs, 4:ncol(b$genotypes)]
+  print(snpcovar)
 }
 # Plot correlations between phenotypes
 
