@@ -152,7 +152,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
     )
   if (!is.null(genes)){
     gwas_results <-  left_join(gwas_results, genes, by="rs")
-    toprs <- gwas_results %>% filter(P>namethr, ispeak=TRUE, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+    toprs <- gwas_results %>% filter(P>namethr, ispeak==TRUE, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
       # Select only one gene
       group_by(rs) %>% summarize(gene_name=gene_name[1])
     # Add gene_name to don
