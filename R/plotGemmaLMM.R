@@ -129,8 +129,8 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point(aes(color=as.factor((chr + 21 * ((P>redthr)+0)) * ((choose==0)+0) + (((choose>0)+0) * (40+choose) ))) , alpha=1, size=1) +
-    scale_color_manual(values = c(rep(c("#333F48", "#0085CA"),10), rep("#AB2328", 20), rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    geom_point(aes(color=as.factor(chr * ((choose==0)+0) + (((choose>0)+0) * (20+choose) ))) , alpha=1, size=1) +
+    scale_color_manual(values = c(rep(c("#333F48", "#0085CA"),10), rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
