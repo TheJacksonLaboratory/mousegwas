@@ -243,10 +243,12 @@ snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
   snpcovar <- base::t(as.matrix(b$genotypes)[as.matrix(b$genotypes[,1]) %in% yamin$confSNPs, 4:ncol(b$genotypes)])
   if(is.null(covars)) snpcovar <- cbind(1, snpcovar)
+  print(dim(covars))
+  print(dim(snpcovar))
 }
 # Plot correlations between phenotypes
 
-print(head(b$phenotypes))
+#print(head(b$phenotypes))
 colnames(b$phenotypes) <- gsub("OFA_Groom", "", colnames(b$phenotypes))
 if (dim(b$phenotypes)[2]>1){
   ppr <- ggpairs(as.data.frame(b$phenotypes))
