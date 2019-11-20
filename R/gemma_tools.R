@@ -223,11 +223,11 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
 
       for (n in 1:length(pfiles)){
         print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
-                     " -p ", pfiles[n], " -a ", anotfile, covar_flg
+                     " -p ", pfiles[n], " -a ", anotfile, covar_flg,
                      " -k ", ksfile, " -o ", outfiles[n],
                      " -n ", nns))
         system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
-                      " -p ", pfiles[n], " -a ", anotfile, covar_flg
+                      " -p ", pfiles[n], " -a ", anotfile, covar_flg,
                       #" -c ", covarfile,
                       " -k ", ksfile, " -o ", outfiles[n],
                       " -n ", nns))
