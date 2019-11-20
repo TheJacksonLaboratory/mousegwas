@@ -242,7 +242,7 @@ write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.t
 snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
   print(yamin$confSNPs)
-  snpcovar <- as.matrix(b$genotypes)[as.matrix(b$genotypes[,1]) %in% yamin$confSNPs, 4:ncol(b$genotypes)]
+  snpcovar <- base::t(as.matrix(b$genotypes)[as.matrix(b$genotypes[,1]) %in% yamin$confSNPs, 4:ncol(b$genotypes)])
   print(snpcovar)
 }
 # Plot correlations between phenotypes
@@ -276,12 +276,12 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                              rbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
+                              cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
   # Run no LOCO to get the unified heritability for each phenotype
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                rbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
+                                cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
     # Extract the VPE values for each phenotype
   }
   allVPE = data.table(PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
@@ -296,7 +296,7 @@ if (args$method == "GEMMA"){
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                b$covars, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
+                                cbind(b$covarssnpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
 }
 
 is.metasoft <- TRUE
