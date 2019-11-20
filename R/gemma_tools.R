@@ -144,8 +144,8 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
   covar_flg <- ""
   if (! is.null(covars)){
-    covarfile <- paste0(basedir, "/covariates.csv")
-    fwrite(covars, covarfile, col.names = FALSE, na="NA")
+    covarfile <- paste0(basedir, "/covariates.txt")
+    fwrite(covars, covarfile, col.names = FALSE, na="NA", quote = FALSE, sep = "\t")
     covar_flg <- paste0(" -c ", covarfile)
   }
   genofile <- paste0(basedir, "/all_genotypes.csv")
