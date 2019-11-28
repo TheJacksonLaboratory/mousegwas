@@ -83,10 +83,10 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
   }
-
+  gwas_results <- gwas_results %>% mutate(P=-log10(p_wald))
   ret_gwas <- gwas_results
   gwas_results[gwas_results$chr=="X","chr"] <- 20# gwas_results %>% dplyr::filter(chr=="X") %>% dplyr::mutate(chr=20)
-  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr), P=-log10(p_wald)) %>% arrange(chr, ps)
+  gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr)) %>% arrange(chr, ps)
 
   don <- gwas_results %>%
 

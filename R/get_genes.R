@@ -22,7 +22,8 @@ get_genes <- function(snps, dist=1000000){
                  "gene_biotype"), mart=ensembl)
   annot$ext_start <- annot$start_position-dist
   annot$ext_end <- annot$end_position+dist
-  affgene <- fuzzy_left_join(as_tibble(snps), as_tibble(annot), by=c("chr"="chromosome_name", "ext_start"="ps", "ext_end"="ps"), match_fun=c("==", ">=", "<="))
+  annot <- as_tibble(annot) %>% filter(!is.na(chromosome_name), !is.na(ext_start), !is.na(ext_end))
+  affgene <- fuzzy_left_join(as_tibble(snps), annot, by=c("chr"="chromosome_name", "ps"="ext_start", "ps"="ext_end"), match_fun=c("==", ">=", "<="))
   # There should probably be a better solution but let's do it with a for loop
   #affgene <- data.frame(rs=character(), gene=character())
   #for (s in 1:nrow(snps)){
