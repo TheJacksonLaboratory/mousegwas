@@ -285,11 +285,12 @@ if (args$method == "GEMMA"){
                                 cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
     # Extract the VPE values for each phenotype
   }
-  allVPE = data.table(PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
+  allVPE = data.table(phenotype=character(), PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
   for (n in 1:dim(b$phenotypes)[2]){
     fname <- paste0(args$basedir, "/output/lmm_all_phenotype_", n, ".log.txt")
     if (file.exists(fname)){
       sigs <- get_sigmas(fname)
+      sigs$phenotype <- colnames(b$phenotypes)[n]
       allVPE <- rbind(allVPE, sigs)
     }
   }
