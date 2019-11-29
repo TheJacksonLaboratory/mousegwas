@@ -125,13 +125,14 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
 #' @param eigens Number of eigenvectors to run gemma on
 #' @param loco perform LOCO (default FALSE)
 #' @param single run each phenotype separately and then run metaSOFT to combine results
+#' @param skipcombine don't run metasoft. Used for PVE compute
 #'
 #' @return The unified output file
 #' @export
 #'
 #' @import data.table
 #' @examples
-execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE){
+execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE, skipcombine=FALSE){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
   #setkey(genotypes, rs, physical = FALSE)
@@ -185,7 +186,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       }
       outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
         "lmm_all_phenotype_", n))
-      if (length(outfiles)>1){
+      if (length(outfiles)>1 && !skipcombine){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_allpheno.assoc.pasted.txt"),
                          paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
         return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))

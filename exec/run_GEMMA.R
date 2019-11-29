@@ -282,7 +282,7 @@ if (args$method == "GEMMA"){
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=FALSE, single=TRUE)
+                                cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=FALSE, single=TRUE, skipcombine=TRUE)
     # Extract the VPE values for each phenotype
   }
   allVPE = data.table(phenotype=character(), PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
