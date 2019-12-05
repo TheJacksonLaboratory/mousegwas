@@ -147,6 +147,8 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
 
+fwrite(complete.geno, file = paste0(args$basedir, "/strains_genotypes_all.csv"))
+
 # Compute the specific strains genomes
 strains_genomes <- srdata
 sorder = c()
