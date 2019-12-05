@@ -76,9 +76,9 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
   # Add peak color if genotypes are supplied
   if (!is.null(genotypes)){
-    allgeno <- read.csv(genotypes, header = FALSE, row.names = 1)
-    allgeno <- allgeno[, 3:ncol(allgeno)]
-    pnums <- rep_peaks(allgeno, gwas_results, pthr=10^-redthr)
+    #allgeno <- read.csv(genotypes, header = FALSE, row.names = 1)
+    #allgeno <- allgeno[, 3:ncol(allgeno)]
+    pnums <- rep_peaks(genotypes, gwas_results, pthr=10^-redthr)
     gwas_results <- gwas_results %>% left_join(pnums, by="rs")
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
