@@ -121,6 +121,7 @@ complete.geno <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
+  geno <- geno[rs!="",]
 
   if (is.null(complete.geno)){
     if (length(intersect(names(geno), valid_strains))>0){
