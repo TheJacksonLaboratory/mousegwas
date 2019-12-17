@@ -56,7 +56,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   }
 
   # Remove correlated peaks
-  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.6, pthr=1e-20, maxdist=maxdist){
+  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.6, pthr=1e-20, mxd=maxdist){
     tmat <- base::t(genotypes)
     srt_pv <- gwas_pvs %>% select(rs, p_wald) %>% arrange(p_wald) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
@@ -65,8 +65,8 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
       rs <- srt_pv$rs[nr]
       # Select other SNPs in its vicinity
       rsnum <- gwas_pvs$rs==rs
-      subt <- tmat[,gwas_pvs$rs[gwas_pvs$chr==gwas_pvs$chr[rsnum] & gwas_pvs$ps >= gwas_pvs$ps[rsnum]-maxdist &
-                                        gwas_pvs$ps <= gwas_pvs$ps[rsnum]+maxdist]]
+      subt <- tmat[,gwas_pvs$rs[gwas_pvs$chr==gwas_pvs$chr[rsnum] & gwas_pvs$ps >= gwas_pvs$ps[rsnum]-mxd &
+                                        gwas_pvs$ps <= gwas_pvs$ps[rsnum]+mxd]]
       cvec <- cor(tmat[,rs], subt)
       rel_rs <- colnames(cvec)[cvec[1,]^2 >= rs_thr]
       srt_pv[srt_pv$rs %in% rel_rs & srt_pv$choose==0, "choose"] = peaknum
