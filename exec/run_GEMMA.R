@@ -54,6 +54,8 @@ parser$add_argument("--qqnorm", default=FALSE, action="store_true",
                     help="QQNORM each phenotype before analyzing")
 parser$add_argument("--genedist", default=1000000, type="integer",
                     help="gene distance from SNP, for gene reporting")
+parser$add_argument("--peakdist", default=1000000, type="integer",
+                    help="minimal distance between peaks")
 parser$add_argument("--snpthr", default=7, type="double",
                     help="P threshold for gene reporting")
 parser$add_argument("--namethr", default=10, type="double",
@@ -327,7 +329,7 @@ genotypes = as.data.frame(complete.geno[,-c("chr", "bp38", "minor", "major", "rs
 rownames(genotypes) <- complete.geno[, rs]
 p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"), namethr=args$namethr, redthr=pval_thr,
-                    genotypes = genotypes)
+                    genotypes = genotypes, maxdist = args$peakdist)
                     #genotypes = paste0(args$basedir, "/all_genotypes.csv"))
 save(p, file=paste0(args$basedir, "/gwas_object_output.Rdata"))
 ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")

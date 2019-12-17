@@ -10,6 +10,7 @@
 #' @param redthr Red points above this thr
 #' @param diff A file with results to be subtracted from the first file. Must be in the same format, only implemented for GEMMA
 #' @param genotypes The genotypes of the input strains to compute correlation. If given (as data.frame with row.names) every peak will be colored
+#' @param maxdist maximal distance between peak and related SNPs
 #'
 #' @return A plot
 #' @export
@@ -20,7 +21,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL) {
+plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% select(rs=X1, p_wald=X9)  # RSID and PVALUE_RE2
@@ -55,7 +56,7 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   }
 
   # Remove correlated peaks
-  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.6, pthr=1e-20, maxdist=1000000){
+  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.6, pthr=1e-20, maxdist=maxdist){
     tmat <- base::t(genotypes)
     srt_pv <- gwas_pvs %>% select(rs, p_wald) %>% arrange(p_wald) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
@@ -63,8 +64,9 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
       nr <- which(srt_pv$choose == 0 & srt_pv$p_wald <= pthr)[1]
       rs <- srt_pv$rs[nr]
       # Select other SNPs in its vicinity
-      subt <- tmat[,pwas_pvs$rs[pwas_pvs$chr==gwas_pvs$chr[gwas_pvs$rs==rs] & gwas_pvs$ps >= gwas_pvs$ps[gwas_pvs$rs==rs]-maxdist &
-                                        gwas_pvs$ps <= gwas_pvs$ps[gwas_pvs$rs==rs]+maxdist]]
+      rsnum <- gwas_pvs$rs==rs
+      subt <- tmat[,gwas_pvs$rs[gwas_pvs$chr==gwas_pvs$chr[rsnum] & gwas_pvs$ps >= gwas_pvs$ps[rsnum]-maxdist &
+                                        gwas_pvs$ps <= gwas_pvs$ps[rsnum]+maxdist]]
       cvec <- cor(tmat[,rs], subt)
       rel_rs <- colnames(cvec)[cvec[1,]^2 >= rs_thr]
       srt_pv[srt_pv$rs %in% rel_rs & srt_pv$choose==0, "choose"] = peaknum
