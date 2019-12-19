@@ -30,8 +30,6 @@ parser$add_argument("-g", "--genotypes", nargs = '+',
                     help="The genotypes csv files as downloaded from phenome.jax.org")
 parser$add_argument("--basedir", default=".",
                     help="output directory. Will overwrite existing files")
-parser$add_argument("--genes", default=NULL,
-                    help="a tab delimited table with SNP ID in first column and gene name in second. Might not include all SNPs")
 parser$add_argument("--pylmm", "-p", default="pylmmGWAS.py",
                     help="pylmmGWAS.py executable")
 parser$add_argument("--pylmmkinship", "-k", default="pylmmKinship.py",
@@ -316,18 +314,12 @@ if (args$method=="GEMMA"){
   if (ncol(b$phenotypes)==1) is.metasoft=FALSE
 }
 
-# Read the genes file
-genes = NULL
-if (!is.null(args$genes)){
-  genes <- fread(file=args$genes, col.names = c("rs", "gene_name"), header = FALSE)
-}
-
 pval_thr <- args$snpthr
 
 # Manhattan plot
 genotypes = as.data.frame(complete.geno[,-c("chr", "bp38", "minor", "major", "rs")])
 rownames(genotypes) <- complete.geno[, rs]
-p <- plot_gemma_lmm(results_file, genes=genes, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
+p <- plot_gemma_lmm(results_file, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
                     annotations=paste0(args$basedir, "/annotations.csv"), namethr=args$namethr, redthr=pval_thr,
                     genotypes = genotypes, maxdist = args$peakdist)
                     #genotypes = paste0(args$basedir, "/all_genotypes.csv"))

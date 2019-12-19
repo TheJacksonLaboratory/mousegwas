@@ -1,7 +1,6 @@
 #' Plot the GWAS results as a Manhattan plot and highlight specific genes
 #'
 #' @param results_file A GEMMA results file
-#' @param genes A tibble with the columns rs and gene_name linking genes to SNPs
 #' @param name The title
 #' @param metasoft set TRUE if the input is metaSOFT output
 #' @param pyLMM TRUE if the input is pyLMM output with rs ID in the first column SNP_ID
@@ -21,7 +20,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% select(rs=X1, p_wald=X9)  # RSID and PVALUE_RE2
@@ -67,9 +66,11 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
       rsnum <- gwas_pvs$rs==rs
       subt <- tmat[,gwas_pvs$rs[gwas_pvs$chr==gwas_pvs$chr[rsnum] & gwas_pvs$ps >= gwas_pvs$ps[rsnum]-mxd &
                                         gwas_pvs$ps <= gwas_pvs$ps[rsnum]+mxd]]
-      cvec <- cor(tmat[,rs], subt)
-      rel_rs <- colnames(cvec)[cvec[1,]^2 >= rs_thr]
-      srt_pv[srt_pv$rs %in% rel_rs & srt_pv$choose==0, "choose"] = peaknum
+      if (!is.null(dim(subt))){
+        cvec <- cor(tmat[,rs], subt)
+        rel_rs <- colnames(cvec)[cvec[1,]^2 >= rs_thr]
+        srt_pv[srt_pv$rs %in% rel_rs & srt_pv$choose==0, "choose"] = peaknum
+      }
       srt_pv[nr, "choose"] = peaknum
       srt_pv[nr, "ispeak"] = TRUE
       peaknum = peaknum + 1
@@ -80,11 +81,13 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   #chr     rs      ps      n_miss  allele1 allele0 af      beta_1  beta_2  beta_3  Vbeta_1_1       Vbeta_1_2       Vbeta_1_3       Vbeta_2_2       Vbeta_2_3       Vbeta_3_3       p_lrt
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
   # Add peak color if genotypes are supplied
+  genesdist = maxdist/2
   if (!is.null(genotypes)){
     #allgeno <- read.csv(genotypes, header = FALSE, row.names = 1)
     #allgeno <- allgeno[, 3:ncol(allgeno)]
     pnums <- rep_peaks(genotypes, gwas_results, pthr=10^-redthr)
     gwas_results <- gwas_results %>% left_join(pnums, by="rs")
+    genesdist = 1000
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
   }
@@ -134,8 +137,8 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point(aes(color=as.factor(chr * ((choose==0)+0) + (((choose>0)+0) * (20+choose) ))) , alpha=1, size=1) +
-    scale_color_manual(values = c(rep(c("#333F48", "#0085CA"),10), rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    geom_point(aes(color=as.factor(chr * ((!ispeak)+0) + (((ispeak)+0) * (20+choose) ))) , alpha=1, size=1) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10), rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
@@ -155,15 +158,19 @@ plot_gemma_lmm <- function(results_file, genes=NULL, name="GWAS results", metaso
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank()
     )
-  if (!is.null(genes)){
-    gwas_results <-  left_join(gwas_results, genes, by="rs")
-    toprs <- gwas_results %>% filter(P>namethr, ispeak==TRUE, !is.na(gene_name), !stringr::str_detect(gene_name, "Rik$"), !stringr::str_detect(gene_name, "^Gm")) %>% group_by(gene_name, chr) %>% summarize(rs=rs[which.max(P)]) %>%
-      # Select only one gene
-      group_by(rs) %>% summarize(gene_name=gene_name[1])
+  #if (!is.null(genes)){
+    #gwas_results <-  left_join(gwas_results, genes, by="rs")
+  names_to <- gwas_results %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  names_to <- gwas_results %>% left_join(names_to, by="choose")
+  toprs <- get_genes(names_to %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
+    filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm")) %>%
+    group_by(mgi_symbol, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+    # Select only one gene
+    group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
     # Add gene_name to don
-    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
-                                      aes(BPcum, P, label = gene_name), alpha = 0.7)
-  }
+  p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
+                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7)
+
 
   return(list(plot=p, gwas=ret_gwas, pwas=don))
 }
