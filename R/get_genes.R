@@ -14,8 +14,8 @@
 get_genes <- function(snps, dist=1000000){
   # Get the genes from biomaRt
   #library(biomaRt)
-  ensembl <- useMart("ensembl", dataset="mmusculus_gene_ensembl")
-  annot <- getBM(c("ensembl_gene_id", "mgi_symbol", "chromosome_name", "strand", "start_position", "end_position",
+  ensembl <- biomaRt::useMart("ensembl", dataset="mmusculus_gene_ensembl")
+  annot <- biomaRt::getBM(c("ensembl_gene_id", "mgi_symbol", "chromosome_name", "strand", "start_position", "end_position",
                  "gene_biotype"), mart=ensembl)
   annot$ext_start <- annot$start_position-dist
   annot$ext_end <- annot$end_position+dist
