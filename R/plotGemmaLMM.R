@@ -166,8 +166,8 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     )
   #if (!is.null(genes)){
     #gwas_results <-  left_join(gwas_results, genes, by="rs")
-  names_to <- gwas_results %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-  names_to <- gwas_results %>% left_join(names_to, by="choose")
+  names_to <- ret_gwas %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  names_to <- ret_gwas %>% left_join(names_to, by="choose")
   toprs <- get_genes(names_to %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
     filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm")) %>%
     group_by(mgi_symbol, chr) %>% summarize(rs=rs[which.max(P)]) %>%
