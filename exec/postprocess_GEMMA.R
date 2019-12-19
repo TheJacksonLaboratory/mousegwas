@@ -37,7 +37,8 @@ hmcol <- viridis(256, option="cividis")
 
 # Read the data
 # Read the METASOFT results file. The names of the columns are taken from the phenotypes_order file
-phenos <- read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE)$V1
+phenos <- read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE, skip=1)$V1
+print(phenos)
 cnames <- c("rs", "STUDYNUM", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE",
             "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2", "PVALUE_BE", "I_SQUARE", "Q", "PVALUE_Q",
             "TAU_SQUARE", paste0(phenos, "_PV"), phenos)
