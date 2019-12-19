@@ -28,5 +28,5 @@ Imports:
   fuzzyjoin,
   GGally,
   corrgram,
-  ggbiplot
+  biocViews:ggbiplot
   
