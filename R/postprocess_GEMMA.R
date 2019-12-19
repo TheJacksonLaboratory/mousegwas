@@ -10,7 +10,7 @@
 library(dplyr)
 library(readr)
 library(ggplot2)
-library(ggbiplot)
+#library(ggbiplot)
 library(RColorBrewer)
 library(knitr)
 library(viridis)
