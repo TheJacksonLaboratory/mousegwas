@@ -46,7 +46,7 @@ allgwas <- left_join(allgwas, anno, by="rs") %>% arrange(chr, ps)
 # Read the plotting data
 #p <- load(paste0(args$outdir, "gwas_object_output.Rdata"))
 # Read the genotypes
-geno <- as.matrix(read_csv("strains_genotypes_all.csv", col_types = cols(
+geno <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types = cols(
   .default = col_double(),
   chr = col_character(),
   rs = col_character(),
