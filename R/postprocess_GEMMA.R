@@ -12,7 +12,6 @@ library(readr)
 library(ggplot2)
 #library(ggbiplot)
 library(RColorBrewer)
-library(knitr)
 library(viridis)
 library(gplots)
 library(argparse)
@@ -64,5 +63,13 @@ for (i in 1:length(phenos)){
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot, device="pdf", dpi="print", width=7.25, height=3.6, units="in")
 }
+
+# Plot the MetaSoft results:
+p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
+                    annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
+                    name = "Combined RE2 p-value",genotypes = geno, namethr = 7, redthr = 7)
+ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
+       plot=p$plot, device="pdf", dpi="print", width=7.25, height=3.6, units="in")
+
 
 
