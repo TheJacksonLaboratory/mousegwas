@@ -32,14 +32,19 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else{
-    gwas_results <- read_delim(results_file, "\t", col_names = TRUE, col_type = cols(
-      .default = col_double(),
-      chr = col_character(),
-      rs = col_character(),
-      ps = col_double(),
-      n_miss = col_double(),
-      allele1 = col_character(),
-      allele0 = col_character()))
+    gwas_results <- NULL
+    # Results file might be a vector of files
+    for (rf in results_file){
+      gwas_results <- rbind(gwas_results, read_delim(results_file, "\t", col_names = TRUE, col_type = cols(
+        .default = col_double(),
+        chr = col_character(),
+        rs = col_character(),
+        ps = col_double(),
+        n_miss = col_double(),
+        allele1 = col_character(),
+        allele0 = col_character())))
+    }
+
     if (! is.null(diff)){
       difres <- read_delim(diff, "\t", col_names = TRUE, col_type = cols(
         .default = col_double(),
@@ -52,6 +57,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
       jres <- gwas_results %>% inner_join(select(difres, c(rs, p_wald)), by="rs", suffix = c("", ".d"))
       gwas_results <- jres %>% mutate(p_wald = p_wald/p_wald.d) %>% select(-p_wald.d)
     }
+
   }
 
   # Remove correlated peaks
