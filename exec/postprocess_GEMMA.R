@@ -16,6 +16,7 @@ library(RColorBrewer)
 library(viridis)
 library(gplots)
 library(argparse)
+library(gemmawrapper)
 
 parser <- ArgumentParser()
 
