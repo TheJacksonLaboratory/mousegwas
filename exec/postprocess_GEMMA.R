@@ -9,6 +9,7 @@
 # Load relevant libraries:
 library(dplyr)
 library(readr)
+library(tibble)
 library(ggplot2)
 #library(ggbiplot)
 library(RColorBrewer)
