@@ -59,6 +59,13 @@ geno <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), co
 
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
+# Plot the combined Manhattan plot
+p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
+                    annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
+                    name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7)
+ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
+       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.6, units="in")
+
 # Plot each phenotype's Manhattan plot
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
@@ -66,13 +73,5 @@ for (i in 1:length(phenos)){
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.6, units="in")
 }
-
-# Plot the MetaSoft results:
-p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
-                    annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
-                    name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7)
-ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
-       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.6, units="in")
-
 
 
