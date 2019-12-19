@@ -35,7 +35,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     gwas_results <- NULL
     # Results file might be a vector of files
     for (rf in results_file){
-      gwas_results <- rbind(gwas_results, read_delim(results_file, "\t", col_names = TRUE, col_type = cols(
+      gwas_results <- rbind(gwas_results, read_delim(rf, "\t", col_names = TRUE, col_type = cols(
         .default = col_double(),
         chr = col_character(),
         rs = col_character(),
