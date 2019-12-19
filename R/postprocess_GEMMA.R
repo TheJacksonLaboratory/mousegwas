@@ -7,7 +7,9 @@
 # Input also includes the number of clusters to use for clustering. Colors are preset
 
 # Load relevant libraries:
-library(tidyverse)
+library(dplyr)
+library(readr)
+library(ggplot2)
 library(ggbiplot)
 library(RColorBrewer)
 library(knitr)
