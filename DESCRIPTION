@@ -27,5 +27,6 @@ Imports:
   biomaRt (>= 2.34.1),
   fuzzyjoin,
   GGally,
-  corrgram
+  corrgram,
+  ggbiplot
   
