@@ -144,7 +144,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
 
     # Show all points
     geom_point(aes(color=as.factor(chr * ((!ispeak)+0) + (((ispeak)+0) * (20+choose) ))) , alpha=1, size=1) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10), rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10), rep("#666666", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
@@ -175,7 +175,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
     # Add gene_name to don
   p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
-                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=3, family="Courier")
+                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
 
 
   return(list(plot=p, gwas=ret_gwas, pwas=don))
