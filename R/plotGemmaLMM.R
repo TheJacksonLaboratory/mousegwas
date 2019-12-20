@@ -17,6 +17,7 @@
 #' @import dplyr
 #' @import readr
 #' @import ggplot2
+#' @import ggnewscale
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
@@ -87,13 +88,12 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   #chr     rs      ps      n_miss  allele1 allele0 af      beta_1  beta_2  beta_3  Vbeta_1_1       Vbeta_1_2       Vbeta_1_3       Vbeta_2_2       Vbeta_2_3       Vbeta_3_3       p_lrt
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
   # Add peak color if genotypes are supplied
-  genesdist = maxdist/2
+  genesdist = 10000
   if (!is.null(genotypes)){
     #allgeno <- read.csv(genotypes, header = FALSE, row.names = 1)
     #allgeno <- allgeno[, 3:ncol(allgeno)]
     pnums <- rep_peaks(genotypes, gwas_results, pthr=10^-redthr)
     gwas_results <- gwas_results %>% left_join(pnums, by="rs")
-    genesdist = 1000
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
   }
@@ -139,23 +139,15 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   ymin <- 1.25 * min(log10P, na.rm = TRUE)
   chr_label <- axisdf$chr
   chr_label[chr_label==20] = "X"
+
   # Make the plot
-  new_scale <- function(new_aes) {
-    structure(ggplot2::standardise_aes_names(new_aes), class = "new_aes")
-  }
-  ggplot_add.new_aes <- function(object, plot, object_name) {
-    plot$layers <- lapply(plot$layers, bump_aes, new_aes = object)
-    plot$scales$scales <- lapply(plot$scales$scales, bump_aes, new_aes = object)
-    plot$labels <- bump_aes(plot$labels, new_aes = object)
-    plot
-  }
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
     geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
     scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +#, rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
- #   new_scale("color") +
+    new_scale_color() +
     geom_point(data= . %>% filter(ispeak), aes(color = "#A6761D"), alpha=1, size=0.9) +
 
     # custom X axis:
@@ -178,15 +170,15 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     )
   #if (!is.null(genes)){
     #gwas_results <-  left_join(gwas_results, genes, by="rs")
-  names_to <- ret_gwas %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-  names_to <- ret_gwas %>% left_join(names_to, by="choose")
-  toprs <- get_genes(names_to %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
+#  names_to <- ret_gwas %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+#  names_to <- ret_gwas %>% left_join(names_to, by="choose")
+  toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
     filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
     #group_by(mgi_symbol, chr) %>% summarize(rs=rs[which.max(P)]) %>%
     # Select only one gene
     #group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
     # Add gene_name to don
-  p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
+  p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(select(toprs, rs, mgi_symbol), by="rs"),
                                     aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
 
 
