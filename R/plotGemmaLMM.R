@@ -145,21 +145,25 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
 
     # Show all points
     geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +#, rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))#, rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
-    ggnewscale::new_scale_color() +
-    geom_point(data= . %>% filter(ispeak), aes(color = "#A6761D"), alpha=1, size=0.9) +
+  if (sum(don$ispeak) > 0){
+    # Plot peaks in color
+    p <- p + ggnewscale::new_scale_color() +
+    geom_point(data= don %>% filter(ispeak), aes(color = "#A6761D"), alpha=1, size=0.9)
 
-    # custom X axis:
-    scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
+    # Print names around peaks
+    toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
+    filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
+    # Add gene names
+    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(select(toprs, rs, mgi_symbol), by="rs"),
+                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
+}
+  p <- p + scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
     scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
     ylim(ymin,ymax) +
     xlab(name) +
     ylab("-log(P-value)") +
-    # Add highlighted points
-    #geom_point(data=subset(don, is_highlight=="yes"), color="orange", size=2) +
-
-    # Custom the theme:
     theme_bw() +
     theme(
       legend.position="none",
@@ -168,19 +172,6 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
       panel.grid.major.x = element_blank(),
       panel.grid.minor.x = element_blank()
     )
-  #if (!is.null(genes)){
-    #gwas_results <-  left_join(gwas_results, genes, by="rs")
-#  names_to <- ret_gwas %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-#  names_to <- ret_gwas %>% left_join(names_to, by="choose")
-  toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
-    filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
-    #group_by(mgi_symbol, chr) %>% summarize(rs=rs[which.max(P)]) %>%
-    # Select only one gene
-    #group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
-    # Add gene_name to don
-  p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(select(toprs, rs, mgi_symbol), by="rs"),
-                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
-
 
   return(list(plot=p, gwas=ret_gwas, pwas=don))
 }
