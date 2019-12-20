@@ -175,7 +175,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
     # Add gene_name to don
   p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
-                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=4, family="Courier")
+                                    aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=3, family="Courier")
 
 
   return(list(plot=p, gwas=ret_gwas, pwas=don))
