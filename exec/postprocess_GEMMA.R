@@ -64,14 +64,14 @@ p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 7)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
-       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.6, units="in")
+       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.54, units="in")
 
 # Plot each phenotype's Manhattan plot
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
                        name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7)
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
-         plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.6, units="in")
+         plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.54, units="in")
 }
 
 # Cluster the peaks using the m-values
@@ -82,6 +82,7 @@ pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(mvalgwas[,phenos], args$clusters, nstart=5)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
-ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
+bip <- ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
+ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf", plot = bip + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=3.54, height=3.54, units="in"), )
 # Plot the m-value heatmap
 
