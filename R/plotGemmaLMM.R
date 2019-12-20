@@ -147,7 +147,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
     scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +#, rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
-    new_scale_color() +
+    ggnewscale::new_scale_color() +
     geom_point(data= . %>% filter(ispeak), aes(color = "#A6761D"), alpha=1, size=0.9) +
 
     # custom X axis:
