@@ -140,11 +140,17 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   chr_label <- axisdf$chr
   chr_label[chr_label==20] = "X"
   # Make the plot
+  new_scale <- function(new_aes) {
+    structure(ggplot2::standardise_aes_names(new_aes), class = "new_aes")
+  }
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point(aes(color=as.factor(chr * ((!ispeak)+0) + (((ispeak)+0) * (21) ))) , alpha=1, size=0.7) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10), rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +#, rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+
+    new_scale("color") +
+    geom_point(data= . %>% filter(ispeak), aes(color = "#A6761D"), alpha=1, size=0.9) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
@@ -169,10 +175,10 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   names_to <- ret_gwas %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
   names_to <- ret_gwas %>% left_join(names_to, by="choose")
   toprs <- get_genes(names_to %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
-    filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm")) %>%
-    group_by(mgi_symbol, chr) %>% summarize(rs=rs[which.max(P)]) %>%
+    filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
+    #group_by(mgi_symbol, chr) %>% summarize(rs=rs[which.max(P)]) %>%
     # Select only one gene
-    group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
+    #group_by(rs) %>% summarize(mgi_symbol=mgi_symbol[1])
     # Add gene_name to don
   p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(toprs, by="rs"),
                                     aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
