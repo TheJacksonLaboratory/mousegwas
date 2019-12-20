@@ -143,8 +143,8 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point(aes(color=as.factor(chr * ((!ispeak)+0) + (((ispeak)+0) * (20+choose) ))) , alpha=1, size=1) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10), rep("#666666", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    geom_point(aes(color=as.factor(chr * ((!ispeak)+0) + (((ispeak)+0) * (21) ))) , alpha=1, size=0.7) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10), rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
 
     # custom X axis:
     scale_x_continuous( label = chr_label, breaks= axisdf$center ) +

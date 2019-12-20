@@ -74,4 +74,14 @@ for (i in 1:length(phenos)){
          plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.6, units="in")
 }
 
+# Cluster the peaks using the m-values
+set.seed(49)
+pcvals <- prcomp(allgwas[,phenos])
+pcmvals <- cbind(allgwas, pcvals$x)
+pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
+kk <- kmeans(mvalgwas[,phenos], args$clusters, nstart=5)
+pcmvals <- cbind(pcmvals, kk$cluster)
+# plot the PCA
+ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
+# Plot the m-value heatmap
 
