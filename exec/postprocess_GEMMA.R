@@ -64,7 +64,7 @@ PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
 # Plot the combined Manhattan plot
-if (F){p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
+p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10, maxdist=10000000)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
@@ -72,7 +72,7 @@ ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        width=fullw, height=height, units="in")
 
 # Plot each phenotype's Manhattan plot
-for (i in 1:length(phenos)){
+if (F){for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
                        name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000)
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
