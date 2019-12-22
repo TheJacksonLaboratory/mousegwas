@@ -96,7 +96,7 @@ ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot the m-value heatmap
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
-colrow <- tibble(rs = colnames(pgwas), cluster=kk$clusters) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
+colrow <- tibble(rs = colnames(pgwas), cluster=kk$cluster) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height, family = "Times")
 heatmap.2(pgwas, col = hmcol,
           Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
