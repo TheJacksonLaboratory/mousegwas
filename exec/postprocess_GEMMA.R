@@ -103,6 +103,10 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-ggplot(PVE, aes(phenotype, PVE)) + geom_bar(color="black", stat="identity") +
+pvep <- ggplot(PVE, aes(phenotype, PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(1,"Accent"),
+                                            stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
-  theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5))
+  theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
+  theme(text=element_text(size=10, family="Times"))
+ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi = "print",
+       width = fullw, height = height, units = "in")
