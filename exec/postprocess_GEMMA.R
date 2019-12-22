@@ -35,7 +35,9 @@ args <- parser$parse_args()
 ccols <- brewer.pal(args$clusters, "Dark2")
 # Heatmap plot for m-values
 hmcol <- viridis(256, option="cividis")
-
+fullw <- 7.25
+halfw <- 3.54
+height <- 3.54
 # Read the data
 # Read the METASOFT results file. The names of the columns are taken from the phenotypes_order file
 phenos <- as.character(read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE, skip=1)$V1)
@@ -64,25 +66,40 @@ p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10, maxdist=10000000)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
-       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.54, units="in")
+       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
+       width=fullw, height=height, units="in")
 
 # Plot each phenotype's Manhattan plot
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
                        name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000)
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
-         plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=7.25, height=3.54, units="in")
+         plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
+         width=fullw, height=height, units="in")
 }
 
 # Cluster the peaks using the m-values
 set.seed(49)
-pcvals <- prcomp(allgwas[,phenos])
-pcmvals <- cbind(allgwas, pcvals$x)
+pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
+pgwas <- as.matrix(pgwas[, phenos])
+pcvals <- prcomp(pgwas)
+pcmvals <- cbind(pgwas, pcvals$x)
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
-kk <- kmeans(mvalgwas[,phenos], args$clusters, nstart=5)
+kk <- kmeans(pgwas, args$clusters, nstart=5)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
 bip <- ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
-ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf", plot = bip + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print", width=3.54, height=3.54, units="in"), )
+ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
+       plot = bip + theme(text=element_text(size=10, family="Times")),
+       device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot the m-value heatmap
+clustcol <- tibble(cluster=1:args$clusters, color=ccols)
+colrow <- tibble(rs = col.names(pgwas), cluster=kk$clusters) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
+pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height, family = "Times")
+heatmap.2(pgwas, col = hmcol,
+          Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
+          RowSideColors = colrow[,1,drop=T], labRow = NA)
+dev.off()
+
+# Plot the PVE estimates with SE
 
