@@ -29,6 +29,8 @@ parser$add_argument("--plotdir", "-p", default=".",
                     help="Where to put the plots")
 parser$add_argument("--clusters", '-c', default=5, type="integer",
                     help="Number of peaks clusters")
+parser$add_argument("--rotation", "-r", default="OFA_DistanceTraveled_first55m,OFA_PeripheryTime_first55m,OFA_Groom_first55m",
+                    help="comma separated list of phenotypes to plot in the ggbiplot")
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -85,12 +87,13 @@ set.seed(49)
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
 pcvals <- prcomp(pgwas)
+pcvals$rotation <- pcvals$rotation[strsplit(args$rotation),]
 pcmvals <- cbind(pgwas, pcvals$x)
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
-bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
+bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.title = element_blank())
 ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        plot = bip + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
