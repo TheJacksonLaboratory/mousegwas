@@ -64,7 +64,7 @@ PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
 # Plot the combined Manhattan plot
-p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
+if (F){p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10, maxdist=10000000)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
@@ -79,7 +79,7 @@ for (i in 1:length(phenos)){
          plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
          width=fullw, height=height, units="in")
 }
-
+}
 # Cluster the peaks using the m-values
 set.seed(49)
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
@@ -96,7 +96,7 @@ ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot the m-value heatmap
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
-colrow <- tibble(rs = colnames(pgwas), cluster=kk$cluster) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
+colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height, family = "Times")
 heatmap.2(pgwas, col = hmcol,
           Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
