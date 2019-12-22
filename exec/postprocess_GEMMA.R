@@ -95,7 +95,7 @@ ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot the m-value heatmap
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
-colrow <- tibble(rs = col.names(pgwas), cluster=kk$clusters) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
+colrow <- tibble(rs = colnames(pgwas), cluster=kk$clusters) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height, family = "Times")
 heatmap.2(pgwas, col = hmcol,
           Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
@@ -103,7 +103,7 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-pvep <- ggplot(PVE, aes(phenotype, PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(1,"Accent"),
+pvep <- ggplot(PVE %>% arrange(desc(PVE)), aes(phenotype, PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Accent")[1],
                                             stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
