@@ -59,7 +59,7 @@ geno <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), co
   minor = col_character()
 )) %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -major, -minor))
 
-PVE <- read_csv(paste0(args$outdir, "PVE_GEMMA_estimates.txt"))
+PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
 # Plot the combined Manhattan plot
