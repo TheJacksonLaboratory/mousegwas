@@ -87,7 +87,7 @@ set.seed(49)
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
 pcvals <- prcomp(pgwas)
-pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ","),]
+pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],]
 pcmvals <- cbind(pgwas, pcvals$x)
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5)
