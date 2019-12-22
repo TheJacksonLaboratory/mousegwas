@@ -93,7 +93,7 @@ pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
-bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.title = element_blank())
+bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
 ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        plot = bip + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
@@ -105,7 +105,7 @@ heatmap.2(pgwas, col = hmcol,
           Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
           RowSideColors = colrow[,1,drop=T], labRow = NA)
 dev.off()
-
+graphics.off()
 # Plot the PVE estimates with SE
 pvep <- ggplot(PVE, aes(reorder(phenotype, -PVE), PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
