@@ -7,6 +7,7 @@
 # Input also includes the number of clusters to use for clustering. Colors are preset
 
 # Load relevant libraries:
+library(plyr)
 library(dplyr)
 library(readr)
 library(tibble)
@@ -103,7 +104,7 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-pvep <- ggplot(PVE %>% arrange(desc(PVE)), aes(phenotype, PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Accent")[1],
+pvep <- ggplot(PVE, aes(reorder(phenotype, -PVE), PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
