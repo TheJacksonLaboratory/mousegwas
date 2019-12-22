@@ -17,7 +17,6 @@ library(viridis)
 library(gplots)
 library(argparse)
 library(gemmawrapper)
-library(ggbiplot)
 
 parser <- ArgumentParser()
 
@@ -60,6 +59,7 @@ geno <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), co
   minor = col_character()
 )) %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -major, -minor))
 
+PVE <- read_csv(paste0(args$outdir, "PVE_GEMMA_estimates.txt"))
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
 # Plot the combined Manhattan plot
@@ -89,7 +89,7 @@ pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
-bip <- ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
+bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols)
 ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        plot = bip + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
@@ -103,4 +103,6 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-
+ggplot(PVE, aes(phenotype, PVE)) + geom_bar(color="black", stat="identity") +
+  geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
+  theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5))
