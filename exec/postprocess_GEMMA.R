@@ -17,6 +17,7 @@ library(viridis)
 library(gplots)
 library(argparse)
 library(gemmawrapper)
+library(ggbiplot)
 
 parser <- ArgumentParser()
 
