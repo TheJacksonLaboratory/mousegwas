@@ -29,7 +29,6 @@ Imports:
   fuzzyjoin,
   GGally,
   corrgram,
-  ggnewscale
-Remotes: 
-  vqv/ggbiplot
+  ggnewscale,
+Remotes: vqv/ggbiplot
  
