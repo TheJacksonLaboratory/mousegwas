@@ -83,7 +83,7 @@ if (F){for (i in 1:length(phenos)){
 }
 }
 # Cluster the peaks using the m-values
-set.seed(49)
+set.seed(490)
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
 pcvals <- prcomp(pgwas)
@@ -94,22 +94,21 @@ kk <- kmeans(pgwas, args$clusters, nstart=5)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
 bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
-par(mar=c(1,1,1,1))
+
 ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        plot = bip + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot the m-value heatmap
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
 colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
-pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height, family = "Times")
-par(mar=c(1,1,1,1))
+pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = "Times")
 heatmap.2(pgwas, col = hmcol,
           Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
           RowSideColors = colrow[,1,drop=T], labRow = NA,
-          hclustfun = function(x) hclust(x, method="average"))
+          hclustfun = function(x) hclust(x, method="average"),
+          cexRow=1,cexCol=1,margins=c(10,8),srtCol=45)
 dev.off()
-par(mar=c(1,1,1,1))
-graphics.off()
+
 # Plot the PVE estimates with SE
 pvep <- ggplot(PVE, aes(reorder(phenotype, -PVE), PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
