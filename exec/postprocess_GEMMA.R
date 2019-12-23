@@ -124,5 +124,5 @@ ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi =
 p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=kk$cluster), by="rs")
 # Recolor the second layer with the clusters colors
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
-       plot = p$plot %+% geom_point(aes(color=cluster), alpha=1, size=0.9) + scale_color_manual(values=ccols),
+       plot = p$plot %+% p$pwas %+% geom_point(aes(color=cluster), alpha=1, size=0.9) + scale_color_manual(values=ccols),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
