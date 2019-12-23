@@ -90,7 +90,7 @@ pcvals <- prcomp(pgwas)
 pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],]
 pcmvals <- cbind(pgwas, pcvals$x)
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
-kk <- kmeans(pgwas, args$clusters, nstart=5)
+kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
 pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
 bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
@@ -118,3 +118,11 @@ pvep <- ggplot(PVE, aes(reorder(phenotype, -PVE), PVE)) + geom_bar(color="black"
   theme(text=element_text(size=10, family="Times"))
 ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi = "print",
        width = fullw, height = height, units = "in")
+
+# Plot the metasoft manhattan plot with clusters colors
+# Add the cluster number to the pwas object
+p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=kk$cluster), by="rs")
+# Recolor the second layer with the clusters colors
+ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
+       plot = p$plot %+% geom_point(aes(color=cluster), alpha=1, size=0.9) + scale_color_manual(values=ccols),
+       device="pdf", dpi="print", width=halfw, height=height, units="in")
