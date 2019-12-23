@@ -54,13 +54,14 @@ allgwas <- left_join(allgwas, anno, by="rs") %>% arrange(chr, ps)
 # Read the plotting data
 #p <- load(paste0(args$outdir, "gwas_object_output.Rdata"))
 # Read the genotypes
-geno <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types = cols(
+geno_t <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types = cols(
   .default = col_double(),
   chr = col_character(),
   rs = col_character(),
   major = col_character(),
   minor = col_character()
-)) %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -major, -minor))
+))
+geno <- geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor))
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 # We're all set
@@ -126,3 +127,41 @@ p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=kk$cluster),
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
        plot = p$plot %+% p$pwas %+% geom_point(aes(color=cluster), alpha=1, size=0.9) + scale_color_manual(values=ccols),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
+
+# Plot the LD drop figure
+comp_LD_2 <- function(genotypes, c, maxdist = 2500000, MAF=0.1, miss=0.1){
+  gen <- genotypes %>% filter(chr==c, !is.na(rs)) %>% arrange(bp38)
+  gen <- gen[(rowSums(gen[,6:ncol(gen)]==0, na.rm=T) > (dim(gen)[2]-5)*MAF &
+                rowSums(gen[,6:ncol(gen)]>0, na.rm=T) > (dim(gen)[2]-5)*MAF &
+                rowSums(is.na(gen[,6:ncol(gen)])) < (dim(gen)[2]-5)*miss),]
+  allcor = NULL
+  for (i in 1:(nrow(gen)-1)){
+    tmat <- as.data.frame(base::t(gen %>% filter(between(bp38, gen$bp38[i], gen$bp38[i]+maxdist)) %>%
+                                    dplyr::select(-bp38, -chr, -major, -minor) %>% column_to_rownames(var = "rs")))
+    if (ncol(tmat)<2) next()
+    ct <- cor(tmat[,1], tmat[, 2:ncol(tmat), drop=F], use = 'pairwise.complete.obs', method="pearson")
+    allcor <- rbind(allcor, as_tibble(t(ct), rownames = "SNP2") %>% mutate(r_sq = V1^2, SNP1=gen$rs[i]) %>% dplyr::select(SNP1, SNP2, r_sq))
+  }
+  return(allcor)
+}
+allchr = NULL
+for (chr in unique(geno_t$chr[geno_t$chr != 'X'])){
+  allchr <- rbind(allchr, comp_LD_2(geno_t, chr))
+}
+allchr <- allchr %>% left_join(dplyr::select(geno_t, rs, bp38), by=c("SNP1" = "rs")) %>%
+  left_join(dplyr::select(geno_t, rs, bp38), by=c("SNP2" = "rs")) %>% mutate(dist = bp38.y-bp38.x)
+avgwin = 5000
+allchr$distc <- fct_explicit_na(cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
+allavg <- allchr %>% group_by(distc) %>% summarise(avdist=mean(dist),avr_sq=mean(r_sq, na.rm = T)) %>% ungroup()
+pld <- ggplot(allavg, aes(avdist, avr_sq)) + geom_smooth(method="loess", color=RColorBrewer::brewer.pal(3,"Set1")[3])+
+  xlim(c(0, 2500000)) + labs(x="Distance (Bases)",y=expression("Average LD"~(r^{2})))
+ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw() + theme(
+  panel.border = element_blank(),
+  panel.grid.major.x = element_blank(),
+  panel.grid.minor.x = element_blank(),
+  panel.grid.major.y = element_blank(),
+  panel.grid.minor.y = element_blank(),
+  text=element_text(size=10, family="Times")
+),
+device="pdf", dpi="print", width=halfw, height=height, units="in"
+)
