@@ -113,6 +113,7 @@ dev.off()
 pvep <- ggplot(PVE, aes(reorder(phenotype, -PVE), PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
+  xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
   theme(text=element_text(size=10, family="Times"))
 ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi = "print",
