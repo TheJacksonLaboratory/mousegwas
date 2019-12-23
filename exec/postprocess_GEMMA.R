@@ -103,10 +103,10 @@ clustcol <- tibble(cluster=1:args$clusters, color=ccols)
 colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = "Times")
 heatmap.2(pgwas, col = hmcol,
-          Rowv = T, Colv = T, dendrogram = "both", scale="none", trace="none",
+          Rowv = T, Colv = T, dendrogram = "row", scale="none", trace="none",
           RowSideColors = colrow[,1,drop=T], labRow = NA,
           hclustfun = function(x) hclust(x, method="average"),
-          cexRow=1,cexCol=1,margins=c(10,8),srtCol=45)
+          margins=c(12,8),srtCol=45, key=F)
 dev.off()
 
 # Plot the PVE estimates with SE
