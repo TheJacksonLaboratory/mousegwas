@@ -69,6 +69,9 @@ geno_t <- read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types 
 geno <- as.matrix(geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor))
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
+PVE <- left_join(PVE, as_tibble(pnames, rownames="phenotype"), by = ("phenotype"))
+print(PVE)
+
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
 # Plot the combined Manhattan plot
@@ -116,7 +119,6 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-PVE <- left_join(PVE, as_tibble(pnames, rownames="phenotype"), by = c("phenotype"))
 pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
