@@ -163,7 +163,7 @@ for (chr in unique(geno_s$chr)){
 allchr <- allchr %>% left_join(dplyr::select(geno_s, rs, bp38), by=c("SNP1" = "rs")) %>%
   left_join(dplyr::select(geno_s, rs, bp38), by=c("SNP2" = "rs")) %>% mutate(dist = bp38.y-bp38.x)
 avgwin = 5000
-allchr$distc <- fct_explicit_na(cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
+allchr$distc <- (cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
 allavg <- allchr %>% group_by(distc) %>% summarise(avdist=mean(dist),avr_sq=mean(r_sq, na.rm = T)) %>% ungroup()
 pld <- ggplot(allavg, aes(avdist, avr_sq)) + geom_smooth(method="loess", color=RColorBrewer::brewer.pal(3,"Set1")[3])+
   xlim(c(0, 2500000)) + labs(x="Distance (Bases)",y=expression("Average LD"~(r^{2})))
