@@ -31,6 +31,8 @@ parser$add_argument("--clusters", '-c', default=5, type="integer",
                     help="Number of peaks clusters")
 parser$add_argument("--rotation", "-r", default="OFDistTraveled55m,OFPeripheryTime55m,GrTime55m",
                     help="comma separated list of phenotypes to plot in the ggbiplot")
+parser$add_argument("--sample", "-s", type="integer", defalut=10000,
+                    help="Number of SNPs to sample for the LD plotting")
 parser$add_argument("--names", "-n",
                     help="Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
 args <- parser$parse_args()
@@ -48,7 +50,6 @@ height <- 3.54
 phenos <- as.character(read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE, skip=1)$V1)
 pnames <- read.csv(args$names,row.names = 2)
 phenos <- as.character(pnames[phenos, "PaperName", drop=T])
-print(phenos)
 cnames <- c("rs", "STUDYNUM", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE",
             "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2", "PVALUE_BE", "I_SQUARE", "Q", "PVALUE_Q",
             "TAU_SQUARE", paste0(phenos, "_PV"), phenos, "empty")
@@ -70,7 +71,6 @@ geno <- as.matrix(geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-c
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 PVE <- left_join(PVE, as_tibble(pnames, rownames="phenotype"), by = ("phenotype"))
-print(PVE)
 
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
@@ -132,8 +132,11 @@ ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi =
 # Add the cluster number to the pwas object
 p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk$cluster)), by="rs")
 # Recolor the second layer with the clusters colors
+pnoname <- p$plot
+pnoname$layers <- pnonames$layers[1:2]
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
-       plot = p$plot + ggnewscale::new_scale_color() + geom_point(aes(color=p$pwas$cluster), alpha=1, size=0.9) + scale_color_manual(values=ccols),
+       plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(color=p$pwas$cluster), alpha=1, size=0.9) +
+         scale_color_manual(values=ccols) + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=fullw, height=height, units="in")
 
 # Plot the LD drop figure
@@ -152,9 +155,10 @@ comp_LD_2 <- function(genotypes, c, maxdist = 2500000, MAF=0.1, miss=0.1){
   }
   return(allcor)
 }
+geno_s <- geno_t %>% sample_n(args$sample)
 allchr = NULL
 for (chr in unique(geno_t$chr[geno_t$chr != 'X'])){
-  allchr <- rbind(allchr, comp_LD_2(geno_t, chr))
+  allchr <- rbind(allchr, comp_LD_2(geno_s, chr))
 }
 allchr <- allchr %>% left_join(dplyr::select(geno_t, rs, bp38), by=c("SNP1" = "rs")) %>%
   left_join(dplyr::select(geno_t, rs, bp38), by=c("SNP2" = "rs")) %>% mutate(dist = bp38.y-bp38.x)
