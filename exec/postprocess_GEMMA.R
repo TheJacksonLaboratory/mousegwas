@@ -58,15 +58,15 @@ allgwas <- left_join(allgwas, anno, by="rs") %>% arrange(chr, ps)
 # Read the plotting data
 #p <- load(paste0(args$outdir, "gwas_object_output.Rdata"))
 # Read the genotypes
-geno_t <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types = cols(
+geno_t <- read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types = cols(
   .default = col_double(),
   chr = col_character(),
   rs = col_character(),
   major = col_character(),
   minor = col_character()
-)))
+))
 
-geno <- geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor)
+geno <- as.matrix(geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor))
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 # We're all set
