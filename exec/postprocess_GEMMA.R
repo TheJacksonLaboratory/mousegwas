@@ -120,7 +120,7 @@ dev.off()
 
 # Plot the PVE estimates with SE
 pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(color="black", stat="identity") +
-  scale_fill_manual(values = RColorBrewer::brewer.pal(8,"Accent"))
+  scale_fill_manual(values = RColorBrewer::brewer.pal(8,"Accent")) +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
   xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
