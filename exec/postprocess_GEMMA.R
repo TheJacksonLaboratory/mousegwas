@@ -42,6 +42,7 @@ args <- parser$parse_args()
 ccols <- brewer.pal(args$clusters, "Dark2")
 # Heatmap plot for m-values
 hmcol <- viridis(256, option="cividis")
+grpcol <- RColorBrewer::brewer.pal(8,"Accent")
 fullw <- 7.25
 halfw <- 3.54
 height <- 3.54
@@ -77,7 +78,8 @@ dir.create(args$plotdir, recursive = TRUE)
 # Plot the combined Manhattan plot
 p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
-                    name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10, maxdist=10000000)
+                    name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10,
+                    maxdist=10000000, corrthr=0.2)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
        width=fullw, height=height, units="in")
@@ -85,7 +87,8 @@ ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
 # Plot each phenotype's Manhattan plot
 if (F){for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
-                       name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000)
+                       name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000,
+                       corrthr=0.2)
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
          width=fullw, height=height, units="in")
@@ -97,10 +100,8 @@ pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rown
 pgwas <- as.matrix(pgwas[, phenos])
 pcvals <- prcomp(pgwas)
 pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],]
-pcmvals <- cbind(pgwas, pcvals$x)
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
-pcmvals <- cbind(pcmvals, kk$cluster)
 # plot the PCA
 bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
 
@@ -108,19 +109,27 @@ ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        plot = bip + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot the m-value heatmap
+# Order the columns
+rowarr <- NULL
+for (i in 1:args$cluster){
+  cc <- hclust(dist(pgwas[kk$cluster==i,]))
+  rowarr <- c(rowarr, row.names(pgwas)[kk$cluster==i][cc$order])
+}
+pgwas <- pgwas[rowarr,]
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
-colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
+colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr]) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
+colcol <- PVE %>% left_join(tibble(Group=unique(PVE$Group), color=grpcol[1:length(unique(PVE$Group))])) %>% column_to_rownames(var="PaperName") %>% dplyr::select(color)
 pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = "Times")
 heatmap.2(pgwas, col = hmcol,
-          Rowv = T, Colv = T, dendrogram = "row", scale="none", trace="none",
-          RowSideColors = colrow[,1,drop=T], labRow = NA,
+          Rowv = F, Colv = T, dendrogram = "col", scale="none", trace="none",
+          RowSideColors = colrow[,1,drop=T], ColSideColors = colcol[,1,drop=T], labRow = NA,
           hclustfun = function(x) hclust(x, method="average"),
           margins=c(12,8),srtCol=45, key=F)
 dev.off()
 
 # Plot the PVE estimates with SE
 pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(color="black", stat="identity") +
-  scale_fill_manual(values = RColorBrewer::brewer.pal(8,"Accent")) +
+  scale_fill_manual(values = grpcol) +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
   xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
@@ -165,7 +174,7 @@ allchr <- allchr %>% left_join(dplyr::select(geno_s, rs, bp38), by=c("SNP1" = "r
 avgwin = 5000
 allchr$distc <- (cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
 allavg <- allchr %>% group_by(distc) %>% summarise(avdist=mean(dist),avr_sq=mean(r_sq, na.rm = T)) %>% ungroup()
-pld <- ggplot(allavg, aes(avdist, avr_sq)) + geom_smooth(method="loess", color=RColorBrewer::brewer.pal(3,"Set1")[3])+
+pld <- ggplot(allavg, aes(avdist, avr_sq)) + geom_smooth(method="loess", color=RColorBrewer::brewer.pal(3,"Set1")[3], se=FALSE)+
   xlim(c(0, 2500000)) + labs(x="Distance (Bases)",y=expression("Average LD"~(r^{2})))
 ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw() + theme(
   panel.border = element_blank(),

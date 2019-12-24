@@ -10,6 +10,8 @@
 #' @param diff A file with results to be subtracted from the first file. Must be in the same format, only implemented for GEMMA
 #' @param genotypes The genotypes of the input strains to compute correlation. If given (as data.frame with row.names) every peak will be colored
 #' @param maxdist maximal distance between peak and related SNPs
+#' @param corrthr r-square threshold to consider SNPs in the same peak, combined with maxdist
+#'
 #'
 #' @return A plot
 #' @export
@@ -21,7 +23,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.2) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% select(rs=X1, p_wald=X9)  # RSID and PVALUE_RE2
@@ -62,7 +64,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   }
 
   # Remove correlated peaks
-  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.3, pthr=1e-20, mxd=maxdist){
+  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=corrthr, pthr=1e-20, mxd=maxdist){
     tmat <- base::t(genotypes)
     srt_pv <- gwas_pvs %>% select(rs, p_wald) %>% arrange(p_wald) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
