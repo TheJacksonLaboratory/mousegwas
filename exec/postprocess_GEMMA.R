@@ -116,7 +116,7 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-PVE <- left_join(PVE, pnames, by = c("phenotype" = "row.names"))
+PVE <- left_join(PVE, as_tibble(pnames, rownames="phenotype"), by = c("phenotype"))
 pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
