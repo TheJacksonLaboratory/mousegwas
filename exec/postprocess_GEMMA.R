@@ -29,7 +29,7 @@ parser$add_argument("--plotdir", "-p", default=".",
                     help="Where to put the plots")
 parser$add_argument("--clusters", '-c', default=5, type="integer",
                     help="Number of peaks clusters")
-parser$add_argument("--rotation", "-r", default="OFA_DistanceTraveled_first55m,OFA_PeripheryTime_first55m,OFA_Groom_first55m",
+parser$add_argument("--rotation", "-r", default="OFDistTraveled55m,OFPeripheryTime55m,GrTime55m",
                     help="comma separated list of phenotypes to plot in the ggbiplot")
 parser$add_argument("--names", "-n",
                     help="Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
