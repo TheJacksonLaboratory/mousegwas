@@ -155,15 +155,13 @@ comp_LD_2 <- function(genotypes, c, maxdist = 2500000, MAF=0.1, miss=0.1){
   }
   return(allcor)
 }
-geno_s <- geno_t %>% filter(chr != "X") %>% sample_n(args$sample)
+geno_s <- geno_t %>% filter(chr != "X", chr != "Y") %>% sample_n(args$sample)
 allchr = NULL
-for (chr in unique(geno_t$chr)){
+for (chr in unique(geno_s$chr)){
   allchr <- rbind(allchr, comp_LD_2(geno_s, chr))
-  print(chr)
-  print(head(allchr))
 }
-allchr <- allchr %>% left_join(dplyr::select(geno_t, rs, bp38), by=c("SNP1" = "rs")) %>%
-  left_join(dplyr::select(geno_t, rs, bp38), by=c("SNP2" = "rs")) %>% mutate(dist = bp38.y-bp38.x)
+allchr <- allchr %>% left_join(dplyr::select(geno_s, rs, bp38), by=c("SNP1" = "rs")) %>%
+  left_join(dplyr::select(geno_s, rs, bp38), by=c("SNP2" = "rs")) %>% mutate(dist = bp38.y-bp38.x)
 avgwin = 5000
 allchr$distc <- fct_explicit_na(cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
 allavg <- allchr %>% group_by(distc) %>% summarise(avdist=mean(dist),avr_sq=mean(r_sq, na.rm = T)) %>% ungroup()
