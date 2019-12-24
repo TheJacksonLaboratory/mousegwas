@@ -62,7 +62,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   }
 
   # Remove correlated peaks
-  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.6, pthr=1e-20, mxd=maxdist){
+  rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.3, pthr=1e-20, mxd=maxdist){
     tmat <- base::t(genotypes)
     srt_pv <- gwas_pvs %>% select(rs, p_wald) %>% arrange(p_wald) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
