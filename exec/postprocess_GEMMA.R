@@ -31,6 +31,8 @@ parser$add_argument("--clusters", '-c', default=5, type="integer",
                     help="Number of peaks clusters")
 parser$add_argument("--rotation", "-r", default="OFA_DistanceTraveled_first55m,OFA_PeripheryTime_first55m,OFA_Groom_first55m",
                     help="comma separated list of phenotypes to plot in the ggbiplot")
+parser$add_argument("--names", "-n",
+                    help="Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -44,6 +46,8 @@ height <- 3.54
 # Read the data
 # Read the METASOFT results file. The names of the columns are taken from the phenotypes_order file
 phenos <- as.character(read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE, skip=1)$V1)
+pnames <- read_csv(args$names) %>% column_to_rownames(var="OriginalName")
+phenos <- pnames[phenos, "PaperName", drop=T]
 print(phenos)
 cnames <- c("rs", "STUDYNUM", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE",
             "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2", "PVALUE_BE", "I_SQUARE", "Q", "PVALUE_Q",
@@ -62,7 +66,7 @@ geno_t <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), 
   minor = col_character()
 )))
 
-geno <- geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor))
+geno <- geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor)
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 # We're all set
@@ -112,7 +116,8 @@ heatmap.2(pgwas, col = hmcol,
 dev.off()
 
 # Plot the PVE estimates with SE
-pvep <- ggplot(PVE, aes(reorder(phenotype, -PVE), PVE)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
+PVE <- left_join(PVE, pnames, by = c("phenotype" = "row.names"))
+pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(color="black", fill = RColorBrewer::brewer.pal(3,"Set1")[2],
                                             stat="identity") +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
   xlab("Phenotype") +
