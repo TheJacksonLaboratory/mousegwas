@@ -60,7 +60,8 @@ geno_t <- as.matrix(read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), 
   rs = col_character(),
   major = col_character(),
   minor = col_character()
-))
+)))
+
 geno <- geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor))
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
