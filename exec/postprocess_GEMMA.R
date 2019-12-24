@@ -133,7 +133,7 @@ ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi =
 p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk$cluster)), by="rs")
 # Recolor the second layer with the clusters colors
 pnoname <- p$plot
-pnoname$layers <- pnonames$layers[1:2]
+pnoname$layers <- pnoname$layers[1:2]
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
        plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(color=p$pwas$cluster), alpha=1, size=0.9) +
          scale_color_manual(values=ccols) + theme(text=element_text(size=10, family="Times")),
