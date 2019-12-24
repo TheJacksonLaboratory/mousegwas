@@ -130,7 +130,7 @@ ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi =
 
 # Plot the metasoft manhattan plot with clusters colors
 # Add the cluster number to the pwas object
-p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=kk$cluster), by="rs")
+p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk$cluster)), by="rs")
 # Recolor the second layer with the clusters colors
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
        plot = p$plot %+% p$pwas %+% geom_point(aes(color=cluster), alpha=1, size=0.9) + scale_color_manual(values=ccols),
