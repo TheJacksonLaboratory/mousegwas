@@ -31,7 +31,7 @@ parser$add_argument("--clusters", '-c', default=5, type="integer",
                     help="Number of peaks clusters")
 parser$add_argument("--rotation", "-r", default="OFDistTraveled55m,OFPeripheryTime55m,GrTime55m",
                     help="comma separated list of phenotypes to plot in the ggbiplot")
-parser$add_argument("--sample", "-s", type="integer", defalut=10000,
+parser$add_argument("--sample", "-s", type="integer", default=10000,
                     help="Number of SNPs to sample for the LD plotting")
 parser$add_argument("--names", "-n",
                     help="Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
