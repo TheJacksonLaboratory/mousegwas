@@ -46,7 +46,7 @@ height <- 3.54
 # Read the data
 # Read the METASOFT results file. The names of the columns are taken from the phenotypes_order file
 phenos <- as.character(read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE, skip=1)$V1)
-pnames <- read_csv(args$names) %>% column_to_rownames(var="OriginalName")
+pnames <- read.csv(args$names,row.names = 2)
 phenos <- pnames[phenos, "PaperName", drop=T]
 print(phenos)
 cnames <- c("rs", "STUDYNUM", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE",
