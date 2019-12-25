@@ -85,15 +85,15 @@ ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        width=fullw, height=height, units="in")
 
 # Plot each phenotype's Manhattan plot
-if (F){for (i in 1:length(phenos)){
+for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
                        name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000,
-                       corrthr=0.2)
+                       corrthr=0.4)
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
          width=fullw, height=height, units="in")
 }
-}
+
 # Cluster the peaks using the m-values
 set.seed(490)
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
@@ -164,7 +164,7 @@ comp_LD_2 <- function(genotypes, c, maxdist = 2500000, MAF=0.1, miss=0.1){
   }
   return(allcor)
 }
-geno_s <- geno_t %>% filter(chr != "X", chr != "Y") %>% sample_n(args$sample)
+geno_s <- geno_t %>% filter(chr != "X", chr != "Y", chr != "MT") %>% sample_n(args$sample)
 allchr = NULL
 for (chr in unique(geno_s$chr)){
   allchr <- rbind(allchr, comp_LD_2(geno_s, chr))
@@ -183,6 +183,32 @@ ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw
   panel.grid.major.y = element_blank(),
   panel.grid.minor.y = element_blank(),
   text=element_text(size=10, family="Times")
-),
-device="pdf", dpi="print", width=halfw, height=height, units="in"
+  ),
+  device="pdf", dpi="print", width=halfw, height=height, units="in"
 )
+# MAF histogram
+mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-5)))
+mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
+mafdat <- left_join(p$gwas, mafdat, by="rs")
+mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
+  scale_color_manual(values = RColorBrewer::display.brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
+  scale_fill_manual(values = RColorBrewer::display.brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
+  theme_bw() + theme(panel.border = element_blank(),
+                     panel.grid.major.x = element_blank(),
+                     panel.grid.minor.x = element_blank(),
+                     panel.grid.major.y = element_blank(),
+                     panel.grid.minor.y = element_blank(),
+                     text=element_text(size=10, family="Times")
+  )
+ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
+       device="pdf", dpi="print", width=halfw, height=height, units="in")
+# Plot markers density
+chrord <- c("X", 19:1)
+densp <- geno_t %>% filter(chr!="Y", chr!="MT") %>% ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
+  geom_bin2d(binwidth=1, drop=T) + xlab("Position (Mbp)") + ylab ("Chromosome") +
+  scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) + theme_bw() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        text=element_text(size=10, family="Times"))
+ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
+       device="pdf", dpi="print", width=fullw, height=height*2, units="in")
