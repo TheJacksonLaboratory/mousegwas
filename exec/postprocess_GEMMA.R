@@ -41,7 +41,7 @@ args <- parser$parse_args()
 # Cluster colors
 ccols <- brewer.pal(args$clusters, "Dark2")
 # Heatmap plot for m-values
-hmcol <- viridis(256, option="cividis")
+hmcol <- viridis(128, option="cividis")
 grpcol <- RColorBrewer::brewer.pal(8,"Accent")
 fullw <- 7.25
 halfw <- 3.54
@@ -79,7 +79,7 @@ dir.create(args$plotdir, recursive = TRUE)
 p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10,
-                    maxdist=10000000, corrthr=0.2)
+                    maxdist=10000000, corrthr=0.4)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
        width=fullw, height=height, units="in")
@@ -124,7 +124,7 @@ heatmap.2(pgwas, col = hmcol,
           Rowv = F, Colv = T, dendrogram = "col", scale="none", trace="none",
           RowSideColors = colrow[,1,drop=T], ColSideColors = colcol[,1,drop=T], labRow = NA,
           hclustfun = function(x) hclust(x, method="average"),
-          margins=c(12,8),srtCol=45, key=F)
+          margins=c(12,8),srtCol=45, key=T, density.info = "none")
 dev.off()
 
 # Plot the PVE estimates with SE

@@ -23,7 +23,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.2) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% select(rs=X1, p_wald=X9)  # RSID and PVALUE_RE2
@@ -76,9 +76,15 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
       subt <- tmat[,gwas_pvs$rs[gwas_pvs$chr==gwas_pvs$chr[rsnum] & gwas_pvs$ps >= gwas_pvs$ps[rsnum]-mxd &
                                         gwas_pvs$ps <= gwas_pvs$ps[rsnum]+mxd]]
       if (!is.null(dim(subt))){
-        cvec <- cor(tmat[,rs], subt)
-        rel_rs <- colnames(cvec)[cvec[1,]^2 >= rs_thr]
-        srt_pv[srt_pv$rs %in% rel_rs & srt_pv$choose==0, "choose"] = peaknum
+        rsset = c(rs)
+        changed <- T
+        while (changed){
+          cvec <- cor(tmat[,rsset], subt)
+          rel_rs <- colnames(cvec)[colSums(cvec^2 >= rs_thr, na.rm = T)>=1]
+          if (length(setdiff(rel_rs, rsset)) == 0) changed = F
+          rsset <- c(rsset, rel_rs)
+        }
+        srt_pv[srt_pv$rs %in% rsset & srt_pv$choose==0, "choose"] = peaknum
       }
       srt_pv[nr, "choose"] = peaknum
       srt_pv[nr, "ispeak"] = TRUE
