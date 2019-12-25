@@ -158,7 +158,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   if (sum(don$ispeak) > 0){
     # Plot peaks in color
     p <- p + ggnewscale::new_scale_color() +
-    geom_point(data= don %>% filter(ispeak), aes(color = "#A6761D"), alpha=1, size=0.9)
+    geom_point(data= don %>% filter(ispeak), aes(color = "#377EB8"), alpha=1, size=0.9)
 
     # Print names around peaks
     toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
