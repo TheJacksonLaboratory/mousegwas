@@ -153,7 +153,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
 
     # Show all points
     geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))#, rep("#A6761D", max(gwas_results$choose)))) + # rep(c("#cc0029", "#00cc4e", "#0022cc", "#aa00cc"), ceiling(max(gwas_results$choose)/4)) )) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))
 
   if (sum(don$ispeak) > 0){
     # Plot peaks in color

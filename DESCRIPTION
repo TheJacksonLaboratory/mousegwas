@@ -29,6 +29,7 @@ Imports:
   fuzzyjoin,
   GGally,
   corrgram,
-  ggnewscale
+  ggnewscale,
+  enrichR
 Remotes: git::https://github.com/vqv/ggbiplot
  

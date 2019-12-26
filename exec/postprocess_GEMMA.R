@@ -17,6 +17,7 @@ library(RColorBrewer)
 library(viridis)
 library(gplots)
 library(argparse)
+library(enrichR)
 library(gemmawrapper)
 
 parser <- ArgumentParser()
@@ -224,3 +225,32 @@ densp <- geno_t %>% filter(chr!="Y", chr!="MT") %>% left_join(select(p$pwas, rs,
         text=element_text(size=10, family="Times"))
 ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
        device="pdf", dpi="print", width=fullw, height=height, units="in")
+
+# Get the genes related to each cluster, print them and run enrichR
+ext_peak <- function(snps, maxdist=2000000){
+  csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
+}
+pg <- ext_peak(p$pwas)
+ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
+       plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
+         theme_bw() + theme(text=element_text(size=10, family="Times")),
+       device="pdf", dpi="print", width=halfw, height=height, units="in")
+allgenes = NULL
+dbs <- listEnrichrDbs()
+for (k in 1:args$clusters){
+  affgen <- get_genes(pg[pg$ispeak==T & pg$cluster==k,], dist=1000)
+  allgenes <- rbind(allgenes, affgen)
+  write_csv(affgen, path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv"))
+  # Run enrichr
+  enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
+  for (d in dbs$libraryName){
+    if (dim(enrr[[d]])[2] > 1){
+      rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05 / length(dbs$libraryName))
+      if (nrow(rtb) > 0)
+        write_csv((rtb %>% mutate(total.genes= length(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), cluster=k, library=d)),
+                  path = paste0(args$plotdir, "/enrichR_cluster_", k, "_db_", d, "p005.csv"))
+
+    }
+  }
+}
