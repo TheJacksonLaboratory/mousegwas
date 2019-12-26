@@ -191,7 +191,7 @@ avgwin = 5000
 allchr$distc <- (cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
 allavg <- allchr %>% group_by(distc) %>% summarise(avdist=mean(dist),avr_sq=mean(r_sq, na.rm = T)) %>% ungroup()
 pld <- ggplot(allavg, aes(avdist/1000000, avr_sq)) + geom_line( color=RColorBrewer::brewer.pal(3,"Set1")[3], se=FALSE)+
-  xlim(c(0, 2500000)) + labs(x="Distance (Mbp)",y=expression("Average LD"~(r^{2})))
+  xlim(c(0, 2.5)) + labs(x="Distance (Mbp)",y=expression("Average LD"~(r^{2})))
 ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw() + theme(
   panel.border = element_blank(),
   panel.grid.major.x = element_blank(),
