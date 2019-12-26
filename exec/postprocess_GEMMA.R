@@ -191,8 +191,8 @@ mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-
 mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
 mafdat <- left_join(p$gwas, mafdat, by="rs")
 mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
-  scale_color_manual(values = RColorBrewer::display.brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
-  scale_fill_manual(values = RColorBrewer::display.brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
+  scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
+  scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
   theme_bw() + theme(panel.border = element_blank(),
                      panel.grid.major.x = element_blank(),
                      panel.grid.minor.x = element_blank(),
