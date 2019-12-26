@@ -143,10 +143,20 @@ p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk
 # Recolor the second layer with the clusters colors
 pnoname <- p$plot
 pnoname$layers <- pnoname$layers[1:2]
+nolab <- p$plot
+nolab$layers <- nolab$layers[1]
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
        plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(color=p$pwas$cluster), alpha=1, size=0.9) +
          scale_color_manual(values=ccols) + theme(text=element_text(size=10, family="Times")),
        device="pdf", dpi="print", width=fullw, height=height, units="in")
+# Plot each cluster's Manhattanplot
+p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
+for (k in 1:args$clusters){
+  ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster", k, ".pdf"), plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
+    geom_point(aes(color=p$pwas$cluster), alpha=1, size=0.9) +
+    scale_color_manual(values=ccols) + theme(text=element_text(size=10, family="Times")),
+    device="pdf", dpi="print", width=fullw, height=height, units="in")
+}
 
 # Plot the LD drop figure
 comp_LD_2 <- function(genotypes, c, maxdist = 2500000, MAF=0.1, miss=0.1){
@@ -204,11 +214,13 @@ ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot markers density
 chrord <- c("X", 19:1)
-densp <- geno_t %>% filter(chr!="Y", chr!="MT") %>% ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
+densp <- geno_t %>% filter(chr!="Y", chr!="MT") %>% left_join(select(p$pwas, rs, ispeak, cluster),by="rs") %>%
+  ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
   geom_bin2d(binwidth=1, drop=T) + xlab("Position (Mbp)") + ylab ("Chromosome") +
-  scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) + theme_bw() +
+  scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) +
+  geom_point(data= . %>% filter(ispeak), color=cluster) + theme_bw() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         text=element_text(size=10, family="Times"))
 ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
-       device="pdf", dpi="print", width=fullw, height=height*2, units="in")
+       device="pdf", dpi="print", width=fullw, height=height, units="in")
