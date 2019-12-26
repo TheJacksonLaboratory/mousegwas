@@ -204,6 +204,7 @@ mafdat <- left_join(p$gwas, mafdat, by="rs")
 mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
   scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
   scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
+  xlab("MAF")
   theme_bw() + theme(panel.border = element_blank(),
                      panel.grid.major.x = element_blank(),
                      panel.grid.minor.x = element_blank(),
@@ -215,11 +216,11 @@ ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 # Plot markers density
 chrord <- c("X", 19:1)
-densp <- geno_t %>% filter(chr!="Y", chr!="MT") %>% left_join(select(p$pwas, rs, ispeak, cluster),by="rs") %>%
+densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
   ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
   geom_bin2d(binwidth=1, drop=T) + xlab("Position (Mbp)") + ylab ("Chromosome") +
   scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) +
-  geom_point(data= . %>% filter(ispeak), color=cluster) + theme_bw() +
+  theme_bw() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         text=element_text(size=10, family="Times"))
