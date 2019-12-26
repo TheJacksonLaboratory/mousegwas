@@ -236,7 +236,7 @@ ext_peak <- function(snps, maxdist=2000000){
   csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
   snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
 }
-pg <- ext_peak(p$pwas)
+pg <- ext_peak(left_join(p$gwas, select(p$pwas, rs, cluster),by="rs"))
 ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
        plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
          theme_bw() + theme(text=element_text(size=10, family="Times")),
