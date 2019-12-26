@@ -153,8 +153,8 @@ ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
 # Plot each cluster's Manhattanplot
 p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
 for (k in 1:args$clusters){
-  ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster", k, ".pdf"), plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
-    geom_point(aes(color=p$pwas$cluster), alpha=1, size=0.9) +
+  ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster_", k, ".pdf"), plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
+    geom_point(aes(color=cluster), alpha=1, size=0.9) +
     scale_color_manual(values=ccols) + theme(text=element_text(size=10, family="Times")),
     device="pdf", dpi="print", width=fullw, height=height, units="in")
 }
