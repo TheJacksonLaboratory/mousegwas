@@ -210,7 +210,7 @@ mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogr
   scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
   scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
   xlab("MAF") +
-  theme_bw() + theme(legend.position=c(0.2,0.1),
+  theme_bw() + theme(legend.position=c(0.15,0.9),
                      panel.border = element_blank(),
                      panel.grid.major.x = element_blank(),
                      panel.grid.minor.x = element_blank(),
