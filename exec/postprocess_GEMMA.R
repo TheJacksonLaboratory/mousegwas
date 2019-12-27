@@ -158,7 +158,7 @@ for (k in 1:args$clusters){
   ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster_", k, ".pdf"),
       plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
       geom_point(aes(color=cluster, alpha=ispeak, size=ispeak), size=0.9) +
-      scale_color_manual(values=ccols) + scale_alpha_manual(values=c(0.1,1)) +
+      scale_color_manual(values=ccols[k]) + scale_alpha_manual(values=c(0.1,1)) +
       scale_size_manual(values=c(0.7, 0.9)) +
       theme(text=element_text(size=10, family="Times")),
     device="pdf", dpi="print", width=fullw, height=height, units="in")
@@ -209,8 +209,9 @@ mafdat <- left_join(p$gwas, mafdat, by="rs")
 mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
   scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
   scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","GWAS")) +
-  xlab("MAF")
-  theme_bw() + theme(panel.border = element_blank(),
+  xlab("MAF") +
+  theme_bw() + theme(legend.position=c(0,1),
+                     panel.border = element_blank(),
                      panel.grid.major.x = element_blank(),
                      panel.grid.minor.x = element_blank(),
                      panel.grid.major.y = element_blank(),
