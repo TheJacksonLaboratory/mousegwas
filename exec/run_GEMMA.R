@@ -23,7 +23,7 @@ parser$add_argument("--downsample", '-d', default=0, type="integer",
 parser$add_argument("-i", "--input",
                     help="Input csv file, assume column names. Definitions for which columns to use and how are in the yaml file")
 parser$add_argument("-y", "--yaml",
-                    help="Yaml file which will include: strain- Name of strain column, phenotypes-phenotypes column names to test, covar-columns to be used as covariates, F1- a dictionary mapping F1 names to strain names, translate- translate strain names to names in the genotypes file")
+                    help="Yaml file which will include: strain- Name of strain column, phenotypes-phenotypes column names to test, covar-columns to be used as covariates, F1- a dictionary mapping F1 names to strain names (female parent first), translate- translate strain names to names in the genotypes file")
 parser$add_argument("--gemma",
                     help="Gemma executable")
 parser$add_argument("-g", "--genotypes", nargs = '+',
@@ -118,6 +118,7 @@ if (args$coat_phenotype |args$coat_covar){
 
 longfile <- tempfile()
 complete.geno <- NULL
+male_X.geno <- NULL
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
@@ -176,6 +177,11 @@ for (comrow in 1:dim(complete_table)[1]){
   if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
     sorder <- c(sorder, sname)
     strains_genomes[, eval(paste0('X',comrow)):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+    if (p1n!=p2n & !is.null(yamin$sex) & complete_table[comrow, yamin$sex]=="M"){
+      # It's an F1 male. Only one X chromosome
+      # The first parent is the female. Take its X chromosome only
+      strains_genomes[complete.geno$chr=="X", eval(paste0('X',comrow))] = complete.geno[complete.geno$chr=="X",..p1n]
+    }
     # Add the phenotypes to the table
 
     ct <- if (p1n==p2n) as.character(coat_table %>% filter(strain==p1n) %>% select(coat)) else as.character(coat_table %>% filter(strain==sname) %>% select(coat))
