@@ -1,4 +1,4 @@
-Package: gemmawrapper
+Package: mousegwas
 Type: Package
 Title: Read csv input file, genotypes ans run GEMMA
 Version: 0.1.0

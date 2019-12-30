@@ -18,7 +18,7 @@ library(viridis)
 library(gplots)
 library(argparse)
 library(enrichR)
-library(gemmawrapper)
+library(mousegwas)
 
 parser <- ArgumentParser()
 

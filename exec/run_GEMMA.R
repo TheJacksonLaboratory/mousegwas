@@ -2,7 +2,7 @@
 #
 # Read csv file, prepare for GEMMA, run GEMMA and plot the results
 #
-library(gemmawrapper)
+library(mousegwas)
 library(argparse)
 library(yaml)
 library(dplyr)
