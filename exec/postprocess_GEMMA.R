@@ -192,7 +192,7 @@ allchr <- allchr %>% left_join(dplyr::select(geno_s, rs, bp38), by=c("SNP1" = "r
 avgwin = 5000
 allchr$distc <- (cut(allchr$dist, breaks=seq(from=min(allchr$dist)-1,to=max(allchr$dist)+1,by=avgwin)))
 allavg <- allchr %>% group_by(distc) %>% summarise(avdist=mean(dist),avr_sq=mean(r_sq, na.rm = T)) %>% ungroup()
-pld <- ggplot(allavg, aes(avdist/1000000, avr_sq)) + geom_smooth(color=RColorBrewer::brewer.pal(3,"Set1")[3], method="loess", span=0.1, se=FALSE)+
+pld <- ggplot(allavg, aes(avdist/1000000, avr_sq)) + geom_smooth(color=RColorBrewer::brewer.pal(3,"Set1")[3], method="loess", span=0.3, se=FALSE)+
   xlim(c(0, 2.5)) + labs(x="Distance (Mbp)",y=expression("Average LD"~(r^{2})))
 ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw() + theme(
   panel.border = element_blank(),
@@ -269,16 +269,18 @@ for (i in 1:length(lilp)){
   pp <- lilp[[i]]
   expp <- ext_peak(pp$gwas)
   affgen <- get_genes(expp[expp$ispeak==T,], dist=1000)
-  write_csv(affgen, path = paste0(args$plotdir, "/genes_for_hoenotype_", i, ".csv"))
-  # Run enrichr
-  enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
-  for (d in dbs$libraryName){
-    if (dim(enrr[[d]])[2] > 1){
-      rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05 / length(dbs$libraryName))
-      if (nrow(rtb) > 0)
-        write_csv((rtb %>% mutate(total.genes= length(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), phenotype = pnames$PaperName[i], library=d)),
-                  path = paste0(args$plotdir, "/enrichR_phenotype_", i, "_db_", d, "p005.csv"))
+  if (nrow(affgen) > 0){
+    write_csv(affgen, path = paste0(args$plotdir, "/genes_for_hoenotype_", i, ".csv"))
+    # Run enrichr
+    enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
+    for (d in dbs$libraryName){
+      if (dim(enrr[[d]])[2] > 1){
+        rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05 / length(dbs$libraryName))
+        if (nrow(rtb) > 0)
+          write_csv((rtb %>% mutate(total.genes= length(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), phenotype = pnames$PaperName[i], library=d)),
+                    path = paste0(args$plotdir, "/enrichR_phenotype_", i, "_db_", d, "p005.csv"))
 
+      }
     }
   }
 }
