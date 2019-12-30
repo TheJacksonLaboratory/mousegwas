@@ -86,12 +86,12 @@ ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        width=fullw, height=height, units="in")
 
 # Plot each phenotype's Manhattan plot
-lilp <- NULL
+lilp <- vector("list", length(phenos))
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
                        name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000,
                        corrthr=0.4)
-  lilp <- c(lilp, pp)
+  lilp[[i]] <- pp
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
          width=fullw, height=height, units="in")
@@ -266,7 +266,7 @@ for (k in 1:args$clusters){
 
 # Do this for each phenotype
 for (i in 1:length(lilp)){
-  pp <- lilp[i]
+  pp <- lilp[[i]]
   expp <- ext_peak(pp$gwas)
   affgen <- get_genes(expp[expp$ispeak==T,], dist=1000)
   write_csv(affgen, path = paste0(args$plotdir, "/genes_for_hoenotype_", i, ".csv"))
