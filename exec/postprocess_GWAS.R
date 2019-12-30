@@ -156,7 +156,7 @@ pnoname$layers <- pnoname$layers[1:2]
 nolab <- p$plot
 nolab$layers <- nolab$layers[1]
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
-       plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(fill=p$pwas$cluster,color=ispeak), size=0.9) +
+       plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(fill=p$pwas$cluster,color=ispeak), shape=21, size=0.9) +
          scale_fill_manual(values=ccols) + scale_color_manual(values=c(0.5,1)) + theme(text=element_text(size=10, family=ffam)),
        device="pdf", dpi="print", width=fullw, height=height, units="in")
 # Plot each cluster's Manhattanplot
