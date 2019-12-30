@@ -46,6 +46,7 @@ grpcol <- RColorBrewer::brewer.pal(8,"Accent")
 fullw <- 7.25
 halfw <- 3.54
 height <- 3.54
+ffam <- "Arial"
 # Read the data
 # Read the METASOFT results file. The names of the columns are taken from the phenotypes_order file
 phenos <- as.character(read.csv(paste0(args$outdir, "/phenotypes_order.txt"), header = FALSE, skip=1)$V1)
@@ -82,7 +83,7 @@ p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10,
                     maxdist=10000000, corrthr=0.4)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
-       plot=p$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
+       plot=p$plot + theme(text=element_text(size=10, family=ffam)), device="pdf", dpi="print",
        width=fullw, height=height, units="in")
 
 # Plot each phenotype's Manhattan plot
@@ -93,7 +94,7 @@ for (i in 1:length(phenos)){
                        corrthr=0.4)
   lilp[[i]] <- pp
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
-         plot=pp$plot + theme(text=element_text(size=10, family="Times")), device="pdf", dpi="print",
+         plot=pp$plot + theme(text=element_text(size=10, family=ffam)), device="pdf", dpi="print",
          width=fullw, height=height, units="in")
 }
 
@@ -109,7 +110,7 @@ kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
 bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
 
 ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
-       plot = bip + theme(text=element_text(size=10, family="Times")),
+       plot = bip + theme(text=element_text(size=10, family=ffam)),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 
 
@@ -124,7 +125,7 @@ pgwas <- pgwas[rowarr,]
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
 colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr]) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 colcol <- PVE %>% left_join(tibble(Group=unique(PVE$Group), color=grpcol[1:length(unique(PVE$Group))])) %>% column_to_rownames(var="PaperName") %>% dplyr::select(color)
-pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = "Times")
+pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = ffam)
 heatmap.2(pgwas, col = hmcol,
           Rowv = F, Colv = T, dendrogram = "col", scale="none", trace="none",
           RowSideColors = colrow[,1,drop=T], ColSideColors = colcol[,1,drop=T], labRow = NA,
@@ -139,7 +140,7 @@ pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(c
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
   xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
-  theme(text=element_text(size=10, family="Times"))
+  theme(text=element_text(size=10, family=ffam))
 ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi = "print",
        width = fullw, height = height, units = "in")
 
@@ -155,8 +156,8 @@ pnoname$layers <- pnoname$layers[1:2]
 nolab <- p$plot
 nolab$layers <- nolab$layers[1]
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
-       plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(color=p$pwas$cluster, alpha=ispeak,size=ispeak)) +
-         scale_color_manual(values=ccols) + scale_alpha_manual(values=c(0.5,1)) + scale_size_manual(values=c(0.3, 0.9)) + theme(text=element_text(size=10, family="Times")),
+       plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(fill=p$pwas$cluster,color=ispeak), size=0.9) +
+         scale_fill_manual(values=ccols) + scale_color_manual(values=c(0.5,1)) + theme(text=element_text(size=10, family=ffam)),
        device="pdf", dpi="print", width=fullw, height=height, units="in")
 # Plot each cluster's Manhattanplot
 #p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
@@ -166,7 +167,7 @@ for (k in 1:args$clusters){
       geom_point(aes(color=cluster, alpha=ispeak, size=ispeak)) +
       scale_color_manual(values=ccols[k]) + scale_alpha_manual(values=c(0.5,1)) +
       scale_size_manual(values=c(0.3, 0.9)) +
-      theme(text=element_text(size=10, family="Times")),
+      theme(text=element_text(size=10, family=ffam)),
     device="pdf", dpi="print", width=fullw, height=height, units="in")
 }
 
@@ -205,7 +206,7 @@ ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw
   panel.grid.minor.x = element_blank(),
   panel.grid.major.y = element_blank(),
   panel.grid.minor.y = element_blank(),
-  text=element_text(size=10, family="Times")
+  text=element_text(size=10, family=ffam)
   ),
   device="pdf", dpi="print", width=halfw, height=height, units="in"
 )
@@ -225,7 +226,7 @@ mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogr
                      panel.grid.minor.x = element_blank(),
                      panel.grid.major.y = element_blank(),
                      panel.grid.minor.y = element_blank(),
-                     text=element_text(size=10, family="Times")
+                     text=element_text(size=10, family=ffam)
   )
 ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
        device="pdf", dpi="print", width=halfw, height=height, units="in")
@@ -240,7 +241,7 @@ densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
   theme_bw() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
-        text=element_text(size=10, family="Times"))
+        text=element_text(size=10, family=ffam))
 ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
        device="pdf", dpi="print", width=fullw, height=height, units="in")
 
@@ -253,7 +254,7 @@ ext_peak <- function(snps, maxdist=2000000){
 pg <- ext_peak(left_join(p$gwas, select(p$pwas, rs, cluster),by="rs"))
 ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
        plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
-         theme_bw() + theme(text=element_text(size=10, family="Times")),
+         theme_bw() + theme(text=element_text(size=10, family=ffam)),
        device="pdf", dpi="print", width=halfw, height=height, units="in")
 allgenes = NULL
 dbs <- listEnrichrDbs()
