@@ -156,17 +156,23 @@ pnoname$layers <- pnoname$layers[1:2]
 nolab <- p$plot
 nolab$layers <- nolab$layers[1]
 ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
-       plot = pnoname + ggnewscale::new_scale_color() + geom_point(aes(fill=p$pwas$cluster,color=ispeak), shape=21, size=0.9) +
-         scale_fill_manual(values=ccols) + scale_color_manual(values=c(0.5,1)) + theme(text=element_text(size=10, family=ffam)),
+       plot = pnoname + ggnewscale::new_scale_color() +
+         geom_point(aes(alpha=p$pwas$ispeak), size=1.2, color="black") +
+         scale_alpha_manual(values = c(0,1)) +
+         ggnewscale::new_scale_color() +
+         geom_point(aes(color=p$pwas$cluster), size=0.9) +
+         scale_color_manual(values=ccols) + theme(text=element_text(size=10, family=ffam)),
        device="pdf", dpi="print", width=fullw, height=height, units="in")
 # Plot each cluster's Manhattanplot
 #p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
 for (k in 1:args$clusters){
   ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster_", k, ".pdf"),
       plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
-      geom_point(aes(color=cluster, alpha=ispeak, size=ispeak)) +
-      scale_color_manual(values=ccols[k]) + scale_alpha_manual(values=c(0.5,1)) +
-      scale_size_manual(values=c(0.3, 0.9)) +
+      geom_point(aes(alpha=p$pwas$ispeak), size=1.2, color="black") +
+      scale_alpha_manual(values = c(0,1)) +
+      ggnewscale::new_scale_color() +
+      geom_point(aes(color=cluster)) +
+      scale_color_manual(values=ccols[k]) +
       theme(text=element_text(size=10, family=ffam)),
     device="pdf", dpi="print", width=fullw, height=height, units="in")
 }
