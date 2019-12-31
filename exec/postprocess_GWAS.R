@@ -27,7 +27,7 @@ parser$add_argument("--outdir", "-o",
                     help="run_GEMMA.R output dir")
 parser$add_argument("--plotdir", "-p", default=".",
                     help="Where to put the plots")
-parser$add_argument("--clusters", '-c', default=6, type="integer",
+parser$add_argument("--clusters", '-c', default=7, type="integer",
                     help="Number of peaks clusters")
 parser$add_argument("--rotation", "-r", default="OFDistTraveled55m,OFPeripheryTime55m,GrTime55m",
                     help="comma separated list of phenotypes to plot in the ggbiplot")
@@ -300,7 +300,7 @@ for (i in 1:length(lilp)){
     # Run enrichr
     enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
     for (d in dbs$libraryName){
-      if (!is.null(enrr[[d]]) & dim(enrr[[d]])[2] > 1){
+      if (length(dim(enrr[[d]]))>1 && dim(enrr[[d]])[2] > 1){
         rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05)
         if (nrow(rtb) > 0)
           write_csv((rtb %>% mutate(total.genes= length(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), phenotype = pnames$PaperName[i], library=d)),
