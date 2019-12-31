@@ -171,7 +171,7 @@ for (k in 1:args$clusters){
       geom_point(aes(alpha=ispeak), size=1.2, color="black") +
       scale_alpha_manual(values = c(0,1)) +
       ggnewscale::new_scale_color() +
-      geom_point(aes(color=cluster)) +
+      geom_point(aes(color=cluster), size=0.9) +
       scale_color_manual(values=ccols[k]) +
       theme(text=element_text(size=10, family=ffam)),
     device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
