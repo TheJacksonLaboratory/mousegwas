@@ -291,7 +291,7 @@ for (i in 1:length(lilp)){
     # Run enrichr
     enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
     for (d in dbs$libraryName){
-      if (dim(enrr[[d]])[2] > 1){
+      if (!is.null(enrr[[d]]) & dim(enrr[[d]])[2] > 1){
         rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05 / length(dbs$libraryName))
         if (nrow(rtb) > 0)
           write_csv((rtb %>% mutate(total.genes= length(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), phenotype = pnames$PaperName[i], library=d)),
