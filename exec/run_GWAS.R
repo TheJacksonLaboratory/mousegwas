@@ -69,6 +69,7 @@ args <- parser$parse_args()
 yamin <- yaml.load_file(args$yaml)
 
 # Make the output directory
+if (!grepl("^/", args$basedir)) args$basedir <- paste(getwd(), args$basedir, sep = "/")
 dir.create(args$basedir, recursive = TRUE)
 # Read the input table
 complete_table <- read_csv(args$input, col_names=TRUE)
