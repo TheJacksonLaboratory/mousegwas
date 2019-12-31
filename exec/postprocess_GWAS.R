@@ -168,7 +168,7 @@ ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
 for (k in 1:args$clusters){
   ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster_", k, ".pdf"),
       plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
-      geom_point(aes(alpha=p$pwas$ispeak), size=1.2, color="black") +
+      geom_point(aes(alpha=ispeak), size=1.2, color="black") +
       scale_alpha_manual(values = c(0,1)) +
       ggnewscale::new_scale_color() +
       geom_point(aes(color=cluster)) +
