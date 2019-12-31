@@ -125,7 +125,7 @@ pgwas <- pgwas[rowarr,]
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
 colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr]) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 colcol <- PVE %>% left_join(tibble(Group=unique(PVE$Group), color=grpcol[1:length(unique(PVE$Group))])) %>% column_to_rownames(var="PaperName") %>% dplyr::select(color)
-pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = ffam)
+cairo_pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = ffam)
 heatmap.2(pgwas, col = hmcol,
           Rowv = F, Colv = T, dendrogram = "col", scale="none", trace="none",
           RowSideColors = colrow[,1,drop=T], ColSideColors = colcol[,1,drop=T], labRow = NA,
