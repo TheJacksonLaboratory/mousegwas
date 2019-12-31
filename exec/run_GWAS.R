@@ -71,6 +71,7 @@ yamin <- yaml.load_file(args$yaml)
 # Make the output directory
 if (!grepl("^/", args$basedir)) args$basedir <- paste(getwd(), args$basedir, sep = "/")
 dir.create(args$basedir, recursive = TRUE)
+print(paste0("Working directory: ", args$basedir))
 # Read the input table
 complete_table <- read_csv(args$input, col_names=TRUE)
 
