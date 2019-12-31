@@ -83,7 +83,7 @@ p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"
                     name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10,
                     maxdist=10000000, corrthr=0.4)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
-       plot=p$plot + theme(text=element_text(size=10, family=ffam)), device="pdf", dpi="print",
+       plot=p$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
        width=fullw, height=height, units="in")
 
 # Plot each phenotype's Manhattan plot
@@ -94,7 +94,7 @@ for (i in 1:length(phenos)){
                        corrthr=0.4)
   lilp[[i]] <- pp
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
-         plot=pp$plot + theme(text=element_text(size=10, family=ffam)), device="pdf", dpi="print",
+         plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
          width=fullw, height=height, units="in")
 }
 
@@ -111,7 +111,7 @@ bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_ma
 
 ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
        plot = bip + theme(text=element_text(size=10, family=ffam)),
-       device="pdf", dpi="print", width=halfw, height=height, units="in")
+       device = cairo_pdf, dpi="print", width = halfw, height = height, units="in")
 
 
 # Plot the m-value heatmap
@@ -141,7 +141,7 @@ pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(c
   xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
   theme(text=element_text(size=10, family=ffam))
-ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = "pdf", dpi = "print",
+ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = cairo_pdf, dpi = "print",
        width = fullw, height = height, units = "in")
 
 
@@ -162,7 +162,7 @@ ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
          ggnewscale::new_scale_color() +
          geom_point(aes(color=p$pwas$cluster), size=0.9) +
          scale_color_manual(values=ccols) + theme(text=element_text(size=10, family=ffam)),
-       device="pdf", dpi="print", width=fullw, height=height, units="in")
+       device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
 # Plot each cluster's Manhattanplot
 #p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
 for (k in 1:args$clusters){
@@ -174,7 +174,7 @@ for (k in 1:args$clusters){
       geom_point(aes(color=cluster)) +
       scale_color_manual(values=ccols[k]) +
       theme(text=element_text(size=10, family=ffam)),
-    device="pdf", dpi="print", width=fullw, height=height, units="in")
+    device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
 }
 
 
@@ -214,7 +214,7 @@ ggsave(filename = paste0(args$plotdir, "/plot_LD_drop.pdf"), plot=pld + theme_bw
   panel.grid.minor.y = element_blank(),
   text=element_text(size=10, family=ffam)
   ),
-  device="pdf", dpi="print", width=halfw, height=height, units="in"
+  device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 )
 
 
@@ -235,7 +235,7 @@ mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogr
                      text=element_text(size=10, family=ffam)
   )
 ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
-       device="pdf", dpi="print", width=halfw, height=height, units="in")
+       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
 
 
 # Plot markers density
@@ -249,7 +249,7 @@ densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
         panel.grid.minor.x = element_blank(),
         text=element_text(size=10, family=ffam))
 ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
-       device="pdf", dpi="print", width=fullw, height=height, units="in")
+       device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
 
 
 # Get the genes related to each cluster, print them and run enrichR
@@ -261,7 +261,7 @@ pg <- ext_peak(left_join(p$gwas, select(p$pwas, rs, cluster),by="rs"))
 ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
        plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
          theme_bw() + theme(text=element_text(size=10, family=ffam)),
-       device="pdf", dpi="print", width=halfw, height=height, units="in")
+       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
 allgenes = NULL
 dbs <- listEnrichrDbs()
 for (k in 1:args$clusters){
