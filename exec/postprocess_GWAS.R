@@ -309,9 +309,6 @@ densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
              aes(ps/1000000, factor(chr, levels=chrord), fill=factor(cluster)),
              show.legend = F, inherit.aes = F, color = "black",
              position = position_jitter(height=0.15, width=0), shape=21) +
-  geom_errorbarh(data = filter(pg, ispeak, chr!="Y", chr!="MT"),
-                 aes(xmin = minps/1000000, xmax = maxps/1000000, y = factor(chr, levels=chrord), color=factor(cluster)),
-                 show.legend = F, inherit.aes = F, position = position_jitter(height=0.15, width=0), height=0.5) +
   scale_color_manual(values = ccols) +
   theme_bw() +
   theme(panel.grid.major.x = element_blank(),
