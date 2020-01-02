@@ -273,8 +273,8 @@ if (dim(b$phenotypes)[2]>1){
 
 # Remove SNPs with more than 5% missing data and 5% MAF
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
-                             rowSums(b$genotypes)/((ncol(b$genotypes)-3)*2) >= args$MAF &
-                             rowSums(b$genotypes)/((ncol(b$genotypes)-3)*2) <= 1-args$MAF,]
+                             rowSums(b$genotypes[,-1:-3])/((ncol(b$genotypes)-3)*2) >= args$MAF &
+                             rowSums(b$genotypes[,-1:-3])/((ncol(b$genotypes)-3)*2) <= 1-args$MAF,]
 
 
 # Normalize the phenotypes
