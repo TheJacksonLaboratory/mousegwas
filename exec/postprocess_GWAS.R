@@ -247,19 +247,6 @@ ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
        device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
 
 
-# Plot markers density
-chrord <- c("X", 19:1)
-densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
-  ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
-  geom_bin2d(binwidth=1, drop=T) + xlab("Position (Mbp)") + ylab ("Chromosome") +
-  scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) +
-  theme_bw() +
-  theme(panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        text=element_text(size=10, family=ffam))
-ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
-       device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
-
 
 # Get the genes related to each cluster, print them and run enrichR
 ext_peak <- function(snps, maxdist=2000000){
@@ -310,3 +297,26 @@ for (i in 1:length(lilp)){
     }
   }
 }
+
+# Plot markers density
+chrord <- c("X", 19:1)
+densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
+  ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
+  geom_bin2d(binwidth=1, drop=T) + xlab("Position (Mbp)") + ylab ("Chromosome") +
+  scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) +
+  ggnewscale::new_scale_fill() +
+  geom_point(data = filter(pg, ispeak, chr!="Y", chr!="MT"),
+             aes(ps/1000000, factor(chr, levels=chrord), fill=factor(cluster)),
+             show.legend = F, inherit.aes = F, color = "black",
+             position = position_jitter(height=0.15, width=0), shape=21) +
+  geom_errorbarh(data = filter(pg, ispeak, chr!="Y", chr!="MT"),
+                 aes(xmin = minps/1000000, xmax = maxps/1000000, y = factor(chr, levels=chrord), color=factor(cluster)),
+                 show.legend = F, inherit.aes = F, position = position_jitter(height=0.15, width=0), height=0.5) +
+  scale_color_manual(values = ccols) +
+  theme_bw() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        text=element_text(size=10, family=ffam))
+ggsave(filename = paste0(args$plotdir, "/Chromosome_density_plot.pdf"), plot = densp,
+       device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
+
