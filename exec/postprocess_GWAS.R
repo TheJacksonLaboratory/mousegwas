@@ -309,7 +309,7 @@ densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
              aes(ps/1000000, factor(chr, levels=chrord), fill=factor(cluster)),
              show.legend = F, inherit.aes = F, color = "black",
              position = position_jitter(height=0.15, width=0), shape=21) +
-  scale_color_manual(values = ccols) +
+  scale_fill_manual(values = ccols) +
   theme_bw() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
