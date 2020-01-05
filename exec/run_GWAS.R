@@ -141,8 +141,6 @@ for (f in args$genotypes){
   valid_strains <- setdiff(valid_strains, names(complete.geno))
 }
 complete.geno[, chr:=as.character(chr)]
-mafc <- rowSums(complete.geno[,-1:-5])/(ncol(complete.geno)-5)
-complete.geno <- complete.geno[mafc > args$MAF & mafc < 1-args$MAF,]
 srdata <- complete.geno[, .(rs, major, minor)]
 numeric.geno <- complete.geno[, .("chr", "bp38", "rs", "major", "minor")]
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
@@ -151,6 +149,8 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[get(cn)==minor, c(cn) := 2]
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
+mafc <- rowSums(complete.geno[,-1:-5])/(ncol(complete.geno)-5)
+complete.geno <- complete.geno[mafc > args$MAF & mafc < 1-args$MAF,]
 
 fwrite(complete.geno, file = paste0(args$basedir, "/strains_genotypes_all.csv"))
 
