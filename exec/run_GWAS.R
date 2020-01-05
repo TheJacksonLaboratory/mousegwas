@@ -141,6 +141,8 @@ for (f in args$genotypes){
   valid_strains <- setdiff(valid_strains, names(complete.geno))
 }
 complete.geno[, chr:=as.character(chr)]
+mafc <- rowSums(complete.geno[,-1:-5])/(ncol(complete.geno)-5)
+complete.geno <- complete.geno[mafc > args$MAF & mafc < 1-args$MAF,]
 srdata <- complete.geno[, .(rs, major, minor)]
 numeric.geno <- complete.geno[, .("chr", "bp38", "rs", "major", "minor")]
 for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"))){
