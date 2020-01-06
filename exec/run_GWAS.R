@@ -149,8 +149,6 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[get(cn)==minor, c(cn) := 2]
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
-mafc <- rowSums(complete.geno[,-1:-5])/(ncol(complete.geno)-5)
-complete.geno <- complete.geno[mafc > args$MAF & mafc < 1-args$MAF,]
 
 fwrite(complete.geno, file = paste0(args$basedir, "/strains_genotypes_all.csv"))
 
@@ -274,9 +272,9 @@ if (dim(b$phenotypes)[2]>1){
 }
 
 # Remove SNPs with more than 5% missing data and 5% MAF
+mafc <- rowSums(complete.geno[,-1:-5])/(ncol(complete.geno)-5)
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
-                             rowSums(b$genotypes[,-1:-3])/((ncol(b$genotypes)-3)*2) >= args$MAF &
-                             rowSums(b$genotypes[,-1:-3])/((ncol(b$genotypes)-3)*2) <= 1-args$MAF,]
+                             mafc >= args$MAF & mafc <= 1-args$MAF,]
 
 
 # Normalize the phenotypes
