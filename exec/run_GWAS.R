@@ -62,7 +62,7 @@ parser$add_argument("--coat_covar", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a covariate")
 parser$add_argument("--coat_phenotype", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a phenotype")
-parser$add_argument("--metasoft_args", dafault="-lambda_mean 3.672380 -lambda_hetero 4.212553 -mvalue_method mcmc -mvalue_prior_sigma 1",
+parser$add_argument("--metasoft_args", default="-lambda_mean 3.672380 -lambda_hetero 4.212553 -mvalue_method mcmc -mvalue_prior_sigma 1",
                     help="Metasoft additional parameters, see manual")
 
 args <- parser$parse_args()
