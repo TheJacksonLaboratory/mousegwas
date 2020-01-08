@@ -8,12 +8,13 @@
 #' @param pymm PyLMM executable
 #' @param pylmm_kinship pyLMMKinship executable
 #' @param loco Use LOCO or not
+#' @param metasoft_args additional arguments for metasoft
 #'
 #' @return the output file
 #'
 #' @import data.table
 #' @export
-run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylmm_kinship, loco=TRUE){
+run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylmm_kinship, loco=TRUE, metasoft_args=""){
   # Write the phenotypes
   if (!is.null(covars)){
     phenotypes <- get_residuals(covars, phenotypes)
@@ -32,7 +33,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
       annot_file <- paste0(basedir, "/SNPs_only_chr_", chrname, ".txt")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], annot_file, col.names=TRUE, na="NA", sep=" ")
       # Run pylmm on the chromosome
-      run_pylmm_exec(pylmm, geno_sfile, genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname))
+      run_pylmm_exec(pylmm, geno_sfile, genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"], 1, drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_chr_", chrname), metasoft_args=metasoft_args)
     }
     # Combine all results
     system(paste0("cd ", basedir, " && head -1 output_chr_1_combined.txt > output_all_chrs_combined.txt && cat output_chr_*_combined.txt | grep -iv beta >> output_all_chrs_combined.txt"))
@@ -44,7 +45,7 @@ run_pylmm <- function(genotypes, phenotypes, annot, covars, basedir, pylmm, pylm
     fwrite(genotypes[,-1:-3], genofile, col.names = FALSE, na = "NA", sep=" ")
     annot_file <- paste0(basedir, "/SNPs.txt")
     fwrite(genotypes[, 1,drop=F], annot_file, col.names=FALSE, na="NA", sep=" ")
-    run_pylmm_exec(pylmm, genofile, genotypes[,1,drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"))
+    run_pylmm_exec(pylmm, genofile, genotypes[,1,drop=F], phenofile, ksfile, ncol(phenotypes), paste0(basedir, "/output_all_chrs"), metasoft_args=metasoft_args)
     return(paste0(basedir, "/output_all_chrs_combined.txt"))
   }
 }
@@ -93,7 +94,7 @@ calc_pylmm_kinship <- function(genotypes, annot, pylmm_kinship, chrname, basedir
 #'
 #' @import data.table
 #' @examples
-run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, output_head){
+run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, output_head, metasoft_args=""){
   # Run each phenotype (1:nphen)
   for (i in 1:nphen){
     system(paste0(pylmm, " --verbose --emmaPHENO=", phenofile, " --emmaSNP=", geno_sfile, " --kfile=", ksfile, " -p ", i-1, " ", output_head, "_", i, ".pyLMM.tmp"))
@@ -105,7 +106,7 @@ run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, o
   # Run metaSOFT
   if (nphen > 1){
     outfiles <- sapply(1:nphen, function(n) paste0(output_head, "_", n, ".pyLMM"))
-    combine_metaSOFT_pylmm(outfiles, paste0(output_head, "_pasted.txt"), paste0(output_head, "_combined.txt"))
+    combine_metaSOFT_pylmm(outfiles, paste0(output_head, "_pasted.txt"), paste0(output_head, "_combined.txt"), xargs = metasoft_args)
   }else{
     system(paste0("cp ", output_head, "_1.pyLMM ", output_head, "_combined.txt"))
   }
@@ -125,7 +126,7 @@ run_pylmm_exec <- function(pylmm, geno_sfile, annot, phenofile, ksfile, nphen, o
 #'
 #' @import data.table
 #' @examples
-combine_metaSOFT_pylmm <- function(infiles, midfile, outfile, version="2.0.1"){
+combine_metaSOFT_pylmm <- function(infiles, midfile, outfile, version="2.0.1", xargs=""){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
   hasmeta <- file.exists(paste0("Metasoft.jar"))
@@ -147,5 +148,5 @@ combine_metaSOFT_pylmm <- function(infiles, midfile, outfile, version="2.0.1"){
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
   Sys.sleep(1)
   # Run metasoft
-  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile))
+  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log", xargs))
 }

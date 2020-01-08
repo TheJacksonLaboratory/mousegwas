@@ -103,7 +103,7 @@ for (i in 1:length(phenos)){
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
 pcvals <- prcomp(pgwas)
-pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],]
+pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
 # plot the PCA

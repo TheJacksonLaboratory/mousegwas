@@ -62,6 +62,8 @@ parser$add_argument("--coat_covar", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a covariate")
 parser$add_argument("--coat_phenotype", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a phenotype")
+parser$add_argument("--metasoft_args", dafault="-lambda_mean 3.672380 -lambda_hetero 4.212553 -mvalue_method mcmc -mvalue_prior_sigma 1",
+                    help="Metasoft additional parameters, see manual")
 
 args <- parser$parse_args()
 
@@ -290,7 +292,8 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                              cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=!args$noloco, single=is.null(yamin$eigens) || (yamin$eigens==0))
+                              cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=!args$noloco,
+                              single=is.null(yamin$eigens) || (yamin$eigens==0), metasoft_args = args$metasoft_args)
   # Run no LOCO to get the unified heritability for each phenotype
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
@@ -311,7 +314,7 @@ if (args$method == "GEMMA"){
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                cbind(b$covarssnpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco)
+                                cbind(b$covarssnpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = args$metasoft_args)
 }
 
 is.metasoft <- TRUE

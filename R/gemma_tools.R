@@ -82,7 +82,7 @@ get_residuals <- function(covars, phenotypes){
 #' @export
 #'
 #' @examples
-combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"){
+combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1", xargs=""){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
   hasmeta <- file.exists(paste0("Metasoft.jar"))
@@ -111,7 +111,8 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
   Sys.sleep(1)
   # Run metasoft
-  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile))
+  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log", xargs))
+  # Read the log file to get the
 }
 
 #' Run lmm 2 (LRT) on the data with LOCO
@@ -126,13 +127,14 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
 #' @param loco perform LOCO (default FALSE)
 #' @param single run each phenotype separately and then run metaSOFT to combine results
 #' @param skipcombine don't run metasoft. Used for PVE compute
+#' @param metasoft_args additional metasoft arguments
 #'
 #' @return The unified output file
 #' @export
 #'
 #' @import data.table
 #' @examples
-execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE, skipcombine=FALSE){
+execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE, skipcombine=FALSE, metasoft_args=""){
   exec <- get_gemma(basedir)
   # Set keys and merge the genotypes and annotations
   #setkey(genotypes, rs, physical = FALSE)
@@ -188,7 +190,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
         "lmm_all_phenotype_", n))
       if (length(outfiles)>1 && !skipcombine){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_allpheno.assoc.pasted.txt"),
-                         paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
+                         paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"), xargs=metasoft_args)
         return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
       }else{
         return(paste0(basedir, "/output/lmm_all_phenotype_1.assoc.txt"))
@@ -236,7 +238,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       # If singles combine the results to one file
       if (single & length(pfiles)>1){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.pasted.txt"),
-                                                   paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
+                                                   paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"), xargs = metasoft_args)
       }else if (single){
         system(paste0("cp ", basedir, "/output/lmm_",chrname, "_pheno_1.assoc.txt ", basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
       }
