@@ -39,7 +39,7 @@ args <- parser$parse_args()
 
 # Step 1: Read the color pallete
 # Cluster colors
-ccols <- brewer.pal(args$clusters, "Dark2")
+ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 # Heatmap plot for m-values
 hmcol <- viridis(128, option="cividis")
 grpcol <- RColorBrewer::brewer.pal(8,"Accent")
@@ -118,7 +118,7 @@ ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
 # Order the columns
 rowarr <- NULL
 for (i in 1:args$cluster){
-  cc <- hclust(dist(pgwas[kk$cluster==i,]))
+  cc <- hclust(dist(pgwas[kk$cluster==i,, drop=F]))
   rowarr <- c(rowarr, row.names(pgwas)[kk$cluster==i][cc$order])
 }
 pgwas <- pgwas[rowarr,]
