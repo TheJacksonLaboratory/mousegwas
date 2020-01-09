@@ -80,7 +80,7 @@ set.seed(490)
 # Plot the combined Manhattan plot
 p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
-                    name = "Chromosome",genotypes = geno, namethr = 15, redthr = 10,
+                    name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7,
                     maxdist=10000000, corrthr=0.4)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        plot=p$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
@@ -254,6 +254,7 @@ ext_peak <- function(snps, maxdist=2000000){
   snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
 }
 pg <- ext_peak(left_join(p$gwas, select(p$pwas, rs, cluster),by="rs"))
+pg <- pg %>% left_join(select(allgwas, rs, STAT1_RE2, STAT2_RE2))
 ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
        plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
          theme_bw() + theme(text=element_text(size=10, family=ffam)),
