@@ -111,7 +111,7 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
   Sys.sleep(1)
   # Run metasoft
-  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log", xargs))
+  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log ", xargs))
   # Read the log file to get the
 }
 

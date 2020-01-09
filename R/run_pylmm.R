@@ -148,5 +148,5 @@ combine_metaSOFT_pylmm <- function(infiles, midfile, outfile, version="2.0.1", x
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
   Sys.sleep(1)
   # Run metasoft
-  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log", xargs))
+  system(paste0("java -jar Metasoft.jar -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log ", xargs))
 }
