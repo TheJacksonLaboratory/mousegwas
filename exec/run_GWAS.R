@@ -62,11 +62,17 @@ parser$add_argument("--coat_covar", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a covariate")
 parser$add_argument("--coat_phenotype", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a phenotype")
-parser$add_argument("--metasoft_args", default="-lambda_mean 3.672380 -lambda_hetero 4.212553 -mvalue_method mcmc -mvalue_prior_sigma 1",
-                    help="Metasoft additional parameters, see manual")
+parser$add_argument("--lambda_mean", default=1, type="double",
+                    help="lambda_mean for MetaSoft. Should be obtained from an initial run")
+parser$add_argument("--lambda_hetero", default=1, type="double",
+                    help="lambda_hetero for MetaSoft. Should be obtained from an initial run")
+parser$add_argument("--mvalue_method", default="mcmc",
+                    help="Either mcmc (default) or exact if the number of phenotypes is small (<10)")
 
 args <- parser$parse_args()
 
+
+metasoft_args <- paste("-lambda_mean", args$lambda_mean, "-lambda_hetero", args$lambda_hetero, "-mvalue_method", args$mvalue_method, sep=" ")
 # Load the yaml
 yamin <- yaml.load_file(args$yaml)
 
@@ -293,7 +299,7 @@ if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
                               cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=!args$noloco,
-                              single=is.null(yamin$eigens) || (yamin$eigens==0), metasoft_args = args$metasoft_args)
+                              single=is.null(yamin$eigens) || (yamin$eigens==0), metasoft_args = metasoft_args)
   # Run no LOCO to get the unified heritability for each phenotype
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
@@ -314,7 +320,7 @@ if (args$method == "GEMMA"){
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                cbind(b$covarssnpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = args$metasoft_args)
+                                cbind(b$covarssnpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = metasoft_args)
 }
 
 is.metasoft <- TRUE
