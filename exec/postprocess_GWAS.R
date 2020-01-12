@@ -29,8 +29,8 @@ parser$add_argument("--plotdir", "-p", default=".",
                     help="Where to put the plots")
 parser$add_argument("--clusters", '-c', default=7, type="integer",
                     help="Number of peaks clusters")
-parser$add_argument("--rotation", "-r", default="OFDistTraveled55m,OFPeripheryTime55m,GrTime55m",
-                    help="comma separated list of phenotypes to plot in the ggbiplot")
+parser$add_argument("--rotation", "-r", default="",
+                    help="comma separated list of phenotypes to plot in the ggbiplot. If empty plots all")
 parser$add_argument("--sample", "-s", type="integer", default=10000,
                     help="Number of SNPs to sample for the LD plotting")
 parser$add_argument("--names", "-n",
@@ -103,7 +103,9 @@ for (i in 1:length(phenos)){
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
 pcvals <- prcomp(pgwas)
-pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
+if (args$rotation != ""){
+  pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
+}
 pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
 # plot the PCA
