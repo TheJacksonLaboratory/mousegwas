@@ -102,18 +102,18 @@ for (i in 1:length(phenos)){
 
 pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
-pcvals <- prcomp(pgwas)
-if (args$rotation != ""){
-  pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
-}
-pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
+#pcvals <- prcomp(pgwas)
+#if (args$rotation != ""){
+#  pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
+#}
+#pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
 kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
 # plot the PCA
-bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
+#bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
 
-ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
-       plot = bip + theme(text=element_text(size=10, family=ffam)),
-       device = cairo_pdf, dpi="print", width = halfw, height = height, units="in")
+#ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
+#       plot = bip + theme(text=element_text(size=10, family=ffam)),
+#       device = cairo_pdf, dpi="print", width = halfw, height = height, units="in")
 
 
 # Plot the m-value heatmap
