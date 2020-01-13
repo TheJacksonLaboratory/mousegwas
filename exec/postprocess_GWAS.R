@@ -55,7 +55,7 @@ phenos <- as.character(pnames[phenos, "PaperName", drop=T])
 cnames <- c("rs", "STUDYNUM", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BETA_RE", "STD_RE",
             "PVALUE_RE2", "STAT1_RE2", "STAT2_RE2", "PVALUE_BE", "I_SQUARE", "Q", "PVALUE_Q",
             "TAU_SQUARE", paste0(phenos, "_PV"), phenos, "empty")
-allgwas <- read_delim(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"), "\t", col_names = cnames, skip=1, guess_max = 10000)
+allgwas <- read_delim(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"), "\t", col_names = cnames, skip=1, guess_max = Inf)
 anno <- read_delim(paste0(args$outdir, "/annotations.csv"), ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
 allgwas <- left_join(allgwas, anno, by="rs") %>% arrange(chr, ps)
 # Read the plotting data
