@@ -35,6 +35,8 @@ parser$add_argument("--sample", "-s", type="integer", default=10000,
                     help="Number of SNPs to sample for the LD plotting")
 parser$add_argument("--names", "-n",
                     help="Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
+parser$add_argument("--pvalthr", default=5, type="double",
+                    help="p-value threshold for plotting and getting gene lists")
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -80,7 +82,7 @@ set.seed(490)
 # Plot the combined Manhattan plot
 p <- plot_gemma_lmm(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"),
                     annotations = paste0(args$outdir, "/annotations.csv"), metasoft = TRUE,
-                    name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7,
+                    name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
                     maxdist=10000000, corrthr=0.4)
 ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
        plot=p$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
@@ -90,7 +92,7 @@ ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
 lilp <- vector("list", length(phenos))
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
-                       name = "Chromosome",genotypes = geno, namethr = 7, redthr = 7, maxdist=10000000,
+                       name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr, maxdist=10000000,
                        corrthr=0.4)
   lilp[[i]] <- pp
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),

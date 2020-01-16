@@ -72,7 +72,7 @@ parser$add_argument("--mvalue_method", default="mcmc",
 args <- parser$parse_args()
 
 
-metasoft_args <- paste("-lambda_mean", args$lambda_mean, "-lambda_hetero", args$lambda_hetero, "-mvalue_method", args$mvalue_method, sep=" ")
+metasoft_args <- paste("-mvalue_p_thres 1e-5", "-lambda_mean", args$lambda_mean, "-lambda_hetero", args$lambda_hetero, "-mvalue_method", args$mvalue_method, sep=" ")
 # Load the yaml
 yamin <- yaml.load_file(args$yaml)
 
