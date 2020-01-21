@@ -60,6 +60,12 @@ cnames <- c("rs", "STUDYNUM", "PVALUE_FE", "BETA_FE", "STD_FE", "PVALUE_RE", "BE
 allgwas <- read_delim(paste0(args$outdir, "/output/all_lmm_associations.assoc.txt"), "\t", col_names = cnames, skip=1, guess_max = Inf)
 anno <- read_delim(paste0(args$outdir, "/annotations.csv"), ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
 allgwas <- left_join(allgwas, anno, by="rs") %>% arrange(chr, ps)
+allbetas <- read_delim(paste0(args$outdir, "/output/all_lmm_associations.assoc.pasted.txt"), "\t", col_names = c("rs", paste(rep(phenos, each=2), rep(c("beta","SE"), 3), sep=".")))
+alltvals <- allbetas %>% select(rs)
+for (p in phenos){
+  alltvals[,p] <- allbetas[,paste(p, "beta", sep=".")] / allbetas[,paste(p, "SE", sep=".")]
+}
+alltvals <- left_join(alltvals, anno, by="rs") %>% arrange(chr, ps)
 # Read the plotting data
 #p <- load(paste0(args$outdir, "gwas_object_output.Rdata"))
 # Read the genotypes
@@ -90,11 +96,13 @@ ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_all_phenotypes.pdf"),
 
 # Plot each phenotype's Manhattan plot
 lilp <- vector("list", length(phenos))
+allpeaks <- NULL
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(Sys.glob(paste0(args$outdir, "/output/lmm_*_pheno_", i, ".assoc.txt")),
                        name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr, maxdist=10000000,
                        corrthr=0.4)
   lilp[[i]] <- pp
+  allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
          width=fullw, height=height, units="in")
@@ -102,7 +110,8 @@ for (i in 1:length(phenos)){
 
 # Cluster the peaks using the m-values
 
-pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
+#pgwas <- allgwas %>% filter(rs %in% p$gwas$rs[p$gwas$ispeak]) %>% column_to_rownames(var = "rs")
+pgwas <- alltvals %>% filter(rs %in% allpeaks) %>% column_to_rownames(var = "rs")
 pgwas <- as.matrix(pgwas[, phenos])
 #pcvals <- prcomp(pgwas)
 #if (args$rotation != ""){
