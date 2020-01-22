@@ -43,7 +43,8 @@ args <- parser$parse_args()
 # Cluster colors
 ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 # Heatmap plot for m-values
-hmcol <- viridis(128, option="cividis")
+pigr <- RColorBrewer::brewer.pal(name = "PiYG", n=11)
+hmcol <- colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
 grpcol <- RColorBrewer::brewer.pal(8,"Accent")
 fullw <- 7.25
 halfw <- 3.54
