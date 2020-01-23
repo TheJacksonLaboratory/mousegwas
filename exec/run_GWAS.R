@@ -305,7 +305,7 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                              cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=!args$noloco,
+                              b$covars, args$basedir, yamin$eigens, loco=!args$noloco,
                               single=is.null(yamin$eigens) || (yamin$eigens==0), metasoft_args = metasoft_args)
   # Run no LOCO to get the unified heritability for each phenotype
   if (!args$noloco){
