@@ -177,6 +177,8 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
     write_csv(residuals, paste0(basedir, "/residuals.csv"))
 
     resid_comp <- svd(residuals)
+    print("SVD percent of variance explained by loadings:")
+    print(resid_comp$d^2/sum(resid_comp$d^2))
     phenofile <- paste0(basedir, "/phenotypes.csv")
     fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
   }
