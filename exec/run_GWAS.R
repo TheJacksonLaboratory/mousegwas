@@ -320,7 +320,7 @@ if (args$method == "GEMMA"){
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                cbind(b$covarssnpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = metasoft_args)
+                                cbind(b$covars,snpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = metasoft_args)
 }
 
 is.metasoft <- TRUE
