@@ -170,6 +170,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
   }else{
     # Convert the phenotypes to residuals and do svd to remove correlation
     residuals <- get_residuals(covars, phenotypes)
+    write_csv(residuals, paste0(basedir, "/residuals.csv"))
     resid_comp <- svd(residuals)
     phenofile <- paste0(basedir, "/phenotypes.csv")
     fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
