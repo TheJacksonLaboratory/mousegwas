@@ -230,8 +230,8 @@ snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
   snpcovar <- base::t(as.matrix(strains_genomes)[as.matrix(strains_genomes[,1]) %in% yamin$confSNPs, 4:ncol(strains_genomes), drop=F])
   colnames(snpcovar) <- strains_genomes$rs[strains_genomes$rs %in% yamin$confSNPs]
-  for (c in colnames(snpcovar)){
-    snpcovar$c <- as.numeric(snpcovar$c)
+  for (c in 1:ncol(snpcovar)){
+    snpcovar[,c] <- as.numeric(snpcovar[,c])
   }
   covars <- cbind(covars, snpcovar)
   covar_names <- c(covar_names, colnames(snpcovar))
