@@ -60,6 +60,8 @@ get_residuals <- function(covars, phenotypes){
   }
   resids <- NULL
   for (p in names(phenotypes)){
+    print(length(as.data.frame(phenotypes)[,p]))
+    print(dim(covars))
     lft <- lm(as.data.frame(phenotypes)[,p] ~ covars, na.action=na.exclude)
     if (is.null(resids)){
       resids <- data.frame(p=resid(lft))
