@@ -225,6 +225,20 @@ for (comrow in 1:dim(complete_table)[1]){
   }
 }
 
+# Generate a covar table based on the confounding SNPs provided in the yaml file
+snpcovar <- NULL
+if (!is.null(yamin$confSNPs)){
+  snpcovar <- base::t(as.matrix(strains_genomes)[as.matrix(strains_genomes[,1]) %in% yamin$confSNPs, 4:ncol(strains_genomes), drop=F])
+  colnames(snpcovar) <- strains_genomes[,1][strains_genomes[,1] %in% yamin$confSNPs]
+  covars <- cbind(covars, snpcovar)
+  covar_names <- c(covar_names, colnames(snpcovar))
+  print(head(covars))
+  print(head(snpcovar))
+  #if(is.null(b$covars)) snpcovar <- cbind(1, snpcovar)
+  print(dim(covars))
+  print(dim(snpcovar))
+}
+
 # Compute the covariate matrix
 if (length(covar_names) > 0){
   if (args$coat_covar){
@@ -256,14 +270,7 @@ b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec, so
 # Print the phenotypes order
 write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"), quote = FALSE, col.names = FALSE, row.names = FALSE)
 
-# Generate a covar table based on the confounding SNPs provided in the yaml file
-snpcovar <- NULL
-if (!is.null(yamin$confSNPs)){
-  snpcovar <- base::t(as.matrix(b$genotypes)[as.matrix(b$genotypes[,1]) %in% yamin$confSNPs, 4:ncol(b$genotypes), drop=F])
-  if(is.null(b$covars)) snpcovar <- cbind(1, snpcovar)
-  print(dim(b$covars))
-  print(dim(snpcovar))
-}
+
 # Plot correlations between phenotypes
 
 #print(head(b$phenotypes))
@@ -304,7 +311,7 @@ if (args$method == "GEMMA"){
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                cbind(b$covars, snpcovar), args$basedir, yamin$eigens, loco=FALSE, single=TRUE, skipcombine=TRUE)
+                                b$covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE, skipcombine=TRUE)
     # Extract the VPE values for each phenotype
   }
   allVPE = data.table(phenotype=character(), PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
@@ -320,7 +327,7 @@ if (args$method == "GEMMA"){
 }else if (args$method == "pyLMM"){
   results_file <- run_pylmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                cbind(b$covars,snpcovar), args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = metasoft_args)
+                                b$covars, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = metasoft_args)
 }
 
 is.metasoft <- TRUE
