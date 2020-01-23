@@ -70,7 +70,7 @@ get_residuals <- function(covars, phenotypes){
       resids <- cbind(resids, data.frame(resid(lft)))
     }
   }
-  colnames(resid) <- names(phenotypes)
+  colnames(resids) <- names(phenotypes)
   return(resids)
 }
 
