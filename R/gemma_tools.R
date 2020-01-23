@@ -171,7 +171,11 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
   }else{
     # Convert the phenotypes to residuals and do svd to remove correlation
     residuals <- get_residuals(covars, phenotypes)
+    # Change NAs to 0 meaning the phenotype's average, I tried imputing these values but it basically
+    # gave the same results
+    residuals[is.na(residuals)] <- 0
     write_csv(residuals, paste0(basedir, "/residuals.csv"))
+
     resid_comp <- svd(residuals)
     phenofile <- paste0(basedir, "/phenotypes.csv")
     fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
