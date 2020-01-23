@@ -229,7 +229,7 @@ for (comrow in 1:dim(complete_table)[1]){
 snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
   snpcovar <- base::t(as.matrix(strains_genomes)[as.matrix(strains_genomes[,1]) %in% yamin$confSNPs, 4:ncol(strains_genomes), drop=F])
-  colnames(snpcovar) <- strains_genomes[,1][strains_genomes[,1] %in% yamin$confSNPs]
+  colnames(snpcovar) <- strains_genomes$rs[strains_genomes$rs %in% yamin$confSNPs]
   covars <- cbind(covars, snpcovar)
   covar_names <- c(covar_names, colnames(snpcovar))
   print(head(covars))
