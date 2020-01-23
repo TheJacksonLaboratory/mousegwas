@@ -67,9 +67,10 @@ get_residuals <- function(covars, phenotypes){
     if (is.null(resids)){
       resids <- data.frame(p=resid(lft))
     }else{
-      resids <- cbind(resids, data.frame(p=resid(lft)))
+      resids <- cbind(resids, data.frame(resid(lft)))
     }
   }
+  colnames(resid) <- names(phenotypes)
   return(resids)
 }
 
