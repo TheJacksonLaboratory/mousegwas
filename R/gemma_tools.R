@@ -115,7 +115,7 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
   Sys.sleep(1)
   # Run metasoft
-  system(paste0("java -jar Metasoft.jar  -mvalue_prior_sigma 1 -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log ", xargs))
+  #system(paste0("java -jar Metasoft.jar  -mvalue_prior_sigma 1 -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log ", xargs))
   # Read the log file to get the
 }
 
@@ -158,17 +158,16 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
   genofile <- paste0(basedir, "/all_genotypes.csv")
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
 
-  if (single){
-    # Write the phenotype files
-    print(dim(phenotypes)[2])
-    for (n in 1:dim(phenotypes)[2]){
-      print(n)
-      print(head(phenotypes))
-      print(head(as.data.table(phenotypes[,n,with=FALSE])))
-      fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",", na="NA")
-    }
-    phenofile <- paste0(basedir,"/phenotype_",1,".csv")
-  }else{
+  # Write the phenotype files
+  print(dim(phenotypes)[2])
+  for (n in 1:dim(phenotypes)[2]){
+    print(n)
+    print(head(phenotypes))
+    print(head(as.data.table(phenotypes[,n,with=FALSE])))
+    fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",", na="NA")
+  }
+  phenofile <- paste0(basedir,"/phenotype_",1,".csv")
+  if (!single){
     # Convert the phenotypes to residuals and do svd to remove correlation
     residuals <- get_residuals(covars, phenotypes)
     # Change NAs to 0 meaning the phenotype's average, I tried imputing these values but it basically
@@ -212,7 +211,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
                     " -p ", phenofile, " -a ", anotfile,
                     covar_flg,
                     " -k ", ksfile, " -o lmm_all",
-                    " -n ", do.call(paste, c(as.list(1:dim(phenotypes)[2], sep=" ")))))
+                    " -n ", do.call(paste, c(as.list(1:eigens, sep=" ")))))
       return(paste0(basedir,"/output/lmm_all.assoc.txt"))
     }
   }else{
@@ -228,13 +227,22 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
         pfiles <- c(phenofile)
         outfiles <- c(paste0("lmm_", chrname, "_allpheno"))
         nns <- do.call(paste, c(as.list(1:eigens, sep=" ")))
-      }else{
-        pfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(basedir,"/phenotype_",n,".csv"))
-        outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
-          "lmm_", chrname, "_pheno_", n))
-        nns <- "1"
+        print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
+                     " -p ", pfiles[n], " -a ", anotfile, covar_flg,
+                     " -k ", ksfile, " -o ", outfiles[1],
+                     " -n ", nns))
+        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
+                      " -p ", pfiles[n], " -a ", anotfile, covar_flg,
+                      #" -c ", covarfile,
+                      " -k ", ksfile, " -o ", outfiles[1],
+                      " -n ", nns))
       }
 
+      # In addition to running the multi-variate run each phenotype separately
+      pfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(basedir,"/phenotype_",n,".csv"))
+      outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
+        "lmm_", chrname, "_pheno_", n))
+      nns <- "1"
       for (n in 1:length(pfiles)){
         print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
                      " -p ", pfiles[n], " -a ", anotfile, covar_flg,
@@ -242,12 +250,11 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
                      " -n ", nns))
         system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
                       " -p ", pfiles[n], " -a ", anotfile, covar_flg,
-                      #" -c ", covarfile,
                       " -k ", ksfile, " -o ", outfiles[n],
                       " -n ", nns))
       }
       # If singles combine the results to one file
-      if (single & length(pfiles)>1){
+      if (length(pfiles)>1){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.pasted.txt"),
                                                    paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"), xargs = metasoft_args)
       }else if (single){

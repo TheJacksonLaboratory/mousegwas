@@ -2,7 +2,7 @@
 #
 # Plot figures and other post-processing
 #
-# Get the results directory of a run_GEMMA.R script and prepare publication-ready figures (yeah!)
+# Get the results directory of a run_GEMMA.R script and prepare publication-ready figures
 # The script was built and tested on GEMMA only with multiple phenotypes.
 # Input also includes the number of clusters to use for clustering. Colors are preset
 
