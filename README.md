@@ -16,7 +16,7 @@ Another data that should reside in the yaml file is translation of strains to th
 Execution
 ---------
 
-This `package`run_GWAS.py` will read the input files and will prepapre the input for either GEMMA or pyLMM. In the case of GEMMA it will download version 0.98 to the working directory if it can't find the GEMMA executable, if you wish to use pyLMM it should be installed and available in the path. A common process would be creating a virtual environment in python, activating it and installing pyLMM using `pip`, see https://github.com/nickFurlotte/pylmm for details.
+The script `run_GWAS.py` will read the input files and will prepapre the input for either GEMMA or pyLMM. In the case of GEMMA it will download version 0.98 to the working directory if it can't find the GEMMA executable, if you wish to use pyLMM it should be installed and available in the path. A common process would be creating a virtual environment in python, activating it and installing pyLMM using `pip`, see https://github.com/nickFurlotte/pylmm for details.
 The mousegwas will also download METASOFT and run it on the output if there is more than one phenotype.
 
 As part of the data processing, mousegwas can select a subset of the individuals, restricting the number of mice in each strain x sex group or use the average phenotype of all the individuals in such a group. This is controlled by the `-d` option with 0 for average or any other integer for number restriction.
