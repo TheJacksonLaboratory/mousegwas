@@ -1,10 +1,13 @@
 MouseGWAS
 =========
+
 Introduction
 ------------
+
 This package was built to manage the GWAS analysis of mouse phenotypes. The mice in the study were genotypes using either MDA or UCLA chips and deposited in the mouse phenome database (https://phenome.jax.org/genotypes). 
 Input
 -----
+
 The input for the script is the genotype csv files downloaded from the MPD website, the measured phenotypes as a csv file and a yaml file describing the input file.
 The input csv file should contain a column for strain, a column for sex and columns for phenotype measurements. The names of the columns should be defined in the yaml file using the keywords `strain` and `sex` and the phenotypes should be a list under the `phenotypes` keyword.
 Another data that should reside in the yaml file is translation of strains to the strain names in the genotypes files, it is a dictionary under the `translate` keyword, and `F1` keyword which is a dictionary translating the F1 names to their parent names, make sure the female parent is always first, it will be used to determine the X chromosome of make F1s. Confounding SNPs could be given using the `confSNPs`, this might be useful to control for obvious markers like coat color alleles. For sanity check you can supply coat color under `coat` as a dictionary from strain name to coat color and execute a GWAS of coat color with `--coat_phenotype`, it can also be used as a covariate with `--coat_covar`.
