@@ -187,7 +187,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
                   " -p ", phenofile, " -gk 1 -o kinship_all"))
     ksfile <- paste0(basedir, "/output/kinship_all.cXX.txt")
     for (n in 1:dim(phenotypes)[2]){
-      system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
+      system(paste0("cd ", basedir, " && ", exec, " -lmm 4 -g ", genofile,
                       " -p ", phenofile, " -a ", anotfile,
                       covar_flg,
                       " -k ", ksfile, " -o lmm_all_phenotype_", n,
@@ -225,7 +225,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
       outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
         "lmm_", chrname, "_pheno_", n))
       for (n in 1:dim(phenotypes)[2]){
-        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
+        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 4 -g ", geno_sfile,
                       " -p ", phenofile, " -a ", anotfile, covar_flg,
                       " -k ", ksfile, " -o ", outfiles[n],
                       " -n ", n))
