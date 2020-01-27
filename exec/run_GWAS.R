@@ -62,6 +62,8 @@ parser$add_argument("--coat_covar", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a covariate")
 parser$add_argument("--coat_phenotype", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a phenotype")
+parser$add_argument("--runmetasoft", default=FALSE, action="store_true",
+                    help="Run metasoft on the given phenotypes. This assumes the phenotypes have the same effect")
 parser$add_argument("--lambda_mean", default=1, type="double",
                     help="lambda_mean for MetaSoft. Should be obtained from an initial run")
 parser$add_argument("--lambda_hetero", default=1, type="double",
@@ -235,11 +237,6 @@ if (!is.null(yamin$confSNPs)){
   }
   covars <- cbind(covars, snpcovar)
   covar_names <- c(covar_names, colnames(snpcovar))
-  print(head(covars))
-  print(head(snpcovar))
-  #if(is.null(b$covars)) snpcovar <- cbind(1, snpcovar)
-  print(dim(covars))
-  print(dim(snpcovar))
 }
 
 # Compute the covariate matrix
@@ -308,13 +305,13 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                              b$covars, args$basedir, yamin$eigens, loco=!args$noloco,
-                              single=is.null(yamin$eigens) || (yamin$eigens==0), metasoft_args = metasoft_args)
+                              b$covars, args$basedir, loco=!args$noloco,
+                              groups = yamin$groups, runmetasoft=args$runmetasoft, metasoft_args = metasoft_args)
   # Run no LOCO to get the unified heritability for each phenotype
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                                 as.data.table(complete.geno[,.(rs, bp38, chr)]),
-                                b$covars, args$basedir, yamin$eigens, loco=FALSE, single=TRUE, skipcombine=TRUE)
+                                b$covars, args$basedir, loco=FALSE, runmetasoft=F)
     # Extract the VPE values for each phenotype
   }
   allVPE = data.table(phenotype=character(), PVE=numeric(), PVESE=numeric(), Vg=numeric(), Ve=numeric())
@@ -333,13 +330,9 @@ if (args$method == "GEMMA"){
                                 b$covars, args$basedir, args$pylmm, args$pylmmkinship, loco=!args$noloco, metasoft_args = metasoft_args)
 }
 
-is.metasoft <- TRUE
-if (args$method=="GEMMA"){
-  if (!is.null(args$eigens) && args$eigens>0) is.metasoft=FALSE
-  if (ncol(b$phenotypes)==1) is.metasoft=FALSE
-}else if (args$method=="pyLMM"){
-  if (ncol(b$phenotypes)==1) is.metasoft=FALSE
-}
+is.metasoft <- FALSE
+if (args$method=="GEMMA" && args$runmetasoft)
+  is.metasoft = TRUE
 
 pval_thr <- args$snpthr
 

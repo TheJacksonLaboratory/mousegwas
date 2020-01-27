@@ -46,6 +46,7 @@ calc_kinship <- function(genotypes, annot, exec, chrname, basedir, phenofile){
 
 
 #' Get resudials of phenotypes
+#' Not used any more
 #'
 #' @param covars covariates matrix
 #' @param phenotypes a table of phenotypes
@@ -78,21 +79,25 @@ get_residuals <- function(covars, phenotypes){
 #'
 #' @param basedir
 #' @param infiles a vector of input files, each for one phenotype
-#' @param outfile
-#' @param version
+#' @param outfile Output file name
+#' @param runit Actually run metasoft. Otherwise only paste the files
+#' @param version Metasoft version to download
+#' @param xargs additional metasoft args
 #'
 #' @return Write the unified p_lrt into the outfile
 #' @import data.table
 #' @export
 #'
 #' @examples
-combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1", xargs=""){
+combine_metaSOFT <- function(basedir, infiles, midfile, outfile, runit = FALSE, version="2.0.1", xargs=""){
   # Download Metasoft snd extracts
   # http://genetics.cs.ucla.edu/meta_jemdoc/repository/2.0.1/Metasoft.zip
-  hasmeta <- file.exists(paste0("Metasoft.jar"))
-  if (!hasmeta){
-    system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > Metasoft.zip"))
-    system(paste0("unzip -uo Metasoft.zip "))
+  if (runit){
+    hasmeta <- file.exists(paste0("Metasoft.jar"))
+    if (!hasmeta){
+      system(paste0("curl -L http://genetics.cs.ucla.edu/meta_jemdoc/repository/",version,"/Metasoft.zip > Metasoft.zip"))
+      system(paste0("unzip -uo Metasoft.zip "))
+    }
   }
   infiles2 = c()
   for (f in infiles){
@@ -106,7 +111,6 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
   # Read all the input files and write in the desired format
   # chr     rs      ps      n_miss  allele1 allele0 af      beta_1  Vbeta_1_1   p_lrt
   cmass <- fread(paste0(basedir, "/output/", infiles[1], ".assoc.txt"))
-  #print(head(cmass))
   cmass <- cmass[, c("rs", "beta", "se")]
   for (n in 2:length(infiles)){
     ctmp <- fread(paste0(basedir, "/output/", infiles[n], ".assoc.txt"))[,c("rs", "beta", "se")]
@@ -115,8 +119,9 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
   fwrite(cmass, file=midfile, sep = "\t", col.names = FALSE, row.names = FALSE)
   Sys.sleep(1)
   # Run metasoft
-  #system(paste0("java -jar Metasoft.jar  -mvalue_prior_sigma 1 -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log ", xargs))
-  # Read the log file to get the
+  if (runit){
+    system(paste0("java -jar Metasoft.jar  -mvalue_prior_sigma 1 -mvalue -input ",midfile, " -output ", outfile, " -log ", outfile, ".log ", xargs))
+  }
 }
 
 #' Run lmm 2 (LRT) on the data with LOCO
@@ -127,10 +132,9 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
 #' @param covars covariates data.table
 #' @param exec gemma executable
 #' @param basedir dir to write files to
-#' @param eigens Number of eigenvectors to run gemma on
+#' @param groups A list of vectors, each containing phenotypes indices to run as multivariate. The return file will be the first group unless runmetasoft is TRUE
 #' @param loco perform LOCO (default FALSE)
-#' @param single run each phenotype separately and then run metaSOFT to combine results
-#' @param skipcombine don't run metasoft. Used for PVE compute
+#' @param runmetasoft Run metasoft. Return the output file.
 #' @param metasoft_args additional metasoft arguments
 #'
 #' @return The unified output file
@@ -138,14 +142,8 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, version="2.0.1"
 #'
 #' @import data.table
 #' @examples
-execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, loco=TRUE, single=TRUE, skipcombine=FALSE, metasoft_args=""){
+execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = NULL, loco=TRUE, runmetasoft=FALSE, metasoft_args=""){
   exec <- get_gemma(basedir)
-  # Set keys and merge the genotypes and annotations
-  #setkey(genotypes, rs, physical = FALSE)
-#  setkey(annot, rs, physical = FALSE)
-#  loco_geno <- merge(genotypes, annot, by="rs", all.x=TRUE, all.y=FALSE)
-
-
   # Write files to disk
   anotfile <- paste0(basedir, "/annotations.csv")
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
@@ -159,62 +157,63 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
 
   # Write the phenotype files
-  print(dim(phenotypes)[2])
-  for (n in 1:dim(phenotypes)[2]){
-    print(n)
-    print(head(phenotypes))
-    print(head(as.data.table(phenotypes[,n,with=FALSE])))
-    fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",", na="NA")
-  }
-  phenofile <- paste0(basedir,"/phenotype_",1,".csv")
-  if (!single){
-    # Convert the phenotypes to residuals and do svd to remove correlation
-    residuals <- get_residuals(covars, phenotypes)
+  # print(dim(phenotypes)[2])
+  phenofile <- paste0(basedir,"/phenotypes.csv")
+  fwrite(phenotypes, phenofile, col.names = FALSE, sep=",")
+  #for (n in 1:dim(phenotypes)[2]){
+  #  print(n)
+  #  print(head(phenotypes))
+  #  print(head(as.data.table(phenotypes[,n,with=FALSE])))
+  #  fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",", na="NA")
+  #}
+  # Convert the phenotypes to residuals and do svd to remove correlation
+  #  residuals <- get_residuals(covars, phenotypes)
     # Change NAs to 0 meaning the phenotype's average, I tried imputing these values but it basically
     # gave the same results
-    residuals[is.na(residuals)] <- 0
-    write_csv(residuals, paste0(basedir, "/residuals.csv"))
+  #  residuals[is.na(residuals)] <- 0
+  #  write_csv(residuals, paste0(basedir, "/residuals.csv"))
 
-    resid_comp <- svd(residuals)
-    print("SVD percent of variance explained by loadings:")
-    print(resid_comp$d^2/sum(resid_comp$d^2))
-    phenofile <- paste0(basedir, "/phenotypes.csv")
-    fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
-  }
+  #  resid_comp <- svd(residuals)
+  #  print("SVD percent of variance explained by loadings:")
+  #  print(resid_comp$d^2/sum(resid_comp$d^2))
+  #  phenofile <- paste0(basedir, "/phenotypes.csv")
+  #  fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
+
 
   # Compute lmm without LOCO
   if (!loco){
+    # Compute kinship matrix
     system(paste0("cd ", basedir, " && ", exec, " -g ", genofile,
                   " -p ", phenofile, " -gk 1 -o kinship_all"))
     ksfile <- paste0(basedir, "/output/kinship_all.cXX.txt")
-    if (single){
-      for (n in 1:dim(phenotypes)[2]){
-        pfile <- paste0(basedir,"/phenotype_",n,".csv")
-        system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
-                      " -p ", pfile, " -a ", anotfile,
+    for (n in 1:dim(phenotypes)[2]){
+      system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
+                      " -p ", phenofile, " -a ", anotfile,
                       covar_flg,
                       " -k ", ksfile, " -o lmm_all_phenotype_", n,
-                      " -n 1"))
+                      " -n ", n))
       }
-      outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
-        "lmm_all_phenotype_", n))
-      if (length(outfiles)>1 && !skipcombine){
-        combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_allpheno.assoc.pasted.txt"),
-                         paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"), xargs=metasoft_args)
-        return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
-      }else{
-        return(paste0(basedir, "/output/lmm_all_phenotype_1.assoc.txt"))
-      }
-
-    }else{
+    outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0("lmm_all_phenotype_", n))
+    # Run multivariate for each group
+    for (i in 1:length(groups)){
+      ns <- paste(groups[[i]], collapse=" ")
       system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", genofile,
                     " -p ", phenofile, " -a ", anotfile,
                     covar_flg,
-                    " -k ", ksfile, " -o lmm_all",
-                    " -n ", do.call(paste, c(as.list(1:eigens, sep=" ")))))
-      return(paste0(basedir,"/output/lmm_all.assoc.txt"))
+                    " -k ", ksfile, " -o lmm_all_phenotypes_", gsub(" ", "_", ns),
+                    " -n ", ns))
+
     }
-  }else{
+    if (length(outfiles)>1){
+      combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_all_noloco_allpheno.assoc.pasted.txt"),
+                       paste0(basedir, "/output/lmm_all_noloco_allpheno.assoc.txt"), runit = runmetasoft, xargs=metasoft_args)
+      if (runmetasoft)
+        return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
+      else if (!is.null(groups))
+        return (paste0(basedir, "/output/lmm_all_phenotypes_", paste(groups[[1]], collapse="_"), ".assoc.txt"))
+    }else
+      return(paste0(basedir, "/output/lmm_all_phenotype_1.assoc.txt"))
+  }else{ # LOCO
     # Compute kinship to each chromosome and run gemma with loco
     for (chrname in unique(annot$chr)){
       # Avoid empty chromosomes (like MT)
@@ -222,51 +221,59 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, eigens, l
       ksfile <- calc_kinship(genotypes, annot, exec, chrname, basedir, phenofile)
       geno_sfile <- paste0(basedir, "/genotypes_only_chr_", chrname, ".csv")
       fwrite(genotypes[genotypes$rs %in% annot[annot$chr==chrname,"rs"],], geno_sfile, col.names=FALSE, na="NA")
-     # for (n in range(dim(phenotypes)[2])){
-      if (!single){
-        pfiles <- c(phenofile)
-        outfiles <- c(paste0("lmm_", chrname, "_allpheno"))
-        nns <- do.call(paste, c(as.list(1:eigens, sep=" ")))
-        print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
-                     " -p ", pfiles[n], " -a ", anotfile, covar_flg,
-                     " -k ", ksfile, " -o ", outfiles[1],
-                     " -n ", nns))
-        system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
-                      " -p ", pfiles[n], " -a ", anotfile, covar_flg,
-                      #" -c ", covarfile,
-                      " -k ", ksfile, " -o ", outfiles[1],
-                      " -n ", nns))
-      }
-
-      # In addition to running the multi-variate run each phenotype separately
-      pfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(basedir,"/phenotype_",n,".csv"))
+      # Run each phenotype first
       outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0(
         "lmm_", chrname, "_pheno_", n))
-      nns <- "1"
-      for (n in 1:length(pfiles)){
-        print(paste0("Executing: cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
-                     " -p ", pfiles[n], " -a ", anotfile, covar_flg,
-                     " -k ", ksfile, " -o ", outfiles[n],
-                     " -n ", nns))
+      for (n in 1:dim(phenotypes)[2]){
         system(paste0("cd ", basedir, " && ", exec, " -lmin 0.01 -lmax 100 -lmm 1 -g ", geno_sfile,
-                      " -p ", pfiles[n], " -a ", anotfile, covar_flg,
+                      " -p ", phenofile, " -a ", anotfile, covar_flg,
                       " -k ", ksfile, " -o ", outfiles[n],
-                      " -n ", nns))
+                      " -n ", n))
+      }
+      # Run on groups
+      for (i in 1:length(groups)){
+        ns <- paste(groups[[i]], collapse=" ")
+        system(paste0("cd ", basedir, " && ", exec, " -lmm 1 -g ", geno_sfile,
+                      " -p ", phenofile, " -a ", anotfile,
+                      covar_flg,
+                      " -k ", ksfile, " -o lmm_",chrname, "_phenotypes_", gsub(" ", "_", ns),
+                      " -n ", ns))
       }
       # If singles combine the results to one file
-      if (length(pfiles)>1){
+      if (length(outfiles)>1){
         combine_metaSOFT(basedir, outfiles, paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.pasted.txt"),
-                                                   paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"), xargs = metasoft_args)
-      }else if (single){
-        system(paste0("cp ", basedir, "/output/lmm_",chrname, "_pheno_1.assoc.txt ", basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"))
+                         paste0(basedir, "/output/lmm_", chrname, "_allpheno.assoc.txt"),
+                         runit = runmetasoft, xargs = metasoft_args)
       }
     }
-    # Concatenate all loco files into a single output file
+      # Concatenate all loco files into a single output file
+    if (runmetasoft){
+      system(paste0("cd ", basedir,
+                    " && cat output/lmm*allpheno.assoc.txt |head -1 > output/all_lmm_LOCO_associations.assoc.txt",
+                    " && cat output/lmm*allpheno.assoc.txt |grep -i -v beta >> output/all_lmm_LOCO_associations.assoc.txt"))
+    }
+
     system(paste0("cd ", basedir,
-           " && cat output/lmm*allpheno.assoc.txt |head -1 > output/all_lmm_associations.assoc.txt",
-           " && cat output/lmm*allpheno.assoc.txt |grep -i -v beta >> output/all_lmm_associations.assoc.txt",
-           " && cat output/lmm*allpheno.assoc.pasted.txt > output/all_lmm_associations.assoc.pasted.txt"))
-    return(paste0(basedir, "/output/all_lmm_associations.assoc.txt"))
+                  " && cat output/lmm*allpheno.assoc.pasted.txt > output/all_lmm_LOCO_associations.assoc.pasted.txt"))
+    for (i in 1:length(groups)){
+      ns <- paste(groups[[i]], collapse="_")
+      system(paste0("cd ", basedir,
+                    " && cat output/lmm*_phenotypes_", ns, ".assoc.txt |head -1 > output/lmm_all_LOCO_phenotypes_", ns, ".assoc.txt",
+                    " && cat output/lmm*_phenotypes_", ns, ".assoc.txt | grep -v beta >> output/lmm_all_LOCO_phenotypes_", ns, ".assoc.txt"))
+
+    }
+    for (n in 1:dim(phenotypes)[2]){
+      system(paste0("cd ", basedir,
+                    " && cat output/lmm*_phenotype_", n, ".assoc.txt |head -1 > output/lmm_all_LOCO_phenotype_", n, ".assoc.txt",
+                    " && cat output/lmm*_phenotype_", n, ".assoc.txt | grep -v beta >> output/lmm_all_LOCO_phenotype_", n, ".assoc.txt"))
+    }
+    if (runmetasoft)
+      return(paste0(basedir, "/output/all_lmm_LOCO_associations.assoc.txt"))
+    else if (length(groups)){
+      ns <- paste(groups[[1]], collapse="_")
+      return(paste0(basedir, "/output/lmm_all_LOCO_phenotypes_", ns, ".assoc.txt"))
+    }else
+      return(paste0(basedir, "/output/lmm_all_LOCO_phenotype_1.assoc.txt"))
   }
 }
 
