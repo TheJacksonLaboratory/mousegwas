@@ -197,7 +197,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
     # Run multivariate for each group
     for (i in 1:length(groups)){
       ns <- paste(groups[[i]], collapse=" ")
-      system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", genofile,
+      system(paste0("cd ", basedir, " && ", exec, " -lmm 3 -g ", genofile,
                     " -p ", phenofile, " -a ", anotfile,
                     covar_flg,
                     " -k ", ksfile, " -o lmm_all_phenotypes_", gsub(" ", "_", ns),
@@ -233,7 +233,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
       # Run on groups
       for (i in 1:length(groups)){
         ns <- paste(groups[[i]], collapse=" ")
-        system(paste0("cd ", basedir, " && ", exec, " -lmm 2 -g ", geno_sfile,
+        system(paste0("cd ", basedir, " && ", exec, " -lmm 3 -g ", geno_sfile,
                       " -p ", phenofile, " -a ", anotfile,
                       covar_flg,
                       " -k ", ksfile, " -o lmm_",chrname, "_phenotypes_", gsub(" ", "_", ns),
