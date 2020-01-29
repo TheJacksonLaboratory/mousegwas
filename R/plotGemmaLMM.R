@@ -26,12 +26,12 @@
 plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
-    gwas_results <- gwas_results %>% select(rs=X1, p_score=X9)  # RSID and PVALUE_RE2
+    gwas_results <- gwas_results %>% dplyr::select(rs=X1, p_score=X9)  # RSID and PVALUE_RE2
     anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else if (pyLMM){
     gwas_results <- read_delim(results_file, "\t", col_names = TRUE, guess_max = Inf)
-    gwas_results <- gwas_results %>% select(rs=SNP_ID, p_score=P_VALUE)  # RSID and PVALUE_RE2
+    gwas_results <- gwas_results %>% dplyr::select(rs=SNP_ID, p_score=P_VALUE)  # RSID and PVALUE_RE2
     anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else{
@@ -57,8 +57,8 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
         n_miss = col_double(),
         allele1 = col_character(),
         allele0 = col_character()))
-      jres <- gwas_results %>% inner_join(select(difres, c(rs, p_score)), by="rs", suffix = c("", ".d"))
-      gwas_results <- jres %>% mutate(p_score = p_score/p_score.d) %>% select(-p_score.d)
+      jres <- gwas_results %>% inner_join(dplyr::select(difres, c(rs, p_score)), by="rs", suffix = c("", ".d"))
+      gwas_results <- jres %>% mutate(p_score = p_score/p_score.d) %>% dplyr::select(-p_score.d)
     }
 
   }
@@ -66,7 +66,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   # Remove correlated peaks
   rep_peaks <- function(genotypes, gwas_pvs, rs_thr=corrthr, pthr=1e-20, mxd=maxdist){
     tmat <- base::t(genotypes)
-    srt_pv <- gwas_pvs %>% select(rs, p_score) %>% arrange(p_score) %>% mutate(choose = 0, ispeak=FALSE)
+    srt_pv <- gwas_pvs %>% dplyr::select(rs, p_score) %>% arrange(p_score) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
     while (any(srt_pv$choose[srt_pv$p_score<=pthr] == 0)){
       nr <- which(srt_pv$choose == 0 & srt_pv$p_score <= pthr)[1]
@@ -90,7 +90,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
       srt_pv[nr, "ispeak"] = TRUE
       peaknum = peaknum + 1
     }
-    return(srt_pv %>% select(rs, choose, ispeak))
+    return(srt_pv %>% dplyr::select(rs, choose, ispeak))
   }
 
   #chr     rs      ps      n_miss  allele1 allele0 af      beta_1  beta_2  beta_3  Vbeta_1_1       Vbeta_1_2       Vbeta_1_3       Vbeta_2_2       Vbeta_2_3       Vbeta_3_3       p_lrt
@@ -164,7 +164,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
     filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
     # Add gene names
-    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(select(toprs, rs, mgi_symbol), by="rs"),
+    p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(dplyr::select(toprs, rs, mgi_symbol), by="rs"),
                                     aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
 }
   p <- p + scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
