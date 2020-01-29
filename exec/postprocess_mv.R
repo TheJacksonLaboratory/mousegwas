@@ -57,14 +57,8 @@ pnames <- read.csv(args$names,row.names = 2)
 phenos <- as.character(pnames[phenos, "PaperName", drop=T])
 # SNPs annotations
 anno <- read_delim(paste0(args$outdir, "/annotations.csv"), ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
-allbetas <- read_delim(paste0(args$outdir, "/output/all_lmm_associations.assoc.pasted.txt"), "\t", col_names = c("rs", paste(rep(phenos, each=2), rep(c("beta","SE"), 3), sep=".")))
-alltvals <- allbetas %>% select(rs)
-for (p in phenos){
-  alltvals[,p] <- allbetas[,paste(p, "beta", sep=".")] / allbetas[,paste(p, "SE", sep=".")]
-}
-alltvals <- left_join(alltvals, anno, by="rs") %>% arrange(chr, ps)
 # Read the p-values from all the pasted phenotypes and mv LOCO files
-pvalmat <- allbetas %>% select(rs)
+pvalmat <- NULL
 # Single phenotypes
 for (i in 1:length(phenos)){
   pname <- phenos[i]
@@ -105,7 +99,10 @@ for (i in 1:length(phenos)){
                        corrthr=0.4)
   pname <- phenos[i]
   lilp[[pname]] <- pp
-  pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% select(rs, !!(pname)), by="rs")
+  if (is.null(pvalmat))
+    pvalmat <- pp$gwas %>% mutate(!!(pname):=P) %>% select(rs, !!(pname))
+  else
+    pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% select(rs, !!(pname)), by="rs")
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
