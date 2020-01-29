@@ -59,18 +59,6 @@ phenos <- as.character(pnames[phenos, "PaperName", drop=T])
 anno <- read_delim(paste0(args$outdir, "/annotations.csv"), ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
 # Read the p-values from all the pasted phenotypes and mv LOCO files
 pvalmat <- NULL
-# Single phenotypes
-for (i in 1:length(phenos)){
-  pname <- phenos[i]
-  sinf <- paste0(args$outdir,"/output/lmm_pheno_", i, "_all_LOCO.assoc.txt")
-  allres <- read_delim(sinf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% select(rs, !!(pname))
-  pvalmat <- left_join(pvalmat, allres, by="rs")
-}
-for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.assoc.txt"))){
-  pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", gprf)
-  allres <- read_delim(gprf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% select(rs, !!(pname))
-  pvalmat <- left_join(pvalmat, allres, by="rs")
-}
 
 # Read the genotypes
 geno_t <- read_csv(paste0(args$outdir, "/strains_genotypes_all.csv"), col_types = cols(
@@ -100,9 +88,9 @@ for (i in 1:length(phenos)){
   pname <- phenos[i]
   lilp[[pname]] <- pp
   if (is.null(pvalmat))
-    pvalmat <- pp$gwas %>% mutate(!!(pname):=P) %>% select(rs, !!(pname))
+    pvalmat <- pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname))
   else
-    pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% select(rs, !!(pname)), by="rs")
+    pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname)), by="rs")
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
@@ -113,10 +101,12 @@ for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.asso
   pp <- plot_gemma_lmm(grpf, name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
                        maxdist=10000000, corrthr=0.4)
   pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", gprf)
-  allres <- read_delim(gprf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% select(rs, !!(pname))
-  pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% select(rs, !!(pname)), by="rs")
+  allres <- read_delim(gprf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
+  pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)), by="rs")
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
-
+  ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotypes_", pname, ".pdf"),
+         plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
+         width=fullw, height=height, units="in")
 }
 
 # Cluster the peaks using the P values
@@ -171,7 +161,7 @@ ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = cairo_pdf, d
 # Plot the metasoft manhattan plot with clusters colors
 # Add the cluster number to the pwas object
 p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk$cluster)), by="rs")
-p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
+p$pwas <- p$pwas %>% dplyr::select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%dplyr::select(choose, cluster),by="choose")
 
 # Recolor the second layer with the clusters colors
 pnoname <- p$plot
@@ -276,8 +266,8 @@ ext_peak <- function(snps, maxdist=2000000){
   csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
   snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
 }
-pg <- ext_peak(left_join(p$gwas, select(p$pwas, rs, cluster),by="rs"))
-pg <- pg %>% left_join(select(allgwas, rs, STAT1_RE2, STAT2_RE2))
+pg <- ext_peak(left_join(p$gwas, dplyr::select(p$pwas, rs, cluster),by="rs"))
+pg <- pg %>% left_join(dplyr::select(allgwas, rs, STAT1_RE2, STAT2_RE2))
 ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
        plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
          theme_bw() + theme(text=element_text(size=10, family=ffam)),
