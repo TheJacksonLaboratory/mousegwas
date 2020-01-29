@@ -195,12 +195,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
       }
     outfiles <- sapply(1:dim(phenotypes)[2], function(n) paste0("lmm_all_phenotype_", n))
     # Run multivariate for each group
-    for (i in 1:length(groups)){
+    for (i in names(groups)){
       ns <- paste(groups[[i]], collapse=" ")
       system(paste0("cd ", basedir, " && ", exec, " -lmm 3 -g ", genofile,
                     " -p ", phenofile, " -a ", anotfile,
                     covar_flg,
-                    " -k ", ksfile, " -o lmm_all_phenotypes_", gsub(" ", "_", ns),
+                    " -k ", ksfile, " -o lmm_all_phenotypes_", i,
                     " -n ", ns))
 
     }
@@ -210,7 +210,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
       if (runmetasoft)
         return(paste0(basedir, "/output/lmm_all_allpheno.assoc.txt"))
       else if (!is.null(groups))
-        return (paste0(basedir, "/output/lmm_all_phenotypes_", paste(groups[[1]], collapse="_"), ".assoc.txt"))
+        return (paste0(basedir, "/output/lmm_all_phenotypes_", names(groups)[1], ".assoc.txt"))
     }else
       return(paste0(basedir, "/output/lmm_all_phenotype_1.assoc.txt"))
   }else{ # LOCO
@@ -231,12 +231,12 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
                       " -n ", n))
       }
       # Run on groups
-      for (i in 1:length(groups)){
+      for (i in names(groups)){
         ns <- paste(groups[[i]], collapse=" ")
         system(paste0("cd ", basedir, " && ", exec, " -lmm 3 -g ", geno_sfile,
                       " -p ", phenofile, " -a ", anotfile,
                       covar_flg,
-                      " -k ", ksfile, " -o lmm_",chrname, "_phenotypes_", gsub(" ", "_", ns),
+                      " -k ", ksfile, " -o lmm_",chrname, "_phenotypes_", i,
                       " -n ", ns))
       }
       # If singles combine the results to one file
@@ -255,11 +255,10 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
 
     system(paste0("cd ", basedir,
                   " && cat output/lmm*allpheno.assoc.pasted.txt > output/all_lmm_LOCO_associations.assoc.pasted.txt"))
-    for (i in 1:length(groups)){
-      ns <- paste(groups[[i]], collapse="_")
+    for (i in names(groups)){
       system(paste0("cd ", basedir,
-                    " && cat output/lmm*_phenotypes_", ns, ".assoc.txt |head -1 > output/lmm_phenotypes_", ns, "_all_LOCO.assoc.txt",
-                    " && cat output/lmm*_phenotypes_", ns, ".assoc.txt | grep -v beta >> output/lmm_phenotypes_", ns, "_all_LOCO.assoc.txt"))
+                    " && cat output/lmm*_phenotypes_", ns, ".assoc.txt |head -1 > output/lmm_phenotypes_", i, "_all_LOCO.assoc.txt",
+                    " && cat output/lmm*_phenotypes_", ns, ".assoc.txt | grep -v beta >> output/lmm_phenotypes_", i, "_all_LOCO.assoc.txt"))
 
     }
     for (n in 1:dim(phenotypes)[2]){
@@ -270,8 +269,7 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
     if (runmetasoft)
       return(paste0(basedir, "/output/all_lmm_LOCO_associations.assoc.txt"))
     else if (length(groups)){
-      ns <- paste(groups[[1]], collapse="_")
-      return(paste0(basedir, "/output/lmm_all_LOCO_phenotypes_", ns, ".assoc.txt"))
+      return(paste0(basedir, "/output/lmm_all_LOCO_phenotypes_", names(groups)[1], ".assoc.txt"))
     }else
       return(paste0(basedir, "/output/lmm_all_LOCO_phenotype_1.assoc.txt"))
   }
