@@ -100,8 +100,8 @@ for (i in 1:length(phenos)){
 for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.assoc.txt"))){
   pp <- plot_gemma_lmm(grpf, name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
                        maxdist=10000000, corrthr=0.4)
-  pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", gprf)
-  allres <- read_delim(gprf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
+  pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
+  allres <- read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
   pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)), by="rs")
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotypes_", pname, ".pdf"),
