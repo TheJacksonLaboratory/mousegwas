@@ -269,9 +269,9 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
     if (runmetasoft)
       return(paste0(basedir, "/output/all_lmm_LOCO_associations.assoc.txt"))
     else if (length(groups)){
-      return(paste0(basedir, "/output/lmm_all_LOCO_phenotypes_", names(groups)[1], ".assoc.txt"))
+      return(paste0(basedir, "/output/lmm_phenotypes_", names(groups)[1], "_all_LOCO.assoc.txt"))
     }else
-      return(paste0(basedir, "/output/lmm_all_LOCO_phenotype_1.assoc.txt"))
+      return(paste0(basedir, "/output/lmm_phenotype_1_all_LOCO.assoc.txt"))
   }
 }
 
