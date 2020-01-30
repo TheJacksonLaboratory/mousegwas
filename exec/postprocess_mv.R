@@ -97,10 +97,12 @@ for (i in 1:length(phenos)){
          width=fullw, height=height, units="in")
 }
 # Plot the groups MAnhattan plots
+grouplist <- c()
 for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.assoc.txt"))){
   pp <- plot_gemma_lmm(grpf, name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
                        maxdist=10000000, corrthr=0.4)
   pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
+  grouplist <- c(grouplist, pname)
   allres <- read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
   pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)), by="rs")
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
@@ -137,11 +139,17 @@ for (i in 1:args$cluster){
 pgwas <- pgwas[rowarr,]
 clustcol <- tibble(cluster=1:args$clusters, color=ccols)
 colrow <- tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr]) %>% left_join(clustcol, by="cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
-colcol <- PVE %>% left_join(tibble(Group=unique(PVE$Group), color=grpcol[1:length(unique(PVE$Group))])) %>% column_to_rownames(var="PaperName") %>% dplyr::select(color)
+grptocol <- tibble(Group=unique(PVE$Group), color=grpcol[1:length(unique(PVE$Group))])
+colcol <- PVE %>% left_join(grptocol) %>% column_to_rownames(var="PaperName") %>% dplyr::select(color)
+colcol <- colcol$color
+# Add the groups to the colors
+for (g in grouplist){
+  colcol <- c(colcol, grptocol[grepl(g, grptocol$Group),]$color)
+}
 cairo_pdf(paste0(args$plotdir, "/all_peaks_heatmap.pdf"), width = fullw, height = height+1, family = ffam)
 heatmap.2(pgwas, col = hmcol,
           Rowv = F, Colv = T, dendrogram = "col", scale="none", trace="none",
-          RowSideColors = colrow[,1,drop=T], ColSideColors = colcol[,1,drop=T], labRow = NA,
+          RowSideColors = colrow[,1,drop=T], ColSideColors = colcol, labRow = NA,
           hclustfun = function(x) hclust(x, method="average"),
           margins=c(12,8),srtCol=45, key=T, density.info = "none")
 dev.off()
