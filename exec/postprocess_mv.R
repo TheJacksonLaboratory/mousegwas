@@ -118,7 +118,7 @@ pgwas <- as.matrix(pgwas)
 #  pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
 #}
 #pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
-kk <- kmeans(pgwas, args$clusters, nstart=5, iter.max = 50)
+kk <- kmeans(pgwas, args$clusters)
 # plot the PCA
 #bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
 
