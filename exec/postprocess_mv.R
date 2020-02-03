@@ -114,6 +114,8 @@ for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.asso
 # Cluster the peaks using the P values
 
 pgwas <- pvalmat %>% filter(rs %in% allpeaks) %>% column_to_rownames(var = "rs")
+print(sum(is.na(pgwas)))
+pgwas[is.na(pgwas)] = 0
 pgwas <- as.matrix(pgwas)
 #pcvals <- prcomp(pgwas)
 #if (args$rotation != ""){
@@ -168,44 +170,44 @@ ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = cairo_pdf, d
 
 # Plot the metasoft manhattan plot with clusters colors
 # Add the cluster number to the pwas object
-p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk$cluster)), by="rs")
-p$pwas <- p$pwas %>% dplyr::select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%dplyr::select(choose, cluster),by="choose")
+#p$pwas <- p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster=as.factor(kk$cluster)), by="rs")
+#p$pwas <- p$pwas %>% dplyr::select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%dplyr::select(choose, cluster),by="choose")
 
 # Recolor the second layer with the clusters colors
-pnoname <- p$plot
-pnoname$layers <- pnoname$layers[1:2]
-nolab <- p$plot
-nolab$layers <- nolab$layers[1]
-ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
-       plot = pnoname + ggnewscale::new_scale_color() +
-         geom_point(aes(color=p$pwas$cluster), size=0.9) +
-         scale_color_manual(values=ccols) +
-         ggnewscale::new_scale_color() +
-         geom_point(aes(alpha=p$pwas$ispeak), size=1.2, color="black") +
-         scale_alpha_manual(values = c(0,1)) +
-         ggnewscale::new_scale_color() +
-         geom_point(aes(color=p$pwas$cluster, alpha=p$pwas$ispeak), size=0.9) +
-         scale_color_manual(values=ccols) +
-         scale_alpha_manual(values = c(0,1)) +
-         theme(text=element_text(size=10, family=ffam)),
-       device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
+#pnoname <- p$plot
+#pnoname$layers <- pnoname$layers[1:2]
+#nolab <- p$plot
+#nolab$layers <- nolab$layers[1]
+#ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_clusters_all.pdf"),
+#       plot = pnoname + ggnewscale::new_scale_color() +
+#         geom_point(aes(color=p$pwas$cluster), size=0.9) +
+#         scale_color_manual(values=ccols) +
+#         ggnewscale::new_scale_color() +
+#         geom_point(aes(alpha=p$pwas$ispeak), size=1.2, color="black") +
+#         scale_alpha_manual(values = c(0,1)) +
+#         ggnewscale::new_scale_color() +
+#         geom_point(aes(color=p$pwas$cluster, alpha=p$pwas$ispeak), size=0.9) +
+#         scale_color_manual(values=ccols) +
+#         scale_alpha_manual(values = c(0,1)) +
+#         theme(text=element_text(size=10, family=ffam)),
+#       device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
 # Plot each cluster's Manhattanplot
 #p$pwas <- p$pwas %>% select(-cluster) %>% left_join(filter(p$pwas,ispeak)%>%select(choose, cluster),by="choose")
-for (k in 1:args$clusters){
-  ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster_", k, ".pdf"),
-         plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
-           geom_point(aes(color=cluster), size=0.9) +
-           scale_color_manual(values=ccols[k]) +
-           ggnewscale::new_scale_color() +
-           geom_point(aes(alpha=ispeak), size=1.2, color="black") +
-           scale_alpha_manual(values = c(0,1)) +
-           ggnewscale::new_scale_color() +
-           geom_point(aes(color=cluster, alpha=ispeak), size=0.9) +
-           scale_color_manual(values=ccols[k]) +
-           scale_alpha_manual(values = c(0,1)) +
-           theme(text=element_text(size=10, family=ffam)),
-         device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
-}
+#for (k in 1:args$clusters){
+#  ggsave(filename = paste0(args$plotdir, "/replot_Manhattan_cluster_", k, ".pdf"),
+#         plot = nolab %+% p$pwas[p$pwas$cluster==k | is.na(p$pwas$cluster),] + ggnewscale::new_scale_color() +
+#           geom_point(aes(color=cluster), size=0.9) +
+#           scale_color_manual(values=ccols[k]) +
+#           ggnewscale::new_scale_color() +
+#           geom_point(aes(alpha=ispeak), size=1.2, color="black") +
+#           scale_alpha_manual(values = c(0,1)) +
+#           ggnewscale::new_scale_color() +
+#           geom_point(aes(color=cluster, alpha=ispeak), size=0.9) +
+#           scale_color_manual(values=ccols[k]) +
+#           scale_alpha_manual(values = c(0,1)) +
+#           theme(text=element_text(size=10, family=ffam)),
+#         device=cairo_pdf, dpi="print", width=fullw, height=height, units="in")
+#}
 
 
 # Plot the LD drop figure
