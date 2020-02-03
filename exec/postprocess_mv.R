@@ -44,7 +44,7 @@ args <- parser$parse_args()
 ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 # Heatmap plot for m-values
 pigr <- RColorBrewer::brewer.pal(name = "PiYG", n=11)
-hmcol <- colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
+hmcol <- viridis(128)#colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
 grpcol <- RColorBrewer::brewer.pal(8,"Accent")
 fullw <- 7.25
 halfw <- 3.54
@@ -253,7 +253,7 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 # Plot MAF histogram
 mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-5)))
 mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
-mafdat <- left_join(p$gwas, mafdat, by="rs")
+mafdat <- left_join(lilp[[1]]$gwas, mafdat, by="rs")
 mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
   scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
   scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
