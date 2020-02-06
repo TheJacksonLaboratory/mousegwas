@@ -253,23 +253,23 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 
 
 # Plot MAF histogram
-mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-5)))
-mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
-mafdat <- mafdat %>% filter(rs %in% allsnps)
-mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
-  scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
-  scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
-  xlab("MAF") +
-  theme_bw() + theme(legend.position=c(0.15,0.9),
-                     panel.border = element_blank(),
-                     panel.grid.major.x = element_blank(),
-                     panel.grid.minor.x = element_blank(),
-                     panel.grid.major.y = element_blank(),
-                     panel.grid.minor.y = element_blank(),
-                     text=element_text(size=10, family=ffam)
-  )
-ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
-       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
+#mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-5)))
+#mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
+#mafdat <- mafdat %>% filter(rs %in% allsnps)
+#mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
+#  scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
+#  scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
+#  xlab("MAF") +
+#  theme_bw() + theme(legend.position=c(0.15,0.9),
+#                     panel.border = element_blank(),
+#                     panel.grid.major.x = element_blank(),
+#                     panel.grid.minor.x = element_blank(),
+#                     panel.grid.major.y = element_blank(),
+#                     panel.grid.minor.y = element_blank(),
+#                     text=element_text(size=10, family=ffam)
+#  )
+#ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
+#       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
 
 
 
