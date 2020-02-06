@@ -81,12 +81,14 @@ set.seed(490)
 # Plot each phenotype's Manhattan plot
 lilp <- vector("list", length(phenos))
 allpeaks <- NULL
+allsnps <- NULL
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(paste0(args$outdir, "/output/lmm_pheno_", i, "_all_LOCO.assoc.txt"),
                        name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr, maxdist=10000000,
                        corrthr=0.4)
   pname <- phenos[i]
   lilp[[pname]] <- pp
+  allsnps <- pp$gwas$rs
   if (is.null(pvalmat))
     pvalmat <- pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname))
   else
@@ -253,7 +255,7 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 # Plot MAF histogram
 mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-5)))
 mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
-mafdat <- left_join(lilp[[1]]$gwas, mafdat, by="rs")
+mafdat <- mafdat %>% filter(rs %in% allsnps)
 mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
   scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
   scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
