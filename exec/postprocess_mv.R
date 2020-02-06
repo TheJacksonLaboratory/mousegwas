@@ -287,7 +287,7 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 ext_peak <- function(snps, all_ispeak, all_choose, maxdist=2000000){
   csum <- snps %>% filter(rs %in% all_ispeak$rs[rowSums(all_ispeak %>% select(-rs))>0])
   csum$minps <- csum$ps
-  csum$maxps <- ps
+  csum$maxps <- csum$ps
   for (c in names(all_choose %>% select(-rs))){
     tmps <- left_join(snps, select(all_choose, rs, !!(c)), by="rs")
     tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
