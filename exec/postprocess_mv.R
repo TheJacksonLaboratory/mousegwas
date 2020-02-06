@@ -82,6 +82,8 @@ set.seed(490)
 lilp <- vector("list", length(phenos))
 allpeaks <- NULL
 allsnps <- NULL
+all_ispeak <- NULL
+all_choose <- NULL
 for (i in 1:length(phenos)){
   pp <- plot_gemma_lmm(paste0(args$outdir, "/output/lmm_pheno_", i, "_all_LOCO.assoc.txt"),
                        name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr, maxdist=10000000,
@@ -89,10 +91,15 @@ for (i in 1:length(phenos)){
   pname <- phenos[i]
   lilp[[pname]] <- pp
   allsnps <- pp$gwas$rs
-  if (is.null(pvalmat))
+  if (is.null(pvalmat)){
     pvalmat <- pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname))
-  else
+    all_ispeak <- pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname))
+    all_choose <- pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname))
+  }else{
     pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname)), by="rs")
+    all_ispeak <- left_join(all_ispeak, pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname)), by="rs")
+    all_choose <- left_join(all_choose, pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname)), by="rs")
+  }
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
@@ -107,6 +114,9 @@ for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.asso
   grouplist <- c(grouplist, pname)
   allres <- read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
   pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)), by="rs")
+  all_ispeak <- left_join(all_ispeak, pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname)), by="rs")
+  all_choose <- left_join(all_choose, pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname)), by="rs")
+
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotypes_", pname, ".pdf"),
          plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
@@ -274,18 +284,29 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 
 
 # Get the genes related to each cluster, print them and run enrichR
-ext_peak <- function(snps, maxdist=2000000){
-  csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-  snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
+ext_peak <- function(snps, all_ispeak, all_choose, maxdist=2000000){
+  csum <- snps %>% filter(rs %in% all_ispeak$rs[rowSums(all_ispeak %>% select(-rs))>0])
+  csum$minps <- csum$ps
+  csum$maxps <- ps
+  for (c in names(all_choose %>% select(-rs))){
+    tmps <- left_join(snps, select(all_choose, rs, !!(c)), by="rs")
+    tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+    csum <- csum %>% left_join(tmpc, by=c) %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
+  }
+  csum
+
 }
-pg <- ext_peak(left_join(p$gwas, dplyr::select(p$pwas, rs, cluster),by="rs"))
-pg <- pg %>% left_join(dplyr::select(allgwas, rs, STAT1_RE2, STAT2_RE2))
-ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
-       plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
-         theme_bw() + theme(text=element_text(size=10, family=ffam)),
-       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
+#pg <- ext_peak(left_join(p$gwas, dplyr::select(p$pwas, rs, cluster),by="rs"))
+#pg <- pg %>% left_join(dplyr::select(allgwas, rs, STAT1_RE2, STAT2_RE2))
+#ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
+#       plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
+#         theme_bw() + theme(text=element_text(size=10, family=ffam)),
+#       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
+pg <- anno %>% filter(rs %in% allsnps) %>% join(tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr]))
+pg <- ext_peak(pg, all_ispeak, all_choose)
 allgenes = NULL
 dbs <- listEnrichrDbs()
+pg <- exp_peak()
 for (k in 1:args$clusters){
   affgen <- get_genes(pg[pg$ispeak==T & pg$cluster==k,], dist=1000)
   allgenes <- rbind(allgenes, affgen)
