@@ -290,7 +290,7 @@ ext_peak <- function(snps, all_ispeak, all_choose, maxdist=2000000){
   csum$maxps <- csum$ps
   for (c in names(all_choose %>% select(-rs))){
     tmps <- left_join(snps, select(all_choose, rs, !!(c)), by="rs")
-    tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+    tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% select(rs, minps, maxps)
     csum <- csum %>% left_join(tmpc, by="rs") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
   }
   csum
