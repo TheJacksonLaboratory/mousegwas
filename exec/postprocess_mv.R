@@ -291,7 +291,7 @@ ext_peak <- function(snps, all_i, all_c, maxdist=2000000){
   csum$maxps <- csum$ps
   for (c in names(all_c %>% select(-rs))){
     tmps <- left_join(snps, select(all_c, rs, !!(c)), by="rs") %>% filter(!!(c) > 0)
-    tmpc <- tmps %>% group_by(!!!syms(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% left_join(tmps, by=c) %>% select(rs, minps, maxps)
+    tmpc <- tmps %>% group_by_at(c) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% left_join(tmps, by=c) %>% select(rs, minps, maxps)
     csum <- csum %>% left_join(tmpc, by="rs", suffix=c("",".x")) %>% mutate(maxps = pmin(maxps, maxps.x), minps = pmax(minps, minps.x))
   }
   csum %>% mutate(maxps = pmin(maxps, ps + maxdist), minps = pmax(maxps, ps - maxdist))
@@ -307,7 +307,7 @@ pg <- anno %>% filter(rs %in% allsnps) %>% join(tibble(rs = rownames(pgwas), clu
 pg <- ext_peak(pg, all_ispeak, all_choose)
 allgenes = NULL
 dbs <- listEnrichrDbs()
-pg <- exp_peak()
+
 for (k in 1:args$clusters){
   affgen <- get_genes(pg[pg$ispeak==T & pg$cluster==k,], dist=1000)
   allgenes <- rbind(allgenes, affgen)
