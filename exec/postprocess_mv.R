@@ -99,6 +99,7 @@ for (i in 1:length(phenos)){
     pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname)), by="rs")
     all_ispeak <- left_join(all_ispeak, pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname)), by="rs")
     all_choose <- left_join(all_choose, pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname)), by="rs")
+    print(head(all_choose))
   }
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
