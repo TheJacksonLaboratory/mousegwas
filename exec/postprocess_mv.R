@@ -285,12 +285,12 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 
 
 # Get the genes related to each cluster, print them and run enrichR
-ext_peak <- function(snps, all_ispeak, all_choose, maxdist=2000000){
-  csum <- snps %>% filter(rs %in% all_ispeak$rs[rowSums(all_ispeak %>% select(-rs))>0])
+ext_peak <- function(snps, all_i, all_c, maxdist=2000000){
+  csum <- snps %>% filter(rs %in% all_i$rs[rowSums(all_i %>% select(-rs))>0])
   csum$minps <- csum$ps
   csum$maxps <- csum$ps
-  for (c in names(all_choose %>% select(-rs))){
-    tmps <- left_join(snps, select(all_choose, rs, !!(c)), by="rs")
+  for (c in names(all_c %>% select(-rs))){
+    tmps <- left_join(snps, select(all_c, rs, !!(c)), by="rs")
     tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% select(rs, minps, maxps)
     csum <- csum %>% left_join(tmpc, by="rs") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
   }
