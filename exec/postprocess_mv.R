@@ -291,7 +291,7 @@ ext_peak <- function(snps, all_i, all_c, maxdist=2000000){
   csum$maxps <- csum$ps
   for (c in names(all_c %>% select(-rs))){
     tmps <- left_join(snps, select(all_c, rs, !!(c)), by="rs")
-    tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% select(rs, minps, maxps)
+    tmpc <- tmps %>% group_by(!!(c)) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% left_join(tmps, by=c) %>% select(rs, minps, maxps)
     csum <- csum %>% left_join(tmpc, by="rs") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
   }
   csum
