@@ -37,6 +37,8 @@ parser$add_argument("--names", "-n",
                     help="Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
 parser$add_argument("--pvalthr", default=5, type="double",
                     help="p-value threshold for plotting and getting gene lists")
+parser$add_argument("--nomv", default=FALSE, action="store_true",
+                    help="Ignore multivariate results and use only single phenotypes")
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -107,20 +109,22 @@ for (i in 1:length(phenos)){
 }
 # Plot the groups MAnhattan plots
 grouplist <- c()
-for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.assoc.txt"))){
-  pp <- plot_gemma_lmm(grpf, name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
-                       maxdist=10000000, corrthr=0.4)
-  pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
-  grouplist <- c(grouplist, pname)
-  allres <- read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
-  pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)), by="rs")
-  all_ispeak <- left_join(all_ispeak, pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname)), by="rs")
-  all_choose <- left_join(all_choose, pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname)), by="rs")
+if (!args$nomv){
+  for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.assoc.txt"))){
+    pp <- plot_gemma_lmm(grpf, name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
+                         maxdist=10000000, corrthr=0.4)
+    pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
+    grouplist <- c(grouplist, pname)
+    allres <- read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
+    pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)), by="rs")
+    all_ispeak <- left_join(all_ispeak, pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname)), by="rs")
+    all_choose <- left_join(all_choose, pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname)), by="rs")
 
-  allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
-  ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotypes_", pname, ".pdf"),
-         plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
-         width=fullw, height=height, units="in")
+    allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
+    ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotypes_", pname, ".pdf"),
+           plot=pp$plot + theme(text=element_text(size=10, family=ffam)), dpi="print", device = cairo_pdf,
+           width=fullw, height=height, units="in")
+  }
 }
 
 # Cluster the peaks using the P values
@@ -326,9 +330,13 @@ for (k in 1:args$clusters){
 }
 
 # Do this for each phenotype
+ext_peak_sing <- function(snps, maxdist=2000000){
+  csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
+}
 for (i in 1:length(lilp)){
   pp <- lilp[[i]]
-  expp <- ext_peak(pp$gwas)
+  expp <- ext_peak_sing(pp$gwas)
   affgen <- get_genes(expp[expp$ispeak==T,], dist=1000)
   if (nrow(affgen) > 0){
     write_csv(affgen, path = paste0(args$plotdir, "/genes_for_hoenotype_", i, ".csv"))
