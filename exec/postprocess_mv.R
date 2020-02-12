@@ -99,7 +99,6 @@ for (i in 1:length(phenos)){
     pvalmat <- left_join(pvalmat, pp$gwas %>% mutate(!!(pname):=P) %>% dplyr::select(rs, !!(pname)), by="rs")
     all_ispeak <- left_join(all_ispeak, pp$gwas %>% mutate(!!(pname):=ispeak) %>% dplyr::select(rs, !!(pname)), by="rs")
     all_choose <- left_join(all_choose, pp$gwas %>% mutate(!!(pname):=choose) %>% dplyr::select(rs, !!(pname)), by="rs")
-    print(head(all_choose))
   }
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
   ggsave(filename = paste0(args$plotdir, "/Manhattan_plot_phenotype_", i, "_", phenos[i], ".pdf"),
@@ -286,13 +285,14 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 
 # Get the genes related to each cluster, print them and run enrichR
 ext_peak <- function(snps, all_i, all_c, maxdist=2000000){
-  csum <- snps %>% filter(rs %in% all_i$rs[rowSums(all_i %>% select(-rs))>0])
+  csum <- snps #%>% filter(rs %in% all_i$rs[rowSums(all_i %>% select(-rs))>0])
+  csum <- csum %>% left_join(tibble(rs = all_i$rs, ispeak = (rowSums(select(all_i, -rs))>0)))
   csum$minps <- csum$ps
   csum$maxps <- csum$ps
   for (c in names(all_c %>% select(-rs))){
     tmps <- left_join(snps, select(all_c, rs, !!(c)), by="rs") %>% filter(!!(c) > 0)
     tmpc <- tmps %>% group_by_at(c) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% left_join(tmps, by=c) %>% select(rs, minps, maxps)
-    csum <- csum %>% left_join(tmpc, by="rs", suffix=c("",".x")) %>% mutate(maxps = pmin(maxps, maxps.x), minps = pmax(minps, minps.x))
+    csum <- csum %>% left_join(tmpc, by="rs", suffix=c("",".x")) %>% mutate(maxps = pmin(maxps, maxps.x), minps = pmax(minps, minps.x)) %>% select(-maxps.x, -minps.x)
   }
   csum %>% mutate(maxps = pmin(maxps, ps + maxdist), minps = pmax(maxps, ps - maxdist))
 
