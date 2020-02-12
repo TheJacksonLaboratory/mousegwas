@@ -336,6 +336,7 @@ ext_peak_sing <- function(snps, maxdist=2000000){
 }
 for (i in 1:length(lilp)){
   pp <- lilp[[i]]
+  if (sum(pp$gwas$ispeak)==0) next
   expp <- ext_peak_sing(pp$gwas)
   affgen <- get_genes(expp[expp$ispeak==T,], dist=1000)
   if (nrow(affgen) > 0){

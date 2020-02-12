@@ -23,15 +23,15 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald") {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
-    gwas_results <- gwas_results %>% dplyr::select(rs=X1, p_score=X9)  # RSID and PVALUE_RE2
+    gwas_results <- gwas_results %>% dplyr::select_("rs"="X1", test="X9")  # RSID and PVALUE_RE2
     anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else if (pyLMM){
     gwas_results <- read_delim(results_file, "\t", col_names = TRUE, guess_max = Inf)
-    gwas_results <- gwas_results %>% dplyr::select(rs=SNP_ID, p_score=P_VALUE)  # RSID and PVALUE_RE2
+    gwas_results <- gwas_results %>% dplyr::select_("rs"="SNP_ID", test="P_VALUE")  # RSID and PVALUE_RE2
     anno <- read_delim(annotations, ",", col_names = c("rs", "ps", "chr"), guess_max = Inf)
     gwas_results <- left_join(gwas_results, anno, by="rs")
   }else{
@@ -57,8 +57,8 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
         n_miss = col_double(),
         allele1 = col_character(),
         allele0 = col_character()))
-      jres <- gwas_results %>% inner_join(dplyr::select(difres, c(rs, p_score)), by="rs", suffix = c("", ".d"))
-      gwas_results <- jres %>% mutate(p_score = p_score/p_score.d) %>% dplyr::select(-p_score.d)
+      jres <- gwas_results %>% inner_join(dplyr::select_(difres, c("rs", test)), by="rs", suffix = c("", ".d"))
+      gwas_results <- jres %>% mutate_(test = paste0(test,"/",test,".d")) %>% dplyr::select_(paste0("-",test,".d"))
     }
 
   }
@@ -66,10 +66,10 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   # Remove correlated peaks
   rep_peaks <- function(genotypes, gwas_pvs, rs_thr=corrthr, pthr=1e-20, mxd=maxdist){
     tmat <- base::t(genotypes)
-    srt_pv <- gwas_pvs %>% dplyr::select(rs, p_score) %>% arrange(p_score) %>% mutate(choose = 0, ispeak=FALSE)
+    srt_pv <- gwas_pvs %>% dplyr::select_("rs", test) %>% arrange_(test) %>% mutate(choose = 0, ispeak=FALSE)
     peaknum = 1
-    while (any(srt_pv$choose[srt_pv$p_score<=pthr] == 0)){
-      nr <- which(srt_pv$choose == 0 & srt_pv$p_score <= pthr)[1]
+    while (any(srt_pv$choose[srt_pv[,test,drop=T] <= pthr] == 0)){
+      nr <- which(srt_pv$choose == 0 & srt_pv[,test,drop=T] <= pthr)[1]
       rs <- srt_pv$rs[nr]
       # Select other SNPs in its vicinity
       rsnum <- gwas_pvs$rs==rs
@@ -105,7 +105,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
   }
-  gwas_results <- gwas_results %>% mutate(P=-log10(p_score))
+  gwas_results <- gwas_results %>% mutate_(paste0("P=-log10(",test,")"))
   ret_gwas <- gwas_results
   gwas_results[gwas_results$chr=="X","chr"] <- 20# gwas_results %>% dplyr::filter(chr=="X") %>% dplyr::mutate(chr=20)
   gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr)) %>% arrange(chr, ps)
