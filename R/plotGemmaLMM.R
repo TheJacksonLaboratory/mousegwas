@@ -105,7 +105,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
   }
-  gwas_results <- gwas_results %>% mutate_(paste0("P=-log10(",test,")"))
+  gwas_results <- gwas_results %>% mutate_("P" = paste0("-log10(",test,")"))
   ret_gwas <- gwas_results
   gwas_results[gwas_results$chr=="X","chr"] <- 20# gwas_results %>% dplyr::filter(chr=="X") %>% dplyr::mutate(chr=20)
   gwas_results <- gwas_results %>% mutate(chr=as.numeric(chr)) %>% arrange(chr, ps)
