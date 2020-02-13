@@ -81,7 +81,7 @@ dir.create(args$plotdir, recursive = TRUE)
 set.seed(490)
 
 # Plot each phenotype's Manhattan plot
-lilp <- vector("list", length(phenos))
+lilp <- vector("list", 0)
 allpeaks <- NULL
 allsnps <- NULL
 all_ispeak <- NULL
@@ -287,60 +287,35 @@ device=cairo_pdf, dpi="print", width=halfw, height=height, units="in"
 
 
 
-# Get the genes related to each cluster, print them and run enrichR
-ext_peak <- function(snps, all_i, all_c, maxdist=2000000){
-  csum <- snps #%>% filter(rs %in% all_i$rs[rowSums(all_i %>% select(-rs))>0])
-  csum <- csum %>% left_join(tibble(rs = all_i$rs, ispeak = (rowSums(select(all_i, -rs))>0)))
-  csum$minps <- csum$ps
-  csum$maxps <- csum$ps
-  for (c in names(all_c %>% select(-rs))){
-    tmps <- left_join(snps, select(all_c, rs, !!(c)), by="rs") %>% filter(!!(c) > 0)
-    tmpc <- tmps %>% group_by_at(c) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup() %>% left_join(tmps, by=c) %>% select(rs, minps, maxps)
-    csum <- csum %>% left_join(tmpc, by="rs", suffix=c("",".x")) %>% mutate(maxps = pmin(maxps, maxps.x), minps = pmax(minps, minps.x)) %>% select(-maxps.x, -minps.x)
-  }
-  csum %>% mutate(maxps = pmin(maxps, ps + maxdist), minps = pmax(maxps, ps - maxdist))
 
-}
-#pg <- ext_peak(left_join(p$gwas, dplyr::select(p$pwas, rs, cluster),by="rs"))
-#pg <- pg %>% left_join(dplyr::select(allgwas, rs, STAT1_RE2, STAT2_RE2))
-#ggsave(filename = paste0(args$plotdir, "/peak_width_hist.pdf"),
-#       plot = ggplot(filter(pg, ispeak), aes(log10(maxps-minps))) + geom_histogram(bins = 20) +
-#         theme_bw() + theme(text=element_text(size=10, family=ffam)),
-#       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
-pg <- anno %>% filter(rs %in% allsnps) %>% join(tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr]))
-pg <- ext_peak(pg, all_ispeak, all_choose)
-allgenes = NULL
+# Run enrichR for each phenotype
 dbs <- listEnrichrDbs()
 
-for (k in 1:args$clusters){
-  affgen <- get_genes(pg[pg$ispeak==T & pg$cluster==k,], dist=1000)
-  allgenes <- rbind(allgenes, affgen)
-  write_csv(affgen, path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv"))
-  # Run enrichr
-  enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
-  for (d in dbs$libraryName){
-    if (dim(enrr[[d]])[2] > 1){
-      rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05 )
-      if (nrow(rtb) > 0)
-        write_csv((rtb %>% mutate(total.genes= length(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), cluster=k, library=d)),
-                  path = paste0(args$plotdir, "/enrichR_cluster_", k, "_db_", d, "p005.csv"))
-
-    }
-  }
-}
-
-# Do this for each phenotype
+# Expand each peak to include the entire peak, not just the single SNP
 ext_peak_sing <- function(snps, maxdist=2000000){
   csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
   snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
 }
+
+# This tibble will accumulate all the genes for each cluster (ID and name)
+clustgene <- vector(mode="list", length=args$clusters)
+clustmgi <- vector(mode="list", length=args$clusters)
+allgenes = c()
+pgc <- tibble(rs = rownames(pgwas), cluster=kk$cluster[rowarr])
 for (i in 1:length(lilp)){
   pp <- lilp[[i]]
   if (sum(pp$gwas$ispeak)==0) next
   expp <- ext_peak_sing(pp$gwas)
   affgen <- get_genes(expp[expp$ispeak==T,], dist=1000)
   if (nrow(affgen) > 0){
-    write_csv(affgen, path = paste0(args$plotdir, "/genes_for_hoenotype_", i, ".csv"))
+    # Add the genes to the appropriate cluster
+    clustp <- left_join(affgen, pgc, by="rs")
+    for (c in unique(clustp$cluster)){
+      clustgene[[c]] <- unique(c(clustgene[[c]], clustp$ensembl_gene_id[clustp$cluster==c]))
+      clustmgi[[c]] <- unique(c(clustmgi[[c]], clustp$mgi_symbol[clustp$cluster==c]))
+    }
+    allgenes <- unique(c(allgenes, clustp$mgi_symbol))
+    write_csv(affgen, path = paste0(args$plotdir, "/genes_for_phenotype_", i, ".csv"))
     # Run enrichr
     enrr <- enrichr(unique(affgen$mgi_symbol[!(grepl(pattern = "^Gm", x =  affgen$mgi_symbol) | grepl("Rik$", affgen$mgi_symbol) | affgen$mgi_symbol=="")]), dbs$libraryName)
     for (d in dbs$libraryName){
@@ -351,6 +326,22 @@ for (i in 1:length(lilp)){
                     path = paste0(args$plotdir, "/enrichR_phenotype_", i, "_db_", d, "p005.csv"))
 
       }
+    }
+  }
+}
+
+for (k in 1:args$clusters){
+  write_csv(clustgene[[k]], path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv"))
+  # Run enrichr
+  glen = length(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) | grepl("Rik$", clustmgi[[k]]))])
+  enrr <- enrichr(unique(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) | grepl("Rik$", clustmgi[[k]]))]), dbs$libraryName)
+  for (d in dbs$libraryName){
+    if (dim(enrr[[d]])[2] > 1){
+      rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05 )
+      if (nrow(rtb) > 0)
+        write_csv((rtb %>% mutate(total.genes=glen, cluster=k, library=d)),
+                  path = paste0(args$plotdir, "/enrichR_cluster_", k, "_db_", d, "p005.csv"))
+
     }
   }
 }
