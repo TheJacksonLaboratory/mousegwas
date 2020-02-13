@@ -19,6 +19,7 @@ get_genes <- function(snps, dist=1000000, attempts=5){
   attn <- 1
   while (attn <= attempts && is.null(annot)){
     attn <- attn + 1
+    ensembl <- NULL
     try(
         ensembl <- biomaRt::useMart("ensembl", dataset="mmusculus_gene_ensembl", host = 'useast.ensembl.org'))
     if (is.null(ensembl))
