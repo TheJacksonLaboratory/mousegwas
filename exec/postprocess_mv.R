@@ -112,7 +112,7 @@ grouplist <- c()
 if (!args$nomv){
   for (grpf in Sys.glob(paste0(args$outdir,"/output/lmm_phenotypes_*_all_LOCO.assoc.txt"))){
     pp <- plot_gemma_lmm(grpf, name = "Chromosome",genotypes = geno, namethr = args$pvalthr, redthr = args$pvalthr,
-                         maxdist=10000000, corrthr=0.4)
+                         maxdist=10000000, corrthr=0.4, test="p_score")
     pname <- gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
     grouplist <- c(grouplist, pname)
     allres <- read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs, !!(pname))
