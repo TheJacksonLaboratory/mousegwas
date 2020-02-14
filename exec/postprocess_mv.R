@@ -331,7 +331,7 @@ for (i in 1:length(lilp)){
 }
 
 for (k in 1:args$clusters){
-  write_csv(clustgene[[k]], path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv"))
+  write_csv(data.frame(genes=clustgene[[k]]), path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv"))
   # Run enrichr
   glen = length(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) | grepl("Rik$", clustmgi[[k]]))])
   enrr <- enrichr(unique(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) | grepl("Rik$", clustmgi[[k]]))]), dbs$libraryName)
