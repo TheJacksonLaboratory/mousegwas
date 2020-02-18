@@ -293,7 +293,7 @@ dbs <- listEnrichrDbs()
 
 # Expand each peak to include the entire peak, not just the single SNP
 ext_peak_sing <- function(snps, maxdist=2000000){
-  csum <- snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  csum <- snps %>% group_by(choose) %>% mutate(maxP=max(P)) %>% filter(P>maxP/2) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
   snps %>% left_join(csum, by="choose") %>% mutate(maxps = pmin(maxps, ps+maxdist), minps = pmax(minps, ps-maxdist))
 }
 
