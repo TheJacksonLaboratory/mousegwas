@@ -352,12 +352,6 @@ densp <- geno_t %>% filter(chr!="Y", chr!="MT")  %>%
   ggplot(aes(bp38/1000000, factor(chr, levels=chrord))) +
   geom_bin2d(binwidth=1, drop=T) + xlab("Position (Mbp)") + ylab ("Chromosome") +
   scale_fill_viridis(name=expression(frac('markers', '1 Mbp'))) +
-  ggnewscale::new_scale_fill() +
-  geom_point(data = filter(pg, ispeak, chr!="Y", chr!="MT"),
-             aes(ps/1000000, factor(chr, levels=chrord), fill=factor(cluster)),
-             show.legend = F, inherit.aes = F, color = "black",
-             position = position_jitter(height=0.15, width=0), shape=21) +
-  scale_fill_manual(values = ccols) +
   theme_bw() +
   theme(panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
