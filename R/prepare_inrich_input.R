@@ -37,10 +37,19 @@ write_genes_map <- function(basedir) {
   genes$kpath <- gsub("\\+.*", "", genes$kegg_enzyme)
   genes$kdesc <- paste0("KEGG map", genes$kpath)
   write_delim(
-    genes %>% select(ensembl_gene_id, kpath, kdesc),
+    genes %>% select(ensembl_gene_id, kpath, kdesc) %>% filter(kpath != ""),
     path = paste0(basedir, "/KEGG_pathway_link_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
   )
   return(g)
+}
+
+run_inrich <- function(basedir, name, exec="inrich"){
+  system(paste0("cd ", basedir, " && ", exec,
+                " -a intervals", name, "_for_INRICH.txt",
+                " -m SNPs_map_for_INRICH.txt ",
+                " -g genes_coordinates_for_INRICH.txt",
+                " -t KEGG_pathway_link_for_INRICH.txt",
+                " -o ", name))
 }

@@ -496,6 +496,7 @@ for (i in 1:length(lilp)) {
     next
   expp <- ext_peak_sing(pp$gwas)
   write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, phenos[i])
+  run_inrich(args$plotdir, phenos[i])
   affgen <-
     get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
