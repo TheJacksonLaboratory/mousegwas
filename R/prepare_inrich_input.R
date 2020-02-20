@@ -30,7 +30,7 @@ write_genes_map <- function(basedir) {
       mgi_symbol
     ),
     path = paste0(basedir, "/genes_coordinates_for_INRICH.txt"),
-    sep = "\t",
+    delim = "\t",
     col_names = FALSE
   )
   g <- genes
@@ -39,7 +39,7 @@ write_genes_map <- function(basedir) {
   write_delim(
     genes %>% select(ensembl_gene_id, kpath, kdesc),
     path = paste0(basedir, "/KEGG_pathway_link_for_INRICH.txt"),
-    sep = "\t",
+    delim = "\t",
     col_names = FALSE
   )
   return(g)
