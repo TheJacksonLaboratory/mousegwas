@@ -23,7 +23,7 @@
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
 #' @examples
-plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE, annot=NULL) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% dplyr::select_("rs"="X1", test="X9")  # RSID and PVALUE_RE2
@@ -162,7 +162,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
 
     # Print names around peaks
     if (addgenes){
-      toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist) %>%
+      toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist, annot=annot) %>%
       filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
     # Add gene names
       p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(dplyr::select(toprs, rs, mgi_symbol), by="rs"),
