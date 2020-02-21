@@ -49,6 +49,8 @@ parser$add_argument("--nomv",
                     default = FALSE,
                     action = "store_true",
                     help = "Ignore multivariate results and use only single phenotypes")
+parser$add_argument("--inrich", default="inrich",
+                    help="INRICH exe utable and custom parameters, deafult: inrich")
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -496,7 +498,7 @@ for (i in 1:length(lilp)) {
     next
   expp <- ext_peak_sing(pp$gwas)
   write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, phenos[i])
-  run_inrich(args$plotdir, phenos[i])
+  run_inrich(args$plotdir, phenos[i], exec=args$inrich)
   affgen <-
     get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
