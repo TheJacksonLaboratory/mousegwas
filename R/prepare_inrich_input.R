@@ -48,16 +48,13 @@ write_genes_map <- function(basedir) {
   gotbl <-
     data.table::data.table(gene = character(0),
            go = character(0))
-  #gtr <- data.table(go=character(0), desc=character(0))
-  #setkey(gtr, go)
-  #goterm <- GO.db::GOTERM
   for (i in 1:length(gotrm)) {
-    print(i)
     gotbl <- data.table::rbindlist(list(gotbl, list(names(gotrm)[i],
                                                     gotrm[[i]])))
   }
-}
+
   # Get the descriptions
+  gotbl <- gotbl[!is.na(go),]
   dectbl <-
     data.table::data.table(go = unique(gotbl$go),
                desc = sapply(unique(gotbl$go), function(x) {
