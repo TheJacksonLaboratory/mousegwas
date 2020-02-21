@@ -38,7 +38,7 @@ write_genes_map <- function(basedir) {
   #write the KEGG mapping
   genes$kdesc <- paste0("KEGG map", genes$kpath)
   write_delim(
-    genes %>% select(ensembl_gene_id, kpath, kdesc) %>% filter(kpath != ""),
+    genes %>% dplyr::select(ensembl_gene_id, kpath, kdesc) %>% filter(kpath != ""),
     path = paste0(basedir, "/KEGG_pathway_link_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
@@ -49,9 +49,19 @@ write_genes_map <- function(basedir) {
     tibble(gene = character(0),
            go = character(0),
            desc = character(0))
+  #gtr <- data.table(go=character(0), desc=character(0))
+  #setkey(gtr, go)
+  #goterm <- GO.db::GOTERM
   for (i in 1:length(gotrm)) {
+   # print(i)
     for (g in gotrm[[i]]) {
-      desc = paste0(GO.db::GOTERM[[g]]@Synonym, " (", GO.db::GOTERM[[g]]@Ontology, ")")
+   #   desc <- gtr[g, desc]
+  #    if (length(desc)==0) {
+  #      desc = paste0(goterm[[g]]@Term, " (", goterm[[g]]@Ontology, ")")
+  #      gtr <-  rbindlist(list(gtr, list(g, desc)))
+  #      setkey(gtr, go)
+  #    }
+      desc=g
       gotbl <- add_row(gotbl,
                        gene = names(gotrm)[i],
                        go = g,
