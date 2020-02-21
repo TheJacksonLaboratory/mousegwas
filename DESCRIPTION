@@ -30,6 +30,8 @@ Imports:
   GGally,
   corrgram,
   ggnewscale,
-  enrichR
+  enrichR,
+  goseq,
+  GO.db
 Remotes: git::https://github.com/vqv/ggbiplot
  

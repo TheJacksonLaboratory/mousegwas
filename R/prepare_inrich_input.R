@@ -35,10 +35,32 @@ write_genes_map <- function(basedir) {
   )
   g <- genes
   genes$kpath <- gsub("\\+.*", "", genes$kegg_enzyme)
+  #write the KEGG mapping
   genes$kdesc <- paste0("KEGG map", genes$kpath)
   write_delim(
     genes %>% select(ensembl_gene_id, kpath, kdesc) %>% filter(kpath != ""),
     path = paste0(basedir, "/KEGG_pathway_link_for_INRICH.txt"),
+    delim = "\t",
+    col_names = FALSE
+  )
+  # Read GO mapping and write it too
+  gotrm <- goseq::getgo(genes$ensembl_gene_id, "mm10", "ensGene")
+  gotbl <-
+    tibble(gene = character(0),
+           go = character(0),
+           desc = character(0))
+  for (i in 1:length(gotrm)) {
+    for (g in gotrm[[i]]) {
+      desc = paste0(GO.db::GOTERM[[g]]@Synonym, " (", GO.db::GOTERM[[g]]@Ontology, ")")
+      gotbl <- add_row(gotbl,
+                       gene = names(gotrm)[i],
+                       go = g,
+                       desc = desc)
+    }
+  }
+  write_delim(
+    gotbl,
+    path = paste0(basedir, "GO_terms_link_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
   )
@@ -51,5 +73,11 @@ run_inrich <- function(basedir, name, exec="inrich"){
                 " -m SNPs_map_for_INRICH.txt ",
                 " -g genes_coordinates_for_INRICH.txt",
                 " -t KEGG_pathway_link_for_INRICH.txt",
-                " -o ", name))
+                " -o ", name, "_KEGG_pathways"))
+  system(paste0("cd ", basedir, " && ", exec,
+                " -a intervals", name, "_for_INRICH.txt",
+                " -m SNPs_map_for_INRICH.txt ",
+                " -g genes_coordinates_for_INRICH.txt",
+                " -t GO_terms_link_for_INRICH.txt",
+                " -o ", name, "GO_terms"))
 }
