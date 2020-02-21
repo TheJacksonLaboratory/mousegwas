@@ -46,14 +46,13 @@ write_genes_map <- function(basedir) {
   # Read GO mapping and write it too
   gotrm <- goseq::getgo(genes$ensembl_gene_id, "mm10", "ensGene")
   gotbl <-
-    tibble(gene = character(0),
-           go = character(0),
-           desc = character(0))
+    data.table(gene = character(0),
+           go = character(0))
   #gtr <- data.table(go=character(0), desc=character(0))
   #setkey(gtr, go)
   #goterm <- GO.db::GOTERM
   for (i in 1:length(gotrm)) {
-   # print(i)
+    print(i)
     for (g in gotrm[[i]]) {
    #   desc <- gtr[g, desc]
   #    if (length(desc)==0) {
@@ -62,12 +61,19 @@ write_genes_map <- function(basedir) {
   #      setkey(gtr, go)
   #    }
       desc=g
-      gotbl <- add_row(gotbl,
+    #  gotbl <- add_row(gotbl,
+      gotbl <- rbindlist(list(gotbl, list(
                        gene = names(gotrm)[i],
-                       go = g,
-                       desc = desc)
+                       go = g)))
     }
   }
+  # Get the descriptions
+  dectbl <-
+    data.table(go = unique(gotbl$go),
+               desc = sapply(unique(gotbl$go), function(x) {
+                 paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
+               }))
+  gotbl <- merge.data.table(gotbl, dectbl, by="go")
   write_delim(
     gotbl,
     path = paste0(basedir, "GO_terms_link_for_INRICH.txt"),
