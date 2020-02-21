@@ -54,18 +54,18 @@ write_genes_map <- function(basedir) {
   }
 
   # Get the descriptions
-  gotbl <- gotbl[!is.na(go),]
+  gotbl <- gotbl[!is.na(gotbl$go),]
   dectbl <-
     data.table::data.table(go = unique(gotbl$go),
                desc = sapply(unique(gotbl$go), function(x) {
                  paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
                }))
   gotbl <- data.table::merge.data.table(gotbl, dectbl, by="go")
-  write_delim(
+  data.table::fwrite(
     gotbl,
-    path = paste0(basedir, "GO_terms_link_for_INRICH.txt"),
-    delim = "\t",
-    col_names = FALSE
+    file = paste0(basedir, "GO_terms_link_for_INRICH.txt"),
+    sep = "\t",
+    col.names = FALSE
   )
   return(g)
 }
