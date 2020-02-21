@@ -53,20 +53,10 @@ write_genes_map <- function(basedir) {
   #goterm <- GO.db::GOTERM
   for (i in 1:length(gotrm)) {
     print(i)
-    for (g in gotrm[[i]]) {
-   #   desc <- gtr[g, desc]
-  #    if (length(desc)==0) {
-  #      desc = paste0(goterm[[g]]@Term, " (", goterm[[g]]@Ontology, ")")
-  #      gtr <-  rbindlist(list(gtr, list(g, desc)))
-  #      setkey(gtr, go)
-  #    }
-      desc=g
-    #  gotbl <- add_row(gotbl,
-      gotbl <- data.table::rbindlist(list(gotbl, list(
-                       gene = names(gotrm)[i],
-                       go = g)))
-    }
+    gotbl <- data.table::rbindlist(list(gotbl, list(names(gotrm)[i],
+                                                    gotrm[[i]])))
   }
+}
   # Get the descriptions
   dectbl <-
     data.table::data.table(go = unique(gotbl$go),
