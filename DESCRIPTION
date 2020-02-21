@@ -32,6 +32,7 @@ Imports:
   ggnewscale,
   enrichR,
   goseq,
-  GO.db
+  GO.db,
+  org.Mm.eg.db
 Remotes: git::https://github.com/vqv/ggbiplot
  
