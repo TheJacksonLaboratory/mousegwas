@@ -89,7 +89,7 @@ write_genes_map <- function(basedir) {
                }))
   gotbl <- data.table::merge.data.table(gotbl, dectbl, by="go")
   data.table::fwrite(
-    gotbl,
+    gotbl[,mget(c("gene", "go", "desc"))],
     file = paste0(basedir, "/GO_terms_link_for_INRICH.txt"),
     sep = "\t",
     col.names = FALSE
@@ -97,7 +97,7 @@ write_genes_map <- function(basedir) {
   return(g)
 }
 
-#' Title
+#' Rnu KEGG and GO INRICH for written intervals
 #'
 #' @param basedir Where the files are
 #' @param name The phenotype name
