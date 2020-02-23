@@ -1,3 +1,13 @@
+#' Write the intervals for INRICH execution
+#'
+#' @param snps a data.frame or tibble with the columns chr, minps an maxps describinf intervals
+#' @param basedir Where to write the files to
+#' @param name Name of the phenotype
+#'
+#' @return
+#' @export
+#'
+#' @examples
 write_inrich_phenotype <- function(snps, basedir, name) {
   # Write the intervals using the minps and maxps columns
   write_delim(
@@ -8,6 +18,15 @@ write_inrich_phenotype <- function(snps, basedir, name) {
   )
 }
 
+#' Write the SNPs map for INRICH execution
+#'
+#' @param snps a data.frame or tibble with the columns chr, minps an maxps describinf intervals
+#' @param basedir Where to write the files to
+#'
+#' @return
+#' @export
+#'
+#' @examples
 write_inrich_snps <- function(snps, basedir) {
   # Write the snps chr and position
   write_delim(
@@ -18,6 +37,14 @@ write_inrich_snps <- function(snps, basedir) {
   )
 }
 
+#' Write the genes, KEGG and GO mapping for INRICH execution
+#'
+#' @param basedir Where to write the files to
+#'
+#' @return
+#' @export
+#'
+#' @examples
 write_genes_map <- function(basedir) {
   # Write the genes map chr, staret, stop, ID, desc (mgi_symbol)
   genes <- get_genes()
@@ -70,6 +97,16 @@ write_genes_map <- function(basedir) {
   return(g)
 }
 
+#' Title
+#'
+#' @param basedir Where the files are
+#' @param name The phenotype name
+#' @param exec INRICH executable file
+#'
+#' @return
+#' @export
+#'
+#' @examples
 run_inrich <- function(basedir, name, exec="inrich"){
   system(paste0("cd ", basedir, " && ", exec,
                 " -a intervals", name, "_for_INRICH.txt",
