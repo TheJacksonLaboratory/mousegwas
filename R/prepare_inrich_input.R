@@ -62,7 +62,7 @@ write_genes_map <- function(basedir) {
                }))
   gotbl <- data.table::merge.data.table(gotbl, dectbl, by="go")
   data.table::fwrite(
-    gotbl[,.(gene, go, desc)],
+    gotbl,
     file = paste0(basedir, "/GO_terms_link_for_INRICH.txt"),
     sep = "\t",
     col.names = FALSE
