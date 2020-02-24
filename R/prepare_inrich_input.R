@@ -88,11 +88,13 @@ write_genes_map <- function(basedir) {
                  paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
                }))
   gotbl <- data.table::merge.data.table(gotbl, dectbl, by="go")
-  data.table::fwrite(
-    gotbl[,mget(c("gene", "go", "desc"))],
+  write.table(
+    as.data.frame(gotbl)[, c("gene", "go", "desc")],
     file = paste0(basedir, "/GO_terms_link_for_INRICH.txt"),
     sep = "\t",
-    col.names = FALSE
+    col.names = F,
+    row.names = F,
+    quote = 3
   )
   return(g)
 }

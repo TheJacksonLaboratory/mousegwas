@@ -238,19 +238,8 @@ pgwas <-
 print(sum(is.na(pgwas)))
 pgwas[is.na(pgwas)] = 0
 pgwas <- as.matrix(pgwas)
-#pcvals <- prcomp(pgwas)
-#if (args$rotation != ""){
-#  pcvals$rotation <- pcvals$rotation[strsplit(args$rotation, ",")[[1]],,drop=F]
-#}
-#pcperc <- pcvals$sdev^2/sum(pcvals$sdev^2)
+
 kk <- kmeans(pgwas, args$clusters)
-# plot the PCA
-#bip <- ggbiplot::ggbiplot(pcvals, groups=as.factor(kk$cluster)) + scale_color_manual(name = 'cluster', values=ccols) + theme_bw() + theme(legend.position = "none")
-
-#ggsave(filename = paste0(args$plotdir, "/PCA_plot.pdf"),
-#       plot = bip + theme(text=element_text(size=10, family=ffam)),
-#       device = cairo_pdf, dpi="print", width = halfw, height = height, units="in")
-
 
 # Plot the m-value heatmap
 # Order the columns
