@@ -99,27 +99,65 @@ write_genes_map <- function(basedir) {
   return(g)
 }
 
+
 #' Rnu KEGG and GO INRICH for written intervals
 #'
 #' @param basedir Where the files are
 #' @param name The phenotype name
 #' @param exec INRICH executable file
+#' @param i minimal group size
+#' @param j maximal group size
 #'
 #' @return
 #' @export
 #'
 #' @examples
-run_inrich <- function(basedir, name, exec="inrich"){
-  system(paste0("cd ", basedir, " && ", exec,
-                " -a intervals", name, "_for_INRICH.txt",
-                " -m SNPs_map_for_INRICH.txt ",
-                " -g genes_coordinates_for_INRICH.txt",
-                " -t KEGG_pathway_link_for_INRICH.txt",
-                " -o ", name, "_KEGG_pathways"))
-  system(paste0("cd ", basedir, " && ", exec,
-                " -a intervals", name, "_for_INRICH.txt",
-                " -m SNPs_map_for_INRICH.txt ",
-                " -g genes_coordinates_for_INRICH.txt",
-                " -t GO_terms_link_for_INRICH.txt",
-                " -o ", name, "GO_terms"))
-}
+run_inrich <-
+  function(basedir,
+           name,
+           exec = "inrich",
+           i = 5,
+           j = 200) {
+    system(
+      paste0(
+        "cd ",
+        basedir,
+        " && ",
+        exec,
+        " -a intervals",
+        name,
+        "_for_INRICH.txt",
+        " -m SNPs_map_for_INRICH.txt ",
+        " -g genes_coordinates_for_INRICH.txt",
+        " -t KEGG_pathway_link_for_INRICH.txt",
+        " -o ",
+        name,
+        "_KEGG_pathways",
+        " -i ",
+        i,
+        " -j ",
+        j
+      )
+    )
+    system(
+      paste0(
+        "cd ",
+        basedir,
+        " && ",
+        exec,
+        " -a intervals",
+        name,
+        "_for_INRICH.txt",
+        " -m SNPs_map_for_INRICH.txt ",
+        " -g genes_coordinates_for_INRICH.txt",
+        " -t GO_terms_link_for_INRICH.txt",
+        " -o ",
+        name,
+        "_GO_terms",
+        " -i ",
+        i,
+        " -j ",
+        j
+      )
+    )
+  }

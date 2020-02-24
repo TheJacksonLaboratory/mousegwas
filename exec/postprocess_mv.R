@@ -51,6 +51,11 @@ parser$add_argument("--nomv",
                     help = "Ignore multivariate results and use only single phenotypes")
 parser$add_argument("--inrich", default="inrich",
                     help="INRICH exe utable and custom parameters, deafult: inrich")
+parser$add_argument("--inrich_i", "-i", type="double", default=5,
+                    help="Minimal group size for inrich (-i), default 5")
+parser$add_argument("--inrich_j", "-j", type="double", default=200,
+                    help="Maximal group size for inrich (-j), default 200")
+
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -104,8 +109,6 @@ geno <-
     geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr,-bp38,-major,-minor)
   )
 
-# Write the genes for INRICH, get the gene annotations and pass them on
-annot <- write_genes_map(args$plotdir)
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
@@ -113,6 +116,9 @@ PVE <-
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
 set.seed(490)
+
+# Write the genes for INRICH, get the gene annotations and pass them on
+annot <- write_genes_map(args$plotdir)
 
 # Plot each phenotype's Manhattan plot
 lilp <- vector("list", 0)
@@ -482,7 +488,13 @@ for (i in 1:length(lilp)) {
     next
   expp <- ext_peak_sing(pp$gwas)
   write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, phenos[i])
-  run_inrich(args$plotdir, phenos[i], exec=args$inrich)
+  run_inrich(
+    args$plotdir,
+    phenos[i],
+    exec = args$inrich,
+    i = args$inrich_i,
+    j = args$inrich_j
+  )
   affgen <-
     get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
