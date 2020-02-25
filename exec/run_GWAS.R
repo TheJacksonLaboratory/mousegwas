@@ -160,7 +160,6 @@ for (cn in setdiff(names(complete.geno), c("chr", "bp38", "rs", "major", "minor"
   complete.geno[,c(cn) := as.numeric(get(cn))]#as.numeric(ifelse(..cn=='H', 1, ifelse(..cn==major, 0, 2)))]
 }
 
-fwrite(complete.geno, file = paste0(args$basedir, "/strains_genotypes_all.csv"))
 
 # Compute the specific strains genomes
 strains_genomes <- srdata
@@ -290,6 +289,9 @@ if (dim(b$phenotypes)[2]>1){
 mafc <- rowSums(complete.geno[,-1:-5])/(2*(ncol(complete.geno)-5))
 b$genotypes <- b$genotypes[rowSums(is.na(b$genotypes))<=(ncol(b$genotypes)-3)*args$missing &
                              mafc >= args$MAF & mafc <= 1-args$MAF,]
+
+complete.geno <- complete.geno[rs %in% b$genotypes$rs,]
+fwrite(complete.geno, file = paste0(args$basedir, "/strains_genotypes_all.csv"))
 
 
 # Normalize the phenotypes
