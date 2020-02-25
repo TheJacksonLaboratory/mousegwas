@@ -498,7 +498,7 @@ for (i in 1:length(lilp)) {
     i = args$inrich_i,
     j = args$inrich_j
   )
-  exppc <- expp %>% filter(ispeak) %>% left_join(pgc, by="rs") %>% select(cluster, rs, minps, maxps)
+  exppc <- expp %>% dplyr::filter(ispeak) %>% left_join(pgc, by="rs") %>% dplyr::select(cluster, rs, minps, maxps)
   clusterpeaks <- rbind(clusterpeaks, exppc)
   affgen <-
     get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
