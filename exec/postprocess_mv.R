@@ -483,6 +483,7 @@ clustgene <- vector(mode = "list", length = args$clusters)
 clustmgi <- vector(mode = "list", length = args$clusters)
 allgenes = c()
 pgc <- tibble(rs = rownames(pgwas), cluster = kk$cluster[rowarr])
+clusterpeaks = tibble(cluster=numeric(0), chr=character(0), minps=numeric(0), maxps=numeric(0))
 write_inrich_snps(geno_t, args$plotdir)
 for (i in 1:length(lilp)) {
   pp <- lilp[[i]]
@@ -497,6 +498,8 @@ for (i in 1:length(lilp)) {
     i = args$inrich_i,
     j = args$inrich_j
   )
+  exppc <- expp %>% filter(ispeak) %>% left_join(pgc, by="rs") %>% select(cluster, rs, minps, maxps)
+  clusterpeaks <- rbind(clusterpeaks, exppc)
   affgen <-
     get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
@@ -553,6 +556,16 @@ for (k in 1:args$clusters) {
     data.frame(genes = clustgene[[k]]),
     path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv")
   )
+  # Run INRICH
+  write_inrich_phenotype(clusterpeaks %>% filter(cluster==k), args$plotdir, paste0("cluster_",k))
+  run_inrich(
+    args$plotdir,
+    paste0("cluster_", k),
+    exec = args$inrich,
+    i = args$inrich_i,
+    j = args$inrich_j
+  )
+
   # Run enrichr
   glen = length(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) |
                                   grepl("Rik$", clustmgi[[k]]))])
@@ -581,6 +594,16 @@ for (k in 1:args$clusters) {
     }
   }
 }
+
+# Run INRICH
+write_inrich_phenotype(clusterpeaks, args$plotdir, "all_phenotypes")
+run_inrich(
+  args$plotdir,
+  "all_phenotypes",
+  exec = args$inrich,
+  i = args$inrich_i,
+  j = args$inrich_j
+)
 
 # Plot markers density
 chrord <- c("X", 19:1)
