@@ -469,12 +469,13 @@ ggsave(
 dbs <- listEnrichrDbs()
 
 # Expand each peak to include the entire peak, not just the single SNP
-ext_peak_sing <- function(snps, maxdist = 2000000) {
-  csum <-
-    snps %>% group_by(choose) %>% mutate(maxP = max(P)) %>% filter(P >= maxP - args$drop) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
-                                                                    maxdist),
-                                                     minps = pmax(minps, ps - maxdist))
+ext_peak_sing <- function(snps, maxdist = 250000) {
+  #csum <-
+  #  snps %>% group_by(choose) %>% mutate(maxP = max(P)) %>% filter(P >= maxP - args$drop) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  #snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
+  #                                                                  maxdist),
+  #                                                   minps = pmax(minps, ps - maxdist))
+  snps %>% mutate(minps = ps - maxdist, maxps = ps + maxdist)
 }
 
 # This tibble will accumulate all the genes for each cluster (ID and name)
@@ -487,7 +488,7 @@ for (i in 1:length(lilp)) {
   pp <- lilp[[i]]
   if (sum(pp$gwas$ispeak) == 0)
     next
-  expp <- ext_peak_sing(pp$gwas)
+  expp <- ext_peak_sing(pp$gwas, maxdist = 250000)
   write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, phenos[i])
   run_inrich(
     args$plotdir,
