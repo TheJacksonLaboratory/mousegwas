@@ -55,6 +55,8 @@ parser$add_argument("--inrich_i", "-i", type="double", default=5,
                     help="Minimal group size for inrich (-i), default 5")
 parser$add_argument("--inrich_j", "-j", type="double", default=200,
                     help="Maximal group size for inrich (-j), default 200")
+parser$add_argument("--drop", type="double", default=2,
+                    help="Log p-value drop to include in peak")
 
 args <- parser$parse_args()
 
@@ -469,8 +471,7 @@ dbs <- listEnrichrDbs()
 # Expand each peak to include the entire peak, not just the single SNP
 ext_peak_sing <- function(snps, maxdist = 2000000) {
   csum <-
-    snps %>% group_by(choose) %>% mutate(maxP = max(P)) %>% filter(P > maxP /
-                                                                     2) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+    snps %>% group_by(choose) %>% mutate(maxP = max(P)) %>% filter(P >= maxP - args$drop) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
   snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
                                                                     maxdist),
                                                      minps = pmax(minps, ps - maxdist))
