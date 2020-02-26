@@ -63,7 +63,7 @@ write_genes_map <- function(basedir) {
   g <- genes
   library(org.Mm.eg.db)
   paths <- AnnotationDbi::select(org.Mm.eg.db, columns = c("PATH"), keys = genes$ensembl_gene_id, keytype="ENSEMBL")
-  genes <- left_join(genes, paths, by = c("ensembl_gene_id", "ENSEMBL"))
+  genes <- left_join(genes, paths, by = c("ensembl_gene_id" = "ENSEMBL"))
   #write the KEGG mapping
   genes$kdesc <- paste0("KEGG map", genes$PATH)
   write_delim(
