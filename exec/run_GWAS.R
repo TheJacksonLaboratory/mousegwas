@@ -339,15 +339,45 @@ if (args$method=="GEMMA" && args$runmetasoft)
 pval_thr <- args$snpthr
 
 # Manhattan plot
-genotypes = as.data.frame(complete.geno[,-c("chr", "bp38", "minor", "major", "rs")])
-rownames(genotypes) <- complete.geno[, rs]
-p <- plot_gemma_lmm(results_file, name=args$header, metasoft=is.metasoft, pyLMM=args$method=="pyLMM" && ncol(b$phenotypes)==1,
-                    annotations=paste0(args$basedir, "/annotations.csv"), namethr=args$namethr, redthr=pval_thr,
-                    genotypes = genotypes, maxdist = args$peakdist)
-                    #genotypes = paste0(args$basedir, "/all_genotypes.csv"))
-save(p, file=paste0(args$basedir, "/gwas_object_output.Rdata"))
-ggsave(paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"), plot=p$plot, device="pdf", width=16, height=8, units="in")
+if (args$runmetasoft) {
+  genotypes = as.data.frame(complete.geno[, -c("chr", "bp38", "minor", "major", "rs")])
+  rownames(genotypes) <- complete.geno[, rs]
+  p <-
+    plot_gemma_lmm(
+      results_file,
+      name = args$header,
+      metasoft = is.metasoft,
+      pyLMM = args$method == "pyLMM" && ncol(b$phenotypes) == 1,
+      annotations = paste0(args$basedir, "/annotations.csv"),
+      namethr = args$namethr,
+      redthr = pval_thr,
+      genotypes = genotypes,
+      maxdist = args$peakdist
+    )
+  #genotypes = paste0(args$basedir, "/all_genotypes.csv"))
+  save(p, file = paste0(args$basedir, "/gwas_object_output.Rdata"))
+  ggsave(
+    paste0(args$basedir, "/manhattan_plot_p_lrt.pdf"),
+    plot = p$plot,
+    device = "pdf",
+    width = 16,
+    height = 8,
+    units = "in"
+  )
 
-# Read the significant SNPs and grab their related genes
-affgen <- get_genes(p$gwas[p$gwas$ispeak==T & p$gwas$P>=args$snpthr,], dist=args$genedist)
-fwrite(merge(data.table(affgen), data.table(p$gwas), by="rs"), paste0(args$basedir, "/genes_dist_", args$genedist, "_pval_", args$snpthr, ".csv"))
+  # Read the significant SNPs and grab their related genes
+  affgen <-
+    get_genes(p$gwas[p$gwas$ispeak == T &
+                       p$gwas$P >= args$snpthr, ], dist = args$genedist)
+  fwrite(
+    merge(data.table(affgen), data.table(p$gwas), by = "rs"),
+    paste0(
+      args$basedir,
+      "/genes_dist_",
+      args$genedist,
+      "_pval_",
+      args$snpthr,
+      ".csv"
+    )
+  )
+}
