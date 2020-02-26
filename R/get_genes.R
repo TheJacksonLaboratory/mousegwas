@@ -38,7 +38,6 @@ get_genes <- function(snps = NULL,
                 "start_position",
                 "end_position",
                 "gene_biotype",
-                "kegg_enzyme"
               ),
               mart = ensembl
             ))

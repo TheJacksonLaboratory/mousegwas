@@ -61,11 +61,12 @@ write_genes_map <- function(basedir) {
     col_names = FALSE
   )
   g <- genes
-  genes$kpath <- gsub("\\+.*", "", genes$kegg_enzyme)
+  paths <- AnnotationDbi::select(org.Mm.eg.db, columns = c("PATH"), keys = genes$ensembl_gene_id, keytype="ENSEMBL")
+  genes <- left_join(genes, paths, by = c("ensembl_gene_id", "ENSEMBL"))
   #write the KEGG mapping
-  genes$kdesc <- paste0("KEGG map", genes$kpath)
+  genes$kdesc <- paste0("KEGG map", genes$PATH)
   write_delim(
-    genes %>% dplyr::select(ensembl_gene_id, kpath, kdesc) %>% filter(kpath != ""),
+    genes %>% dplyr::select(ensembl_gene_id, PATH, kdesc) %>% filter(PATH != ""),
     path = paste0(basedir, "/KEGG_pathway_link_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
