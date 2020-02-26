@@ -84,19 +84,26 @@ write_genes_map <- function(basedir) {
   # Get the descriptions
   gotbl <- gotbl[!is.na(gotbl$go),]
   dectbl <-
-    data.table::data.table(go = unique(gotbl$go),
-               desc = sapply(unique(gotbl$go), function(x) {
-                 paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
-               }))
-  gotbl <- data.table::merge.data.table(gotbl, dectbl, by="go")
-  write.table(
-    as.data.frame(gotbl)[, c("gene", "go", "desc")],
-    file = paste0(basedir, "/GO_terms_link_for_INRICH.txt"),
-    sep = "\t",
-    col.names = F,
-    row.names = F,
-    quote = 3
-  )
+    data.table::data.table(
+      go = unique(gotbl$go),
+      ont = sapply(unique(gotbl$go), function(x) {
+        GO.db::GOTERM[[x]]@Ontology
+      }),
+      desc = sapply(unique(gotbl$go), function(x) {
+        paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
+      })
+    )
+  gotbl <- data.table::merge.data.table(gotbl, dectbl, by = "go")
+  for (ont in c("CC", "BP", "MF")) {
+    write.table(
+      as.data.frame(gotbl)[gotbl$ont == ont, c("gene", "go", "desc")],
+      file = paste0(basedir, "/GO_", ont, "_terms_link_for_INRICH.txt"),
+      sep = "\t",
+      col.names = F,
+      row.names = F,
+      quote = 3
+    )
+  }
   return(g)
 }
 
@@ -140,25 +147,31 @@ run_inrich <-
         j
       )
     )
-    system(
-      paste0(
-        "cd ",
-        basedir,
-        " && ",
-        exec,
-        " -a intervals",
-        name,
-        "_for_INRICH.txt",
-        " -m SNPs_map_for_INRICH.txt ",
-        " -g genes_coordinates_for_INRICH.txt",
-        " -t GO_terms_link_for_INRICH.txt",
-        " -o ",
-        name,
-        "_GO_terms",
-        " -i ",
-        i,
-        " -j ",
-        j
+    for (ont in c("CC", "BP", "MF")) {
+      system(
+        paste0(
+          "cd ",
+          basedir,
+          " && ",
+          exec,
+          " -a intervals",
+          name,
+          "_for_INRICH.txt",
+          " -m SNPs_map_for_INRICH.txt ",
+          " -g genes_coordinates_for_INRICH.txt",
+          " -t GO_",
+          ont,
+          "_terms_link_for_INRICH.txt",
+          " -o ",
+          name,
+          "_GO_",
+          ont,
+          "_terms",
+          " -i ",
+          i,
+          " -j ",
+          j
+        )
       )
-    )
+    }
   }
