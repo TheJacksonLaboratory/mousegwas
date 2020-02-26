@@ -11,7 +11,7 @@
 write_inrich_phenotype <- function(snps, basedir, name) {
   # Write the intervals using the minps and maxps columns
   write_delim(
-    snps %>% dplyr::select(chr, minps, maxps),
+    snps[, c("chr", "minps", "maxps")],
     path = paste0(basedir, "/intervals", name, "_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
