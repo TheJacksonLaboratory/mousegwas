@@ -77,8 +77,8 @@ write_genes_map <- function(basedir) {
   gotbl <-
     data.table::data.table(gene = character(0),
            go = character(0))
-  for (i in 1:length(gotrm)) {
-    gotbl <- data.table::rbindlist(list(gotbl, list(names(gotrm)[i],
+  for (i in names(gotrm)) {
+    gotbl <- data.table::rbindlist(list(gotbl, list(i,
                                                     gotrm[[i]])))
   }
 
