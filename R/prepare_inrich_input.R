@@ -104,6 +104,10 @@ write_genes_map <- function(basedir) {
       quote = 3
     )
   }
+
+  # Download MP mammalian phenotypes annotations from MGI:
+  system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MGI_PhenotypicAllele.rpt | awk -F\"\t\" '{split($11, sp, \",\"); for (a in sp) print $10\"\t\"sp[a]}' >", basedir, "/MP_terms_for_INRICH.txt"))
+
   return(genes)
 }
 
@@ -147,6 +151,27 @@ run_inrich <-
         j
       )
     )
+    system(
+      paste0(
+        "cd ",
+        basedir,
+        " && ",
+        exec,
+        " -a intervals",
+        name,
+        "_for_INRICH.txt",
+        " -m SNPs_map_for_INRICH.txt ",
+        " -g genes_coordinates_for_INRICH.txt",
+        " -t MP_terms_for_INRICH.txt",
+        " -o ",
+        name,
+        "_MP_terms",
+        " -i ",
+        i,
+        " -j ",
+        j
+      )
+    )
     for (ont in c("CC", "BP", "MF")) {
       system(
         paste0(
@@ -174,4 +199,5 @@ run_inrich <-
         )
       )
     }
+
   }
