@@ -57,6 +57,8 @@ parser$add_argument("--inrich_j", "-j", type="double", default=200,
                     help="Maximal group size for inrich (-j), default 200")
 parser$add_argument("--drop", type="double", default=2,
                     help="Log p-value drop to include in peak")
+parser$add_argument("--peakdist", type="double", default=1000000,
+                    help="Half the interval width")
 
 args <- parser$parse_args()
 
@@ -489,7 +491,7 @@ for (i in 1:length(lilp)) {
   pp <- lilp[[i]]
   if (sum(pp$gwas$ispeak) == 0)
     next
-  expp <- ext_peak_sing(pp$gwas, maxdist = 250000)
+  expp <- ext_peak_sing(pp$gwas, maxdist = args$peakdist)
   write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, phenos[i])
   run_inrich(
     args$plotdir,
