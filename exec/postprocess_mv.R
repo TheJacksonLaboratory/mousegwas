@@ -330,6 +330,7 @@ for (i in names(lilp)) {
   p$pwas <-
     p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
                            "rs")
+  if (sum(p$pwas$ispeak)==0) next
   p$pwas <-
     p$pwas %>% dplyr::select(-cluster) %>% left_join(filter(p$pwas, ispeak) %>%
                                                        dplyr::select(choose, cluster), by = "choose")
