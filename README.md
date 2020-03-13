@@ -6,6 +6,12 @@ Introduction
 
 This package was built to manage the GWAS analysis of mouse phenotypes. The mice in the study were genotypes using either MDA or UCLA chips and deposited in the mouse phenome database (https://phenome.jax.org/genotypes). 
 
+Installation
+------------
+```bash
+Rscript -e 'library(devtools); install_git("https://bitbucket.jax.org/scm/~peera/gemmawarpper.git")'
+```
+
 Input
 -----
 
@@ -32,5 +38,6 @@ Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))'  -
 ```
 Running the post-process script will be done as follows:
 ```bash
-Rscript -e 'source(file=system.file("exec/postprocess_GWAS.R", package="mousegwas"))' -s 100000 -n example/GroomingPaperPhenoTranslationTable.csv -o GWAS_output -p GWAS_figures
+Rscript -e 'source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -s 100000 -n example/GroomingPaperPhenoTranslationTable.csv -o GWAS_output -p GWAS_figures -c 7 --nomv --pvalthr 5 -inrich ~/bin/inrich
 ```
+Assuming INRICH is installed in `~/bin/inrich`

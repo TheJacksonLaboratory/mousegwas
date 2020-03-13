@@ -70,6 +70,8 @@ parser$add_argument("--lambda_hetero", default=1, type="double",
                     help="lambda_hetero for MetaSoft. Should be obtained from an initial run")
 parser$add_argument("--mvalue_method", default="mcmc",
                     help="Either mcmc (default) or exact if the number of phenotypes is small (<10)")
+parser$add_argument("--MDA", action="store_true", default=FALSE,
+                    help="Use the pre-loaded MDA genotypes files in the package, replaces -g")
 
 args <- parser$parse_args()
 
@@ -130,6 +132,13 @@ if (args$coat_phenotype |args$coat_covar){
 
 longfile <- tempfile()
 complete.geno <- NULL
+if (args$MDA){
+  args$genotypes <- c(system.file("extdata", "snp_190703353330.csv.gz", package = "mousegwas"),
+                      system.file("extdata", "snp_190703530013.csv.gz", package = "mousegwas"),
+                      system.file("extdata", "snp_190703577680.csv.gz", package = "mousegwas"),
+                      system.file("extdata", "snp_190703687397.csv.gz", package = "mousegwas"),
+                      system.file("extdata", "snp_190703843678.csv.gz", package = "mousegwas"))
+}
 for (f in args$genotypes){
   geno <- fread(f)
   geno[, c("major", "minor") := tstrsplit(observed, "/", fixed=TRUE, keep=1:2)]
