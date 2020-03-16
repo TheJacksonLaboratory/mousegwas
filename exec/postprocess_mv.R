@@ -371,8 +371,10 @@ for (g in pnames$Group){
       allpwas <- lilp[[p]]$pwas
       mp = lilp[[p]]$plot
     }else{
-      allpwas$P <- pmax(allpwas$P, lilp[[p]]$pwas$P)
-      allpwas$ispeak <- allpwas$ispeak | lilp[[p]]$pwas$ispeak
+      allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "ispeak")], by="rs", suffix=c("", ".x"))
+      allpwas$P <- pmax(allpwas$P, allpwas$P.x)
+      allpwas$ispeak <- allpwas$ispeak | allpwas$ispeak.x
+      allpwas <- allpwas %>% select(-P.x, -ispeak.x)
     }
 
   }
