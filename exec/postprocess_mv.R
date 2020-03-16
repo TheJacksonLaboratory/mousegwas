@@ -386,7 +386,7 @@ for (g in pnames$Group){
   ggsave(
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", g, ".pdf"),
     plot = pnoname + ggnewscale::new_scale_color() +
-      geom_point(aes(color = p$pwas$cluster), size = 0.9) +
+      geom_point(aes(color = allpwas$cluster), size = 0.9) +
       scale_color_manual(values = ccols) +
       ggnewscale::new_scale_color() +
       geom_point(aes(alpha = allpwas$ispeak), size = 1.2, color = "black") +
