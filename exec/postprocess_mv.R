@@ -84,6 +84,7 @@ phenos <-
   )$V1)
 pnames <- read.csv(args$names, row.names = 2)
 phenos <- as.character(pnames[phenos, "PaperName", drop = T])
+group_phenos <-
 # SNPs annotations
 anno <-
   read_delim(
@@ -361,6 +362,49 @@ for (i in names(lilp)) {
   )
 }
 
+# Plot each group's max P
+for (g in pnames$Group){
+  allpwas = NULL
+  mp = NULL
+  for (p in pnames$PaperName[pnames$Group==g]){
+    if (is.null(allpwas)){
+      allpwas <- lilp[[p]]$pwas
+      mp = lilp[[p]]$plot
+    }else{
+      allpwas$P <- pmax(allpwas$P, lilp[[p]]$pwas$P)
+      allpwas$ispeak <- allpwas$ispeak | lilp[[p]]$pwas$ispeak
+    }
+
+  }
+  allpwas <-
+    allpwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
+                           "rs")
+
+  # Recolor the second layer with the clusters colors
+  pnoname <- mp
+  pnoname$layers <- pnoname$layers[1:2]
+  ggsave(
+    filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", g, ".pdf"),
+    plot = pnoname + ggnewscale::new_scale_color() +
+      geom_point(aes(color = p$pwas$cluster), size = 0.9) +
+      scale_color_manual(values = ccols) +
+      ggnewscale::new_scale_color() +
+      geom_point(aes(alpha = allpwas$ispeak), size = 1.2, color = "black") +
+      scale_alpha_manual(values = c(0, 1)) +
+      ggnewscale::new_scale_color() +
+      geom_point(aes(
+        color = allpwas$cluster, alpha = allpwas$ispeak
+      ), size = 0.9) +
+      scale_color_manual(values = ccols) +
+      scale_alpha_manual(values = c(0, 1)) +
+      theme(text = element_text(size = 10, family = ffam)),
+    device = cairo_pdf,
+    dpi = "print",
+    width = fullw,
+    height = height,
+    units = "in"
+  )
+}
 # Plot the LD drop figure
 comp_LD_2 <-
   function(genotypes,
