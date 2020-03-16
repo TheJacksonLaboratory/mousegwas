@@ -35,5 +35,4 @@ Imports:
   GO.db,
   org.Mm.eg.db,
   AnnotationDbi
-Remotes: git::https://github.com/vqv/ggbiplot
- 
+
