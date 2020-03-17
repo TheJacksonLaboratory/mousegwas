@@ -83,7 +83,6 @@ phenos <-
     skip = 1
   )$V1)
 pnames <- read.csv(args$names, row.names = 2)
-pnames <- left_join(pnames, tibble(Group = unique(pnames$Group), color = grpcol[1:length(unique(pnames$Group))]), by="Group")
 phenos <- as.character(pnames[phenos, "PaperName", drop = T])
 group_phenos <-
 # SNPs annotations
@@ -118,6 +117,7 @@ geno <-
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
+pnames <- left_join(pnames, tibble(Group = unique(pnames$Group), color = grpcol[1:length(unique(pnames$Group))]), by="Group")
 
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
@@ -385,7 +385,7 @@ ggsave(
 )
 
 # Plot each group's max P
-for (g in pnames$Group){
+for (g in unique(pnames$Group)){
   allpwas = NULL
   mp = NULL
   for (p in pnames$PaperName[pnames$Group==g]){
