@@ -83,6 +83,7 @@ phenos <-
     skip = 1
   )$V1)
 pnames <- read.csv(args$names, row.names = 2)
+pnames <- left_join(pnames, tibble(Group = unique(pnames$Group), color = grpcol[1:length(unique(pnames$Group))]), by="Group")
 phenos <- as.character(pnames[phenos, "PaperName", drop = T])
 group_phenos <-
 # SNPs annotations
@@ -361,6 +362,27 @@ for (i in names(lilp)) {
     units = "in"
   )
 }
+
+# Plot all the phenotypes together. Color the peaks according to the groups. Plot the grey ones first then the colors
+pall <- lilp[[names(lilp)[1]]]$plot
+pall$layers <- pall$layers[1]
+for (n in names(lilp)[-1]){
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = lilp[[n]]$pwas, aes(color=as.factor(chr)) , alpha=1, size=0.7) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))
+}
+# Add the peaks
+for (n in names(lilp)){
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = lilp[[n]]$pwas[lilp[[n]]$pwas$ispeak,], color=pnames$color[pnames$PaperName==n], size=0.9)
+}
+ggsave(
+  filename = paste0(args$plotdir, "/replot_Manhattan_all_phenotypes_combined.pdf"),
+  plot = pall + theme(text = element_text(size = 10, family = ffam)),
+  device = cairo_pdf,
+  dpi = "print",
+  width = fullw,
+  height = height,
+  units = "in"
+)
 
 # Plot each group's max P
 for (g in pnames$Group){
