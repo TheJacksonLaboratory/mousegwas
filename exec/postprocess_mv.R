@@ -396,7 +396,7 @@ for (g in unique(pnames$Group)){
       allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "ispeak")], by="rs", suffix=c("", ".x"))
       allpwas$P <- pmax(allpwas$P, allpwas$P.x)
       allpwas$ispeak <- allpwas$ispeak | allpwas$ispeak.x
-      allpwas <- allpwas %>% select(-P.x, -ispeak.x)
+      allpwas <- allpwas %>% dplyr::select(-P.x, -ispeak.x)
     }
 
   }
