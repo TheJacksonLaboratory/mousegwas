@@ -363,28 +363,8 @@ for (i in names(lilp)) {
   )
 }
 
-# Plot all the phenotypes together. Color the peaks according to the groups. Plot the grey ones first then the colors
-pall <- lilp[[names(lilp)[1]]]$plot
-pall$layers <- pall$layers[1]
-for (n in names(lilp)[-1]){
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = lilp[[n]]$pwas, aes(color=as.factor(chr)) , alpha=1, size=0.7) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))
-}
-# Add the peaks
-for (n in names(lilp)){
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = lilp[[n]]$pwas[lilp[[n]]$pwas$ispeak,], color=pnames$color[pnames$PaperName==n], size=0.9)
-}
-ggsave(
-  filename = paste0(args$plotdir, "/replot_Manhattan_all_phenotypes_combined.pdf"),
-  plot = pall + theme(text = element_text(size = 10, family = ffam)),
-  device = cairo_pdf,
-  dpi = "print",
-  width = fullw,
-  height = height,
-  units = "in"
-)
-
 # Plot each group's max P
+grpwas <- list()
 for (g in unique(pnames$Group)){
   allpwas = NULL
   mp = NULL
@@ -393,17 +373,17 @@ for (g in unique(pnames$Group)){
       allpwas <- lilp[[p]]$pwas
       mp = lilp[[p]]$plot
     }else{
-      allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "ispeak")], by="rs", suffix=c("", ".x"))
+      allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "ispeak", "choose")], by="rs", suffix=c("", ".x"))
       allpwas$P <- pmax(allpwas$P, allpwas$P.x)
       allpwas$ispeak <- allpwas$ispeak | allpwas$ispeak.x
-      allpwas <- allpwas %>% dplyr::select(-P.x, -ispeak.x)
+      allpwas$choose <- pmax(allpwas$choose, allpwas$choose.x) # We care about choose>0
+      allpwas <- allpwas %>% dplyr::select(-P.x, -ispeak.x, -choose.x)
     }
-
   }
   allpwas <-
     allpwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
-                           "rs")
-
+                            "rs")
+  grpwas[[g]] <- allpwas
   # Recolor the second layer with the clusters colors
   pnoname <- mp
   pnoname$layers <- pnoname$layers[1:2]
@@ -411,10 +391,10 @@ for (g in unique(pnames$Group)){
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", g, ".pdf"),
     plot = pnoname +
       ggnewscale::new_scale_color() +
-      geom_point(aes(alpha = allpwas$ispeak), size = 1.2, color = "black") +
+      geom_point(data=allpwas, aes(alpha = allpwas$ispeak), size = 1.2, color = "black") +
       scale_alpha_manual(values = c(0, 1)) +
       ggnewscale::new_scale_color() +
-      geom_point(aes(
+      geom_point(data=allpwas, aes(
         color = allpwas$cluster, alpha = allpwas$ispeak
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
@@ -427,6 +407,31 @@ for (g in unique(pnames$Group)){
     units = "in"
   )
 }
+
+# Plot all the phenotypes together. Color the peaks according to the groups. Plot the grey ones first then the colors
+pall <- lilp[[names(lilp)[1]]]$plot
+pall$layers <- pall$layers[1]
+for (n in names(grpwas)){
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]], aes(color=as.factor(chr)) , alpha=1, size=0.7) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))
+}
+# Add the peaks
+for (n in names(grpwas)){
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$choose>0,], color=pnames$color[pnames$Group==n][1], size=0.9)
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color=black, size=1.2)
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color=pnames$color[pnames$Group==n][1], size=0.9)
+}
+ggsave(
+  filename = paste0(args$plotdir, "/replot_Manhattan_all_phenotypes_combined.pdf"),
+  plot = pall + theme(text = element_text(size = 10, family = ffam)),
+  device = cairo_pdf,
+  dpi = "print",
+  width = fullw,
+  height = height,
+  units = "in"
+)
+
+
 # Plot the LD drop figure
 comp_LD_2 <-
   function(genotypes,
