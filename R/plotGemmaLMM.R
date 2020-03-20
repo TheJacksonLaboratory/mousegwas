@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000){
+rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000, test="p_wald"){
   tmat <- base::t(genotypes)
   srt_pv <- gwas_pvs %>% dplyr::select_("rs", test) %>% arrange_(test) %>% mutate(choose = 0, ispeak=FALSE)
   peaknum = 1
@@ -114,7 +114,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   if (!is.null(genotypes)){
     #allgeno <- read.csv(genotypes, header = FALSE, row.names = 1)
     #allgeno <- allgeno[, 3:ncol(allgeno)]
-    pnums <- rep_peaks(genotypes, gwas_results, rs_thr=corrthr, pthr=10^-redthr, mxd=maxdist)
+    pnums <- rep_peaks(genotypes, gwas_results, rs_thr=corrthr, pthr=10^-redthr, mxd=maxdist, test=test)
     gwas_results <- gwas_results %>% left_join(pnums, by="rs")
   }else{
     gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
