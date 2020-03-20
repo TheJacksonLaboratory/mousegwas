@@ -418,7 +418,7 @@ for (n in names(grpwas)){
 # Add the peaks
 for (n in names(grpwas)){
   pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$choose>0,], color=pnames$color[pnames$Group==n][1], size=0.9)
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color=black, size=1.2)
+  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color='black', size=1.2)
   pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color=pnames$color[pnames$Group==n][1], size=0.9)
 }
 ggsave(
