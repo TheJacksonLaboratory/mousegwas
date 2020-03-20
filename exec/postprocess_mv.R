@@ -631,6 +631,63 @@ for (i in 1:length(lilp)) {
   }
 }
 
+# Run each group
+for (n in names(grpwas)) {
+  pp <- grpwas[[n]]
+  if (sum(pp$ispeak) == 0)
+    next
+  expp <- ext_peak_sing(pp, maxdist = args$peakdist)
+  write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, n)
+  run_inrich(
+    args$plotdir,
+    n,
+    exec = args$inrich,
+    i = args$inrich_i,
+    j = args$inrich_j
+  )
+  affgen <-
+    get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
+  if (nrow(affgen) > 0) {
+    # Add the genes to the appropriate cluster
+    write_csv(affgen,
+              path = paste0(args$plotdir, "/genes_for_phenotype_Group_", n, ".csv"))
+    # Run enrichr
+    enrr <-
+      enrichr(unique(affgen$mgi_symbol[!(
+        grepl(pattern = "^Gm", x =  affgen$mgi_symbol) |
+          grepl("Rik$", affgen$mgi_symbol) |
+          affgen$mgi_symbol == ""
+      )]), dbs$libraryName)
+    for (d in dbs$libraryName) {
+      if (length(dim(enrr[[d]])) > 1 && dim(enrr[[d]])[2] > 1) {
+        rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05)
+        if (nrow(rtb) > 0)
+          write_csv((
+            rtb %>% mutate(
+              total.genes = length(affgen$mgi_symbol[!(
+                grepl(pattern = "^Gm", x =  affgen$mgi_symbol) |
+                  grepl("Rik$", affgen$mgi_symbol) |
+                  affgen$mgi_symbol == ""
+              )]),
+              phenotype = n,
+              library = d
+            )
+          ),
+          path = paste0(
+            args$plotdir,
+            "/enrichR_phenotype_Group_",
+            n,
+            "_db_",
+            d,
+            "p005.csv"
+          )
+          )
+
+      }
+    }
+  }
+}
+
 for (k in 1:args$clusters) {
   write_csv(
     data.frame(genes = clustgene[[k]]),
