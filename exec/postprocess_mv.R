@@ -57,9 +57,9 @@ parser$add_argument("--inrich_j", "-j", type="double", default=200,
                     help="Maximal group size for inrich (-j), default 200")
 parser$add_argument("--drop", type="double", default=2,
                     help="Log p-value drop to include in peak")
-parser$add_argument("--peakdist", type="double", default=1000000,
+parser$add_argument("--peakdist", type="integer", default=1000000,
                     help="Half the interval width")
-parser$add_argument("--peakdist", type="integer", default=10000000,
+parser$add_argument("--ldpeakdist", type="integer", default=10000000,
                     help="Peak maximal width")
 parser$add_argument("--peakcorr", type="double", default=0.4,
                     help="SNPs R^2 correlation cutoff for peak determination")
@@ -144,7 +144,7 @@ for (i in 1:length(phenos)) {
       genotypes = geno,
       namethr = args$pvalthr,
       redthr = args$pvalthr,
-      maxdist = args$peakdist,
+      maxdist = args$ldpeakdist,
       corrthr = args$peakcorr,
       annot=annot
     )
@@ -205,7 +205,7 @@ if (!args$nomv) {
         genotypes = geno,
         namethr = args$pvalthr,
         redthr = args$pvalthr,
-        maxdist = args$peakdist,
+        maxdist = args$lgpeakdist,
         corrthr = args$peakcorr,
         test = "p_score",
         annot = annot
@@ -384,7 +384,7 @@ for (g in unique(pnames$Group)){
       allpwas <- allpwas %>% dplyr::select(-P.x, -ispeak.x, -choose.x)
     }
   }
-  pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$peakdist)
+  pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
   allpwas <- allpwas %>% left_join(pnums, by="rs")
   allpwas <-
     allpwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
