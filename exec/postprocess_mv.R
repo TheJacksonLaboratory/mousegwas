@@ -374,7 +374,7 @@ for (g in unique(pnames$Group)){
   mp = NULL
   for (p in pnames$PaperName[pnames$Group==g]){
     if (is.null(allpwas)){
-      allpwas <- lilp[[p]]$pwas %>% select(-ispeak, choose)
+      allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
       mp = lilp[[p]]$plot
     }else{
       allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P")], by="rs", suffix=c("", ".x"))
