@@ -374,14 +374,12 @@ for (g in unique(pnames$Group)){
   mp = NULL
   for (p in pnames$PaperName[pnames$Group==g]){
     if (is.null(allpwas)){
-      allpwas <- lilp[[p]]$pwas
+      allpwas <- lilp[[p]]$pwas %>% select(-ispeak, choose)
       mp = lilp[[p]]$plot
     }else{
-      allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "ispeak", "choose")], by="rs", suffix=c("", ".x"))
+      allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P")], by="rs", suffix=c("", ".x"))
       allpwas$P <- pmax(allpwas$P, allpwas$P.x)
-      allpwas$ispeak <- allpwas$ispeak | allpwas$ispeak.x
-      allpwas$choose <- pmax(allpwas$choose, allpwas$choose.x) # We care about choose>0
-      allpwas <- allpwas %>% dplyr::select(-P.x, -ispeak.x, -choose.x)
+      allpwas <- allpwas %>% dplyr::select(-P.x)
     }
   }
   pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
@@ -397,14 +395,12 @@ for (g in unique(pnames$Group)){
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", g, ".pdf"),
     plot = pnoname +
       ggnewscale::new_scale_color() +
-      geom_point(data=allpwas, aes(alpha = allpwas$ispeak), size = 1.2, color = "black") +
-      scale_alpha_manual(values = c(0, 1)) +
+      geom_point(data=allpwas[allpwas$ispeak,], size = 1.2, color = "black") +
       ggnewscale::new_scale_color() +
-      geom_point(data=allpwas, aes(
-        color = allpwas$cluster, alpha = allpwas$ispeak
+      geom_point(data=allpwas[allpwas$ispeak,], aes(
+        color = allpwas$cluster
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
-      scale_alpha_manual(values = c(0, 1)) +
       theme(text = element_text(size = 10, family = ffam)),
     device = cairo_pdf,
     dpi = "print",
