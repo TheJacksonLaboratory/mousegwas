@@ -398,7 +398,7 @@ for (g in unique(pnames$Group)){
       geom_point(data=allpwas[allpwas$ispeak,], size = 1.2, color = "black") +
       ggnewscale::new_scale_color() +
       geom_point(data=allpwas[allpwas$ispeak,], aes(
-        color = allpwas$cluster
+        color = allpwas$cluster[allpwas$ispeak]
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
       theme(text = element_text(size = 10, family = ffam)),
