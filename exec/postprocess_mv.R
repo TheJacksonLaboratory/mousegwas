@@ -392,7 +392,7 @@ for (g in unique(pnames$Group)){
   pnoname <- mp
   pnoname$layers <- pnoname$layers[1:2]
   ggsave(
-    filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", g, ".pdf"),
+    filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", gsub(" ", "_", g), ".pdf"),
     plot = pnoname +
       ggnewscale::new_scale_color() +
       geom_point(data=allpwas[allpwas$ispeak,], size = 1.2, color = "black") +
@@ -646,7 +646,7 @@ for (n in names(grpwas)) {
   if (nrow(affgen) > 0) {
     # Add the genes to the appropriate cluster
     write_csv(affgen,
-              path = paste0(args$plotdir, "/genes_for_phenotype_Group_", n, ".csv"))
+              path = paste0(args$plotdir, "/genes_for_phenotype_Group_", gsub(" ", "_", n), ".csv"))
     # Run enrichr
     enrr <-
       enrichr(unique(affgen$mgi_symbol[!(
@@ -672,7 +672,7 @@ for (n in names(grpwas)) {
           path = paste0(
             args$plotdir,
             "/enrichR_phenotype_Group_",
-            n,
+            gsub(" ", "_", n),
             "_db_",
             d,
             "p005.csv"

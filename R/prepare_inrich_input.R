@@ -10,6 +10,7 @@
 #' @examples
 write_inrich_phenotype <- function(snps, basedir, name) {
   # Write the intervals using the minps and maxps columns
+  name <- gsub(" ", "_", name)
   write_delim(
     snps[, c("chr", "minps", "maxps")],
     path = paste0(basedir, "/intervals", name, "_for_INRICH.txt"),
@@ -131,6 +132,8 @@ run_inrich <-
            exec = "inrich",
            i = 5,
            j = 200) {
+    # Remove spaces from name
+    name <- gsub(" ", "_", name)
     system(
       paste0(
         "cd ",
