@@ -193,11 +193,48 @@ for (i in 1:length(phenos)) {
 }
 # Plot the groups MAnhattan plots
 grouplist <- c()
-if (!args$nomv) {
+grpwas <- list()
+mp = NULL
+if (args$nomv) {
+  # Plot each group's max P
+  for (g in unique(pnames$Group)){
+    allpwas = NULL
+    for (p in pnames$PaperName[pnames$Group==g]){
+      if (is.null(allpwas)){
+        allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
+        mp = lilp[[p]]$plot
+      }else{
+        allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P")], by="rs", suffix=c("", ".x"))
+        allpwas$P <- pmax(allpwas$P, allpwas$P.x)
+        allpwas <- allpwas %>% dplyr::select(-P.x)
+      }
+    }
+    pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
+    allpwas <- allpwas %>% left_join(pnums, by="rs")
+    pname = g
+    pvalmat <-
+      left_join(pvalmat,
+                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
+                by = "rs")
+    all_ispeak <-
+      left_join(all_ispeak,
+                allpwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs,!!(pname)),
+                by = "rs")
+    all_choose <-
+      left_join(all_choose,
+                allpwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs,!!(pname)),
+                by = "rs")
+
+    allpeaks <- c(allpeaks, allwas$rs[allpwas$ispeak])
+    grpwas[[g]] <- allpwas
+    # Recolor the second layer with the clusters colors
+  }
+}else{
   for (grpf in Sys.glob(paste0(
     args$outdir,
     "/output/lmm_phenotypes_*_all_LOCO.assoc.txt"
   ))) {
+
     pp <-
       plot_gemma_lmm(
         grpf,
@@ -210,8 +247,10 @@ if (!args$nomv) {
         test = "p_score",
         annot = annot
       )
+    if (is.null(mp)) mp <- pp$plot
     pname <-
       gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
+    grpwas[[pname]] = pp$pwas
     grouplist <- c(grouplist, pname)
     allres <-
       read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs,!!(pname))
@@ -367,30 +406,13 @@ for (i in names(lilp)) {
   )
 }
 
-# Plot each group's max P
-grpwas <- list()
-for (g in unique(pnames$Group)){
-  allpwas = NULL
-  mp = NULL
-  for (p in pnames$PaperName[pnames$Group==g]){
-    if (is.null(allpwas)){
-      allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
-      mp = lilp[[p]]$plot
-    }else{
-      allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P")], by="rs", suffix=c("", ".x"))
-      allpwas$P <- pmax(allpwas$P, allpwas$P.x)
-      allpwas <- allpwas %>% dplyr::select(-P.x)
-    }
-  }
-  pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
-  allpwas <- allpwas %>% left_join(pnums, by="rs")
-  allpwas <-
-    allpwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
-                            "rs")
-  grpwas[[g]] <- allpwas
-  # Recolor the second layer with the clusters colors
+
+for (g in names(grpwas)){
   pnoname <- mp
   pnoname$layers <- pnoname$layers[1:2]
+  allpwas <-
+    grpwas[[g]] %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
+                            "rs")
   ggsave(
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", gsub(" ", "_", g), ".pdf"),
     plot = pnoname +
