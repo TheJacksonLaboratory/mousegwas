@@ -200,7 +200,7 @@ if (args$nomv) {
     allpwas = NULL
     plist <- pnames$PaperName[pnames$Group==g]
     if (g=="All Phenotypes") plist <- pnames$PaperName
-    for (p in plist){
+    for (p in intersect(plist, names(lilp))){
       if (is.null(allpwas)){
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
       }else{
