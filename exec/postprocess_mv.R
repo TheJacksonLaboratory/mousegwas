@@ -196,7 +196,7 @@ grouplist <- c()
 grpwas <- list()
 if (args$nomv) {
   # Plot each group's max P
-  for (g in c(unique(pnames$Group), "All Phenotypes")){
+  for (g in c(unique(pnames$Group))){#}, "All Phenotypes")){
     allpwas = NULL
     plist <- pnames$PaperName[pnames$Group==g]
     if (g=="All Phenotypes") plist <- pnames$PaperName
