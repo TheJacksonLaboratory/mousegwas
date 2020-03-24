@@ -72,6 +72,7 @@ write_genes_map <- function(basedir) {
     delim = "\t",
     col_names = FALSE
   )
+  return()
   # Read GO mapping and write it too
   gotrm <- goseq::getgo(genes$ensembl_gene_id, "mm10", "ensGene")
   gotbl <-
@@ -176,6 +177,7 @@ run_inrich <-
         j
       )
     )
+    return()
     for (ont in c("CC", "BP", "MF")) {
       system(
         paste0(
