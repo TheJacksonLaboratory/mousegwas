@@ -212,19 +212,6 @@ if (args$nomv) {
     pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
     allpwas <- allpwas %>% left_join(pnums, by="rs")
     pname = g
-    pvalmat <-
-      left_join(pvalmat,
-                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
-                by = "rs")
-    all_ispeak <-
-      left_join(all_ispeak,
-                allpwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs,!!(pname)),
-                by = "rs")
-    all_choose <-
-      left_join(all_choose,
-                allpwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs,!!(pname)),
-                by = "rs")
-
     allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
     grpwas[[g]] <- allpwas
     # Recolor the second layer with the clusters colors
@@ -254,18 +241,6 @@ if (args$nomv) {
     grouplist <- c(grouplist, pname)
     allres <-
       read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs,!!(pname))
-    pvalmat <-
-      left_join(pvalmat,
-                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
-                by = "rs")
-    all_ispeak <-
-      left_join(all_ispeak,
-                pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs,!!(pname)),
-                by = "rs")
-    all_choose <-
-      left_join(all_choose,
-                pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs,!!(pname)),
-                by = "rs")
 
     allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
     ggsave(
