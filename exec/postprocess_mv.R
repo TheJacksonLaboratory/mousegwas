@@ -194,15 +194,15 @@ for (i in 1:length(phenos)) {
 # Plot the groups MAnhattan plots
 grouplist <- c()
 grpwas <- list()
-mp = NULL
 if (args$nomv) {
   # Plot each group's max P
-  for (g in unique(pnames$Group)){
+  for (g in c(unique(pnames$Group), "All Phenotypes")){
     allpwas = NULL
-    for (p in pnames$PaperName[pnames$Group==g]){
+    plist <- pnames$PaperName[pnames$Group==g]
+    if (g=="All Phenotypes") plist <- pnames$PaperName
+    for (p in plist){
       if (is.null(allpwas)){
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
-        mp = lilp[[p]]$plot
       }else{
         allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P")], by="rs", suffix=c("", ".x"))
         allpwas$P <- pmax(allpwas$P, allpwas$P.x)
@@ -383,14 +383,31 @@ for (i in names(lilp)) {
 
 
 for (g in names(grpwas)){
-  pnoname <- mp
-  pnoname$layers <- pnoname$layers[1:2]
+  # Add cluster to ispeak
   allpwas <-
     grpwas[[g]] %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
                             "rs")
+  # Expand cluster to all choose
+  allpwas <-
+    allpwas %>% dplyr::select(-cluster) %>% left_join(filter(allpwas, ispeak) %>%
+                                                       dplyr::select(choose, cluster), by = "choose")
+  axisdf <- allpwas %>% group_by(chr) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
+  ymax <- 1.25 * max(allpwas$P, na.rm = TRUE)
+  ymin <- 1.25 * min(allpwas$P, na.rm = TRUE)
+  chr_label <- axisdf$chr
+  chr_label[chr_label==20] = "X"
   ggsave(
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", gsub(" ", "_", g), ".pdf"),
-    plot = pnoname +
+    plot = ggplot2::ggplot(allpwas, aes(x=BPcum, y=P)) +
+
+      # Show all points
+      geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
+      scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +
+      ggnewscale::new_scale_color() +
+      geom_point(data=allpwas, aes(
+        color = allpwas$cluster
+      ), size = 0.9) +
+      scale_color_manual(values = ccols) +
       ggnewscale::new_scale_color() +
       geom_point(data=allpwas[allpwas$ispeak,], size = 1.2, color = "black") +
       ggnewscale::new_scale_color() +
@@ -398,7 +415,19 @@ for (g in names(grpwas)){
         color = allpwas$cluster[allpwas$ispeak]
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
-      theme(text = element_text(size = 10, family = ffam)),
+      scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
+      scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
+      ylim(ymin,ymax) +
+      xlab(name) +
+      ylab("-log(P-value)") +
+      theme_bw() +
+      theme(
+        legend.position="none",
+        text = element_text(size=10, family=ffam),
+        panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank()
+      ),
     device = cairo_pdf,
     dpi = "print",
     width = fullw,
@@ -406,29 +435,6 @@ for (g in names(grpwas)){
     units = "in"
   )
 }
-
-# Plot all the phenotypes together. Color the peaks according to the groups. Plot the grey ones first then the colors
-pall <- lilp[[names(lilp)[1]]]$plot
-pall$layers <- pall$layers[1]
-for (n in names(grpwas)){
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]], aes(color=as.factor(chr)) , alpha=1, size=0.7) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))
-}
-# Add the peaks
-for (n in names(grpwas)){
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$choose>0,], color=pnames$color[pnames$Group==n][1], size=0.9)
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color='black', size=1.2)
-  pall <- pall + ggnewscale::new_scale_color() + geom_point(data = grpwas[[n]][grpwas[[n]]$ispeak,], color=pnames$color[pnames$Group==n][1], size=0.9)
-}
-ggsave(
-  filename = paste0(args$plotdir, "/replot_Manhattan_all_phenotypes_combined.pdf"),
-  plot = pall + theme(text = element_text(size = 10, family = ffam)),
-  device = cairo_pdf,
-  dpi = "print",
-  width = fullw,
-  height = height,
-  units = "in"
-)
 
 
 # Plot the LD drop figure
@@ -627,6 +633,9 @@ for (i in 1:length(lilp)) {
 # Run each group
 for (n in names(grpwas)) {
   pp <- grpwas[[n]]
+  # Change the chromosome to character
+  pp$chr <- as.character(pp$chr)
+  pp$chr[pp$chr=="20"] <- "X"
   if (sum(pp$ispeak) == 0)
     next
   expp <- ext_peak_sing(pp, maxdist = args$peakdist)
