@@ -225,7 +225,7 @@ if (args$nomv) {
                 allpwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs,!!(pname)),
                 by = "rs")
 
-    allpeaks <- c(allpeaks, allwas$rs[allpwas$ispeak])
+    allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
     grpwas[[g]] <- allpwas
     # Recolor the second layer with the clusters colors
   }
