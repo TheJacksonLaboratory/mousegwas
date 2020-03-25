@@ -195,7 +195,7 @@ for (i in 1:length(phenos)) {
 grpwas <- list()
 if (args$nomv) {
   # Plot each group's max P
-  for (g in c(unique(pnames$Group))){#}, "All Phenotypes")){
+  for (g in c(unique(as.character(pnames$Group)), "All Phenotypes")){
     allpwas = NULL
     plist <- pnames$PaperName[pnames$Group==g]
     if (g=="All Phenotypes"){
@@ -364,7 +364,7 @@ ggsave(
 for (i in names(lilp)) {
   p <- lilp[[i]]
   p$pwas <-
-    p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
+    p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster[rowarr])), by =
                            "rs")
   if (sum(p$pwas$ispeak)==0) next
   p$pwas <-
@@ -401,7 +401,7 @@ for (i in names(lilp)) {
 for (g in names(grpwas)){
   # Add cluster to ispeak
   allpwas <-
-    grpwas[[g]] %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster)), by =
+    grpwas[[g]] %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster[rowarr])), by =
                             "rs")
   # Expand cluster to all choose
   allpwas <-
