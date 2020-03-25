@@ -214,7 +214,10 @@ if (args$nomv) {
       print(g)
       next
     }
-    pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
+    allgwas <- allpwas
+    allgwas$chr <- as.character(allgwas$chr)
+    allgwas$chr[allgwas$chr=="20"] <- "X"
+    pnums <- rep_peaks(geno, allgwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
     allpwas <- allpwas %>% left_join(pnums, by="rs")
     pname = g
     allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
