@@ -205,9 +205,10 @@ if (args$nomv) {
       if (is.null(allpwas)){
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
       }else{
-        allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P")], by="rs", suffix=c("", ".x"))
+        allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "p_wald")], by="rs", suffix=c("", ".x"))
         allpwas$P <- pmax(allpwas$P, allpwas$P.x)
-        allpwas <- allpwas %>% dplyr::select(-P.x)
+        allpwas$p_wald <- pmin(allpwas$p_wald, allpwas$p_wald.x)
+        allpwas <- allpwas %>% dplyr::select(-P.x, -p_wald.x)
       }
     }
     if (is.null(allpwas)){
