@@ -434,7 +434,7 @@ for (g in names(grpwas)){
       scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
       scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
       ylim(ymin,ymax) +
-      xlab(name) +
+      xlab(g) +
       ylab("-log(P-value)") +
       theme_bw() +
       theme(
