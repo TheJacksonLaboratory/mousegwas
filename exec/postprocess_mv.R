@@ -407,6 +407,7 @@ for (g in names(grpwas)){
   allpwas <-
     allpwas %>% dplyr::select(-cluster) %>% left_join(filter(allpwas, ispeak) %>%
                                                        dplyr::select(choose, cluster), by = "choose")
+  print(table(allpwas$choose, allpwas$ispeak))
   axisdf <- allpwas %>% group_by(chr) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
   ymax <- 1.25 * max(allpwas$P, na.rm = TRUE)
   ymin <- 1.25 * min(allpwas$P, na.rm = TRUE)
@@ -421,7 +422,7 @@ for (g in names(grpwas)){
       scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +
       ggnewscale::new_scale_color() +
       geom_point(aes(
-        color = allpwas$cluster
+        color = cluster
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
       ggnewscale::new_scale_color() +
