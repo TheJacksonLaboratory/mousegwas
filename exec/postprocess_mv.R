@@ -420,17 +420,20 @@ for (g in names(grpwas)){
       geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
       scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +
       ggnewscale::new_scale_color() +
-      geom_point(data=allpwas, aes(
+      geom_point(aes(
         color = allpwas$cluster
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
       ggnewscale::new_scale_color() +
-      geom_point(data=allpwas[allpwas$ispeak,], size = 1.2, color = "black") +
+      geom_point(aes(alpha=ispeak), size = 1.2, color = "black") +
+      scale_alpha_manual(values=c(0,1)) +
       ggnewscale::new_scale_color() +
-      geom_point(data=allpwas[allpwas$ispeak,], aes(
-        color = allpwas$cluster[allpwas$ispeak]
+      geom_point(aes(
+        color = cluster,
+        alpha = ispeak
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
+      scale_alpha_manual(values=c(0,1)) +
       scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
       scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
       ylim(ymin,ymax) +
