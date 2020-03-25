@@ -49,20 +49,34 @@ parser$add_argument("--nomv",
                     default = FALSE,
                     action = "store_true",
                     help = "Ignore multivariate results and use only single phenotypes")
-parser$add_argument("--inrich", default="inrich",
-                    help="INRICH exe utable and custom parameters, deafult: inrich")
-parser$add_argument("--inrich_i", "-i", type="double", default=5,
-                    help="Minimal group size for inrich (-i), default 5")
-parser$add_argument("--inrich_j", "-j", type="double", default=200,
-                    help="Maximal group size for inrich (-j), default 200")
-parser$add_argument("--drop", type="double", default=2,
-                    help="Log p-value drop to include in peak")
-parser$add_argument("--peakdist", type="integer", default=1000000,
-                    help="Half the interval width")
-parser$add_argument("--ldpeakdist", type="integer", default=10000000,
-                    help="Peak maximal width")
-parser$add_argument("--peakcorr", type="double", default=0.4,
-                    help="SNPs R^2 correlation cutoff for peak determination")
+parser$add_argument("--inrich", default = "inrich",
+                    help = "INRICH exe utable and custom parameters, deafult: inrich")
+parser$add_argument("--inrich_i",
+                    "-i",
+                    type = "double",
+                    default = 5,
+                    help = "Minimal group size for inrich (-i), default 5")
+parser$add_argument("--inrich_j",
+                    "-j",
+                    type = "double",
+                    default = 200,
+                    help = "Maximal group size for inrich (-j), default 200")
+parser$add_argument("--drop",
+                    type = "double",
+                    default = 2,
+                    help = "Log p-value drop to include in peak")
+parser$add_argument("--peakdist",
+                    type = "integer",
+                    default = 1000000,
+                    help = "Half the interval width")
+parser$add_argument("--ldpeakdist",
+                    type = "integer",
+                    default = 10000000,
+                    help = "Peak maximal width")
+parser$add_argument("--peakcorr",
+                    type = "double",
+                    default = 0.4,
+                    help = "SNPs R^2 correlation cutoff for peak determination")
 
 args <- parser$parse_args()
 
@@ -89,8 +103,8 @@ phenos <-
 pnames <- read.csv(args$names, row.names = 2)
 phenos <- as.character(pnames[phenos, "PaperName", drop = T])
 group_phenos <-
-# SNPs annotations
-anno <-
+  # SNPs annotations
+  anno <-
   read_delim(
     paste0(args$outdir, "/annotations.csv"),
     ",",
@@ -115,13 +129,15 @@ geno_t <-
 
 geno <-
   as.matrix(
-    geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr,-bp38,-major,-minor)
+    geno_t %>% column_to_rownames(var = "rs") %>% dplyr::select(-chr, -bp38, -major, -minor)
   )
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
-pnames <- left_join(pnames, tibble(Group = unique(pnames$Group), color = grpcol[1:length(unique(pnames$Group))]), by="Group")
+pnames <-
+  left_join(pnames, tibble(Group = unique(pnames$Group), color = grpcol[1:length(unique(pnames$Group))]), by =
+              "Group")
 
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
@@ -146,30 +162,30 @@ for (i in 1:length(phenos)) {
       redthr = args$pvalthr,
       maxdist = args$ldpeakdist,
       corrthr = args$peakcorr,
-      annot=annot
+      annot = annot
     )
   pname <- phenos[i]
   lilp[[pname]] <- pp
   allsnps <- pp$gwas$rs
   if (is.null(pvalmat)) {
     pvalmat <-
-      pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname))
+      pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname))
     all_ispeak <-
-      pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs,!!(pname))
+      pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs, !!(pname))
     all_choose <-
-      pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs,!!(pname))
+      pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs, !!(pname))
   } else{
     pvalmat <-
       left_join(pvalmat,
-                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
+                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
                 by = "rs")
     all_ispeak <-
       left_join(all_ispeak,
-                pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs,!!(pname)),
+                pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs, !!(pname)),
                 by = "rs")
     all_choose <-
       left_join(all_choose,
-                pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs,!!(pname)),
+                pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs, !!(pname)),
                 by = "rs")
   }
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
@@ -195,44 +211,54 @@ for (i in 1:length(phenos)) {
 grpwas <- list()
 if (args$nomv) {
   # Plot each group's max P
-  for (g in c(unique(as.character(pnames$Group)), "All Phenotypes")){
+  for (g in c(unique(as.character(pnames$Group)), "All Phenotypes")) {
     allpwas = NULL
-    plist <- pnames$PaperName[pnames$Group==g]
-    if (g=="All Phenotypes"){
+    plist <- pnames$PaperName[pnames$Group == g]
+    if (g == "All Phenotypes") {
       plist <- pnames$PaperName
     }
-    for (p in intersect(plist, names(lilp))){
-      if (is.null(allpwas)){
-        allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
-      }else{
-        allpwas <- left_join(allpwas, lilp[[p]]$pwas[, c("rs", "P", "p_wald")], by="rs", suffix=c("", ".x"))
+    for (p in intersect(plist, names(lilp))) {
+      if (is.null(allpwas)) {
+        allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak,-choose)
+      } else{
+        allpwas <-
+          left_join(allpwas,
+                    lilp[[p]]$pwas[, c("rs", "P", "p_wald")],
+                    by = "rs",
+                    suffix = c("", ".x"))
         allpwas$P <- pmax(allpwas$P, allpwas$P.x)
         allpwas$p_wald <- pmin(allpwas$p_wald, allpwas$p_wald.x)
-        allpwas <- allpwas %>% dplyr::select(-P.x, -p_wald.x)
+        allpwas <- allpwas %>% dplyr::select(-P.x,-p_wald.x)
       }
     }
-    if (is.null(allpwas)){
+    if (is.null(allpwas)) {
       print(g)
       next
     }
-    pnums <- rep_peaks(geno, allpwas, rs_thr=args$peakcorr, pthr=10^-args$pvalthr, mxd=args$ldpeakdist)
-    allpwas <- allpwas %>% left_join(pnums, by="rs")
+    pnums <-
+      rep_peaks(
+        geno,
+        allpwas,
+        rs_thr = args$peakcorr,
+        pthr = 10 ^ -args$pvalthr,
+        mxd = args$ldpeakdist
+      )
+    allpwas <- allpwas %>% left_join(pnums, by = "rs")
     pname = g
     allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
     pvalmat <-
       left_join(pvalmat,
-                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
+                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
                 by = "rs")
 
     grpwas[[g]] <- allpwas
     # Recolor the second layer with the clusters colors
   }
-}else{
+} else{
   for (grpf in Sys.glob(paste0(
     args$outdir,
     "/output/lmm_phenotypes_*_all_LOCO.assoc.txt"
   ))) {
-
     pp <-
       plot_gemma_lmm(
         grpf,
@@ -245,7 +271,8 @@ if (args$nomv) {
         test = "p_score",
         annot = annot
       )
-    if (is.null(mp)) mp <- pp$plot
+    if (is.null(mp))
+      mp <- pp$plot
     pname <-
       gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
     grpwas[[pname]] = pp$pwas
@@ -253,7 +280,7 @@ if (args$nomv) {
     allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
     pvalmat <-
       left_join(pvalmat,
-                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
+                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
                 by = "rs")
 
     ggsave(
@@ -291,7 +318,7 @@ for (i in 1:args$cluster) {
   cc <- hclust(dist(pgwas[kk$cluster == i, , drop = F]))
   rowarr <- c(rowarr, row.names(pgwas)[kk$cluster == i][cc$order])
 }
-pgwas <- pgwas[rowarr, ]
+pgwas <- pgwas[rowarr,]
 clustcol <- tibble(cluster = 1:args$clusters, color = ccols)
 colrow <-
   tibble(rs = rownames(pgwas), cluster = kk$cluster[rowarr]) %>% left_join(clustcol, by =
@@ -303,10 +330,10 @@ colcol <-
 colcol <- colcol$color
 # Add the groups to the colors
 for (g in names(grpwas)) {
-  if (g=="All Phenotypes"){
+  if (g == "All Phenotypes") {
     colcol <- c(colcol, "grey")
-  }else{
-    colcol <- c(colcol, grptocol[grepl(g, grptocol$Group), ]$color)
+  } else{
+    colcol <- c(colcol, grptocol[grepl(g, grptocol$Group),]$color)
   }
 }
 cairo_pdf(
@@ -338,8 +365,8 @@ dev.off()
 
 # Plot the PVE estimates with SE
 pvep <-
-  ggplot(PVE, aes(reorder(PaperName,-PVE), PVE, fill = Group)) + geom_bar(color =
-                                                                            "black", stat = "identity") +
+  ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill = Group)) + geom_bar(color =
+                                                                             "black", stat = "identity") +
   scale_fill_manual(values = grpcol) +
   geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
   xlab("Phenotype") +
@@ -367,10 +394,12 @@ for (i in names(lilp)) {
   p$pwas <-
     p$pwas %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster[rowarr])), by =
                            "rs")
-  if (sum(p$pwas$ispeak)==0) next
+  if (sum(p$pwas$ispeak) == 0)
+    next
   p$pwas <-
     p$pwas %>% dplyr::select(-cluster) %>% left_join(filter(p$pwas, ispeak) %>%
-                                                       dplyr::select(choose, cluster), by = "choose")
+                                                       dplyr::select(choose, cluster),
+                                                     by = "choose")
 
   # Recolor the second layer with the clusters colors
   pnoname <- p$plot
@@ -381,11 +410,16 @@ for (i in names(lilp)) {
       geom_point(aes(color = p$pwas$cluster), size = 0.9) +
       scale_color_manual(values = ccols) +
       ggnewscale::new_scale_color() +
-      geom_point(aes(alpha = p$pwas$ispeak), size = 1.2, color = "black") +
+      geom_point(
+        aes(alpha = p$pwas$ispeak),
+        size = 1.2,
+        color = "black"
+      ) +
       scale_alpha_manual(values = c(0, 1)) +
       ggnewscale::new_scale_color() +
       geom_point(aes(
-        color = p$pwas$cluster, alpha = p$pwas$ispeak
+        color = p$pwas$cluster,
+        alpha = p$pwas$ispeak
       ), size = 0.9) +
       scale_color_manual(values = ccols) +
       scale_alpha_manual(values = c(0, 1)) +
@@ -399,52 +433,57 @@ for (i in names(lilp)) {
 }
 
 
-for (g in names(grpwas)){
+for (g in names(grpwas)) {
   # Add cluster to ispeak
   allpwas <-
     grpwas[[g]] %>% left_join(tibble(rs = rownames(pgwas), cluster = as.factor(kk$cluster[rowarr])), by =
-                            "rs")
+                                "rs")
   # Expand cluster to all choose
   allpwas <-
     allpwas %>% dplyr::select(-cluster) %>% left_join(filter(allpwas, ispeak) %>%
-                                                       dplyr::select(choose, cluster), by = "choose")
+                                                        dplyr::select(choose, cluster),
+                                                      by = "choose")
   print(table(allpwas$choose, allpwas$ispeak))
-  axisdf <- allpwas %>% group_by(chr) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
+  axisdf <-
+    allpwas %>% group_by(chr) %>% summarize(center = (max(BPcum) + min(BPcum)) / 2)
   ymax <- 1.25 * max(allpwas$P, na.rm = TRUE)
   ymin <- 1.25 * min(allpwas$P, na.rm = TRUE)
   chr_label <- axisdf$chr
-  chr_label[chr_label==20] = "X"
+  chr_label[chr_label == 20] = "X"
   ggsave(
-    filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", gsub(" ", "_", g), ".pdf"),
-    plot = ggplot2::ggplot(allpwas, aes(x=BPcum, y=P)) +
+    filename = paste0(
+      args$plotdir,
+      "/replot_Manhattan_clusters_",
+      gsub(" ", "_", g),
+      ".pdf"
+    ),
+    plot = ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
       # Show all points
-      geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
-      scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +
+      geom_point(aes(color = as.factor(chr)) , alpha = 1, size = 0.7) +
+      scale_color_manual(values = c(rep(
+        c("#CCCCCC", "#969696"), 10
+      ))) +
       ggnewscale::new_scale_color() +
-      geom_point(aes(
-        color = cluster
-      ), size = 0.9) +
+      geom_point(aes(color = cluster), size = 0.9) +
       scale_color_manual(values = ccols) +
       ggnewscale::new_scale_color() +
-      geom_point(aes(alpha=ispeak), size = 1.2, color = "black") +
-      scale_alpha_manual(values=c(0,1)) +
+      geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
+      scale_alpha_manual(values = c(0, 1)) +
       ggnewscale::new_scale_color() +
-      geom_point(aes(
-        color = cluster,
-        alpha = ispeak
-      ), size = 0.9) +
+      geom_point(aes(color = cluster,
+                     alpha = ispeak), size = 0.9) +
       scale_color_manual(values = ccols) +
-      scale_alpha_manual(values=c(0,1)) +
-      scale_x_continuous( label = chr_label, breaks= axisdf$center ) +
-      scale_y_continuous(expand = c(0, 0) ) +     # remove space between plot area and x axis
-      ylim(ymin,ymax) +
+      scale_alpha_manual(values = c(0, 1)) +
+      scale_x_continuous(label = chr_label, breaks = axisdf$center) +
+      scale_y_continuous(expand = c(0, 0)) +     # remove space between plot area and x axis
+      ylim(ymin, ymax) +
       xlab(g) +
       ylab("-log(P-value)") +
       theme_bw() +
       theme(
-        legend.position="none",
-        text = element_text(size=10, family=ffam),
+        legend.position = "none",
+        text = element_text(size = 10, family = ffam),
         panel.border = element_blank(),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank()
@@ -465,7 +504,7 @@ comp_LD_2 <-
            maxdist = 2500000,
            MAF = 0.1,
            miss = 0.1) {
-    gen <- genotypes %>% filter(chr == c,!is.na(rs)) %>% arrange(bp38)
+    gen <- genotypes %>% filter(chr == c, !is.na(rs)) %>% arrange(bp38)
     gen <-
       gen[(
         rowSums(gen[, 6:ncol(gen)] == 0, na.rm = T) > (dim(gen)[2] - 5) * MAF &
@@ -473,13 +512,13 @@ comp_LD_2 <-
                                                           5) * MAF &
           rowSums(is.na(gen[, 6:ncol(gen)])) < (dim(gen)[2] - 5) *
           miss
-      ), ]
+      ),]
     allcor = NULL
     for (i in 1:(nrow(gen) - 1)) {
       tmat <-
         as.data.frame(base::t(
           gen %>% filter(between(bp38, gen$bp38[i], gen$bp38[i] + maxdist)) %>%
-            dplyr::select(-bp38,-chr,-major,-minor) %>% column_to_rownames(var = "rs")
+            dplyr::select(-bp38, -chr, -major, -minor) %>% column_to_rownames(var = "rs")
         ))
       if (ncol(tmat) < 2)
         next()
@@ -544,23 +583,48 @@ ggsave(
 
 
 # Plot MAF histogram
-#mafdat <- tibble(rs = geno_t$rs, maf = rowSums(geno_t[,-1:-5])/(2*(ncol(geno_t)-5)))
-#mafdat$maf <- pmin(mafdat$maf, 1-mafdat$maf)
-#mafdat <- mafdat %>% filter(rs %in% allsnps)
-#mafp <- ggplot(mafdat, aes(maf, fill=choose==0, color=choose==0)) + geom_histogram(binwidth = 1/(ncol(geno_t)-5)) + xlim(c(0,0.5)) +
-#  scale_color_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
-#  scale_fill_manual(values = RColorBrewer::brewer.pal(12, "Paired")[3:4], name="", labels=c("All","Peak")) +
-#  xlab("MAF") +
-#  theme_bw() + theme(legend.position=c(0.15,0.9),
-#                     panel.border = element_blank(),
-#                     panel.grid.major.x = element_blank(),
-#                     panel.grid.minor.x = element_blank(),
-#                     panel.grid.major.y = element_blank(),
-#                     panel.grid.minor.y = element_blank(),
-#                     text=element_text(size=10, family=ffam)
-#  )
-#ggsave(filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"), plot=mafp,
-#       device=cairo_pdf, dpi="print", width=halfw, height=height, units="in")
+mafdat <-
+  tibble(rs = geno_t$rs, maf = rowSums(geno_t[, -1:-5]) / (2 * (ncol(geno_t) -
+                                                                  5)))
+mafdat$maf <- pmin(mafdat$maf, 1 - mafdat$maf)
+mafdat <- mafdat %>% filter(rs %in% allsnps)
+if ("All Phenotypes" %in% names(grpwas)) {
+  mafdat$choose <- grpwas[["All Phenotypes"]]$choose[mafdat$rs]
+} else{
+  mafdat$choose <- 0
+}
+mafp <-
+  ggplot(mafdat, aes(maf, fill = choose == 0, color = choose == 0)) + geom_histogram(binwidth = 1 /
+                                                                                       (ncol(geno_t) - 5)) + xlim(c(0, 0.5)) +
+  scale_color_manual(
+    values = RColorBrewer::brewer.pal(12, "Paired")[3:4],
+    name = "",
+    labels = c("All", "Peak")
+  ) +
+  scale_fill_manual(
+    values = RColorBrewer::brewer.pal(12, "Paired")[3:4],
+    name = "",
+    labels = c("All", "Peak")
+  ) +
+  xlab("MAF") +
+  theme_bw() + theme(
+    legend.position = c(0.15, 0.9),
+    panel.border = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    text = element_text(size = 10, family = ffam)
+  )
+ggsave(
+  filename = paste0(args$plotdir, "/plot_MAF_hist.pdf"),
+  plot = mafp,
+  device = cairo_pdf,
+  dpi = "print",
+  width = halfw,
+  height = height,
+  units = "in"
+)
 
 
 
@@ -583,14 +647,19 @@ clustgene <- vector(mode = "list", length = args$clusters)
 clustmgi <- vector(mode = "list", length = args$clusters)
 allgenes = c()
 pgc <- tibble(rs = rownames(pgwas), cluster = kk$cluster[rowarr])
-clusterpeaks = tibble(cluster=numeric(0), chr=character(0), minps=numeric(0), maxps=numeric(0))
+clusterpeaks = tibble(
+  cluster = numeric(0),
+  chr = character(0),
+  minps = numeric(0),
+  maxps = numeric(0)
+)
 write_inrich_snps(geno_t, args$plotdir)
 for (i in 1:length(lilp)) {
   pp <- lilp[[i]]
   if (sum(pp$gwas$ispeak) == 0)
     next
   expp <- ext_peak_sing(pp$gwas, maxdist = args$peakdist)
-  write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, phenos[i])
+  write_inrich_phenotype(expp[expp$ispeak == T, ], args$plotdir, phenos[i])
   run_inrich(
     args$plotdir,
     phenos[i],
@@ -598,10 +667,11 @@ for (i in 1:length(lilp)) {
     i = args$inrich_i,
     j = args$inrich_j
   )
-  exppc <- expp %>% dplyr::filter(ispeak) %>% left_join(pgc, by="rs") %>% dplyr::select(cluster, chr, minps, maxps)
+  exppc <-
+    expp %>% dplyr::filter(ispeak) %>% left_join(pgc, by = "rs") %>% dplyr::select(cluster, chr, minps, maxps)
   clusterpeaks <- rbind(clusterpeaks, exppc)
   affgen <-
-    get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
+    get_genes(expp[expp$ispeak == T, ], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
     # Add the genes to the appropriate cluster
     clustp <- left_join(affgen, pgc, by = "rs")
@@ -656,11 +726,11 @@ for (n in names(grpwas)) {
   pp <- grpwas[[n]]
   # Change the chromosome to character
   pp$chr <- as.character(pp$chr)
-  pp$chr[pp$chr=="20"] <- "X"
+  pp$chr[pp$chr == "20"] <- "X"
   if (sum(pp$ispeak) == 0)
     next
   expp <- ext_peak_sing(pp, maxdist = args$peakdist)
-  write_inrich_phenotype(expp[expp$ispeak==T,], args$plotdir, n)
+  write_inrich_phenotype(expp[expp$ispeak == T, ], args$plotdir, n)
   run_inrich(
     args$plotdir,
     n,
@@ -669,11 +739,16 @@ for (n in names(grpwas)) {
     j = args$inrich_j
   )
   affgen <-
-    get_genes(expp[expp$ispeak == T,], dist = 1000, annot = annot)
+    get_genes(expp[expp$ispeak == T, ], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
     # Add the genes to the appropriate cluster
     write_csv(affgen,
-              path = paste0(args$plotdir, "/genes_for_phenotype_Group_", gsub(" ", "_", n), ".csv"))
+              path = paste0(
+                args$plotdir,
+                "/genes_for_phenotype_Group_",
+                gsub(" ", "_", n),
+                ".csv"
+              ))
     # Run enrichr
     enrr <-
       enrichr(unique(affgen$mgi_symbol[!(
@@ -717,7 +792,9 @@ for (k in 1:args$clusters) {
     path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv")
   )
   # Run INRICH
-  write_inrich_phenotype(clusterpeaks %>% filter(cluster==k), args$plotdir, paste0("cluster_",k))
+  write_inrich_phenotype(clusterpeaks %>% filter(cluster == k),
+                         args$plotdir,
+                         paste0("cluster_", k))
   run_inrich(
     args$plotdir,
     paste0("cluster_", k),
