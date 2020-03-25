@@ -192,14 +192,15 @@ for (i in 1:length(phenos)) {
   )
 }
 # Plot the groups MAnhattan plots
-grouplist <- c()
 grpwas <- list()
 if (args$nomv) {
   # Plot each group's max P
   for (g in c(unique(pnames$Group))){#}, "All Phenotypes")){
     allpwas = NULL
     plist <- pnames$PaperName[pnames$Group==g]
-    if (g=="All Phenotypes") plist <- pnames$PaperName
+    if (g=="All Phenotypes"){
+      plist <- pnames$PaperName
+    }
     for (p in intersect(plist, names(lilp))){
       if (is.null(allpwas)){
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak, -choose)
@@ -209,10 +210,19 @@ if (args$nomv) {
         allpwas <- allpwas %>% dplyr::select(-P.x)
       }
     }
+    if (is.null(allpwas)){
+      print(g)
+      next
+    }
     pnums <- rep_peaks(geno, allpwas, pthr=10^-args$pvalthr, rs_thr=args$peakcorr, mxd=args$lgpeakdist)
     allpwas <- allpwas %>% left_join(pnums, by="rs")
     pname = g
     allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
+    pvalmat <-
+      left_join(pvalmat,
+                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
+                by = "rs")
+
     grpwas[[g]] <- allpwas
     # Recolor the second layer with the clusters colors
   }
@@ -238,11 +248,13 @@ if (args$nomv) {
     pname <-
       gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
     grpwas[[pname]] = pp$pwas
-    grouplist <- c(grouplist, pname)
-    allres <-
-      read_delim(grpf, "\t", guess_max = 1000000) %>% mutate(!!(pname) := p_score) %>% dplyr::select(rs,!!(pname))
 
     allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
+    pvalmat <-
+      left_join(pvalmat,
+                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs,!!(pname)),
+                by = "rs")
+
     ggsave(
       filename = paste0(
         args$plotdir,
@@ -289,8 +301,12 @@ colcol <-
   PVE %>% left_join(grptocol) %>% column_to_rownames(var = "PaperName") %>% dplyr::select(color)
 colcol <- colcol$color
 # Add the groups to the colors
-for (g in grouplist) {
-  colcol <- c(colcol, grptocol[grepl(g, grptocol$Group), ]$color)
+for (g in names(grpwas)) {
+  if (g=="All Phenotypes"){
+    colcol <- c(colcol, "grey")
+  }else{
+    colcol <- c(colcol, grptocol[grepl(g, grptocol$Group), ]$color)
+  }
 }
 cairo_pdf(
   paste0(args$plotdir, "/all_peaks_heatmap.pdf"),
