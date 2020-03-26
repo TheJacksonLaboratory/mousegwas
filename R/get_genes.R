@@ -37,7 +37,8 @@ get_genes <- function(snps = NULL,
                 "strand",
                 "start_position",
                 "end_position",
-                "gene_biotype"
+                "gene_biotype",
+                "goslim_goa_accession"
               ),
               mart = ensembl
             ))

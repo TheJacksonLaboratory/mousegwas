@@ -443,7 +443,6 @@ for (g in names(grpwas)) {
     allpwas %>% dplyr::select(-cluster) %>% left_join(filter(allpwas, ispeak) %>%
                                                         dplyr::select(choose, cluster),
                                                       by = "choose")
-  print(table(allpwas$choose, allpwas$ispeak))
   axisdf <-
     allpwas %>% group_by(chr) %>% summarize(center = (max(BPcum) + min(BPcum)) / 2)
   ymax <- 1.25 * max(allpwas$P, na.rm = TRUE)
@@ -589,7 +588,7 @@ mafdat <-
 mafdat$maf <- pmin(mafdat$maf, 1 - mafdat$maf)
 mafdat <- mafdat %>% filter(rs %in% allsnps)
 if ("All Phenotypes" %in% names(grpwas)) {
-  mafdat$choose <- grpwas[["All Phenotypes"]]$choose[mafdat$rs]
+  mafdat$choose <- grpwas[["All Phenotypes"]][grpwas[["All Phenotypes"]]$rs==mafdat$rs, "choose"]
 } else{
   mafdat$choose <- 0
 }

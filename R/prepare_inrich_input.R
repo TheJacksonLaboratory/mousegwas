@@ -50,13 +50,13 @@ write_genes_map <- function(basedir) {
   # Write the genes map chr, staret, stop, ID, desc (mgi_symbol)
   genes <- get_genes()
   write_delim(
-    genes %>% dplyr::select(
+    unique(genes %>% dplyr::select(
       chromosome_name,
       start_position,
       end_position,
       ensembl_gene_id,
       mgi_symbol
-    ),
+    )),
     path = paste0(basedir, "/genes_coordinates_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
@@ -72,33 +72,25 @@ write_genes_map <- function(basedir) {
     delim = "\t",
     col_names = FALSE
   )
-  return()
   # Read GO mapping and write it too
-  gotrm <- goseq::getgo(genes$ensembl_gene_id, "mm10", "ensGene")
-  gotbl <-
-    data.table::data.table(gene = character(0),
-           go = character(0))
-  for (i in names(gotrm)) {
-    gotbl <- data.table::rbindlist(list(gotbl, list(i,
-                                                    gotrm[[i]])))
-  }
+  gotbl <- genes %>% select(ensembl_gene_id, goslim_goa_accession)
 
   # Get the descriptions
   gotbl <- gotbl[!is.na(gotbl$go),]
   dectbl <-
-    data.table::data.table(
-      go = unique(gotbl$go),
-      ont = sapply(unique(gotbl$go), function(x) {
+    tibble(
+      goslim_goa_accession = unique(gotbl$goslim_goa_accession),
+      ont = sapply(unique(gotbl$goslim_goa_accession), function(x) {
         GO.db::GOTERM[[x]]@Ontology
       }),
-      desc = sapply(unique(gotbl$go), function(x) {
+      desc = sapply(unique(gotbl$goslim_goa_accession), function(x) {
         paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
       })
     )
-  gotbl <- data.table::merge.data.table(gotbl, dectbl, by = "go")
+  gotbl <- join_left(gotbl, dectbl, by = "goslim_goa_accession")
   for (ont in c("CC", "BP", "MF")) {
     write.table(
-      as.data.frame(gotbl)[gotbl$ont == ont, c("gene", "go", "desc")],
+      as.data.frame(gotbl)[gotbl$ont == ont, c("ensembl_gene_id", "goslim_goa_accession", "desc")],
       file = paste0(basedir, "/GO_", ont, "_terms_link_for_INRICH.txt"),
       sep = "\t",
       col.names = F,
@@ -111,7 +103,7 @@ write_genes_map <- function(basedir) {
   system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MGI_PhenotypicAllele.rpt | awk -F\"\t\" '{split($11, sp, \",\"); for (a in sp) print $10\"\t\"sp[a]}' |grep ENS | sort -k2> tmp1"))
   system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MP_EMAPA.rpt | cut -f 1,2 | tr \" \" \"-\" | sort -k1 | join -1 2 -2 1 tmp1 - | awk '{print $2\"\t\"$1\"\t\"$3}' >", basedir, "/MP_terms_for_INRICH.txt && rm tmp1"))
 
-  return(genes)
+  return(unique(genes %>% select(-goslim_goa_accession)))
 }
 
 
@@ -177,7 +169,6 @@ run_inrich <-
         j
       )
     )
-    return()
     for (ont in c("CC", "BP", "MF")) {
       system(
         paste0(
