@@ -586,7 +586,7 @@ if ("All Phenotypes" %in% names(grpwas)) {
   mafdat$choose <- 0
 }
 mafp <-
-  ggplot(mafdat, aes(maf, fill = (choose == 0), color = (choose == 0))) + geom_histogram(binwidth = 1 /
+  ggplot(mafdat, aes(maf, fill = (choose > 0), color = (choose > 0))) + geom_histogram(binwidth = 1 /
                                                                                        (ncol(geno_t) - 5)) + xlim(c(0, 0.5)) +
   scale_color_manual(
     values = RColorBrewer::brewer.pal(12, "Paired")[3:4],
