@@ -588,7 +588,7 @@ mafdat <-
 mafdat$maf <- pmin(mafdat$maf, 1 - mafdat$maf)
 mafdat <- mafdat %>% filter(rs %in% allsnps)
 if ("All Phenotypes" %in% names(grpwas)) {
-  mafdat <- left_join(mafdat, grpwas[["All Phenotypes"]] %>% select(rs, choose), by = "rs")
+  mafdat <- left_join(mafdat, grpwas[["All Phenotypes"]] %>% dplyr::select(rs, choose), by = "rs")
 } else{
   mafdat$choose <- 0
 }
