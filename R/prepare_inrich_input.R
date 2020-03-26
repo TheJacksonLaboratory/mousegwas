@@ -87,7 +87,7 @@ write_genes_map <- function(basedir) {
         paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
       })
     )
-  gotbl <- join_left(gotbl, dectbl, by = "goslim_goa_accession")
+  gotbl <- left_join(gotbl, dectbl, by = "goslim_goa_accession")
   for (ont in c("CC", "BP", "MF")) {
     write.table(
       as.data.frame(gotbl)[gotbl$ont == ont, c("ensembl_gene_id", "goslim_goa_accession", "desc")],
