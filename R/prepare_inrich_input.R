@@ -73,7 +73,7 @@ write_genes_map <- function(basedir) {
     col_names = FALSE
   )
   # Read GO mapping and write it too
-  gotbl <- genes %>% select(ensembl_gene_id, goslim_goa_accession)
+  gotbl <- genes %>% dplyr::select(ensembl_gene_id, goslim_goa_accession)
 
   # Get the descriptions
   gotbl <- gotbl[!is.na(gotbl$go),]
@@ -103,7 +103,7 @@ write_genes_map <- function(basedir) {
   system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MGI_PhenotypicAllele.rpt | awk -F\"\t\" '{split($11, sp, \",\"); for (a in sp) print $10\"\t\"sp[a]}' |grep ENS | sort -k2> tmp1"))
   system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MP_EMAPA.rpt | cut -f 1,2 | tr \" \" \"-\" | sort -k1 | join -1 2 -2 1 tmp1 - | awk '{print $2\"\t\"$1\"\t\"$3}' >", basedir, "/MP_terms_for_INRICH.txt && rm tmp1"))
 
-  return(unique(genes %>% select(-goslim_goa_accession)))
+  return(unique(genes %>% dplyr::select(-goslim_goa_accession)))
 }
 
 
