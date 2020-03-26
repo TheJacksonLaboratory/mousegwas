@@ -75,7 +75,7 @@ parser$add_argument("--ldpeakdist",
                     help = "Peak maximal width")
 parser$add_argument("--peakcorr",
                     type = "double",
-                    default = 0.4,
+                    default = 0.25,
                     help = "SNPs R^2 correlation cutoff for peak determination")
 
 args <- parser$parse_args()
@@ -246,10 +246,10 @@ if (args$nomv) {
     allpwas <- allpwas %>% left_join(pnums, by = "rs")
     pname = g
     allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
-    pvalmat <-
-      left_join(pvalmat,
-                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
-                by = "rs")
+#   pvalmat <-
+#      left_join(pvalmat,
+#                allpwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
+#                by = "rs")
 
     grpwas[[g]] <- allpwas
     # Recolor the second layer with the clusters colors
@@ -633,12 +633,12 @@ dbs <- listEnrichrDbs()
 
 # Expand each peak to include the entire peak, not just the single SNP
 ext_peak_sing <- function(snps, maxdist = 500000) {
-  #csum <-
-  #  snps %>% group_by(choose) %>% mutate(maxP = max(P)) %>% filter(P >= maxP - args$drop) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-  #snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
-  #                                                                  maxdist),
-  #                                                   minps = pmax(minps, ps - maxdist))
-  snps %>% mutate(minps = ps - maxdist, maxps = ps + maxdist)
+  csum <-
+    snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
+                                                                    maxdist),
+                                                     minps = pmax(minps, ps - maxdist))
+  #snps %>% mutate(minps = ps - maxdist, maxps = ps + maxdist)
 }
 
 # This tibble will accumulate all the genes for each cluster (ID and name)

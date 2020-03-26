@@ -28,7 +28,8 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
       while (changed){
         cvec <- cor(tmat[,rsset], subt)
         rel_rs <- colnames(cvec)[colSums(cvec^2 >= rs_thr, na.rm = T)>=1]
-        if (length(setdiff(rel_rs, rsset)) == 0) changed = F
+        #if (length(setdiff(rel_rs, rsset)) == 0) changed = F
+        changed = F
         rsset <- c(rsset, rel_rs)
       }
       srt_pv[srt_pv$rs %in% rsset & srt_pv$choose==0, "choose"] = peaknum
