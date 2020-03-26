@@ -328,14 +328,7 @@ grptocol <-
 colcol <-
   PVE %>% left_join(grptocol) %>% column_to_rownames(var = "PaperName") %>% dplyr::select(color)
 colcol <- colcol$color
-# Add the groups to the colors
-for (g in names(grpwas)) {
-  if (g == "All Phenotypes") {
-    colcol <- c(colcol, "grey")
-  } else{
-    colcol <- c(colcol, grptocol[grepl(g, grptocol$Group),]$color)
-  }
-}
+
 cairo_pdf(
   paste0(args$plotdir, "/all_peaks_heatmap.pdf"),
   width = fullw,
