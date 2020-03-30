@@ -600,7 +600,7 @@ mafp <-
   ) +
   xlab("MAF") +
   theme_bw() + theme(
-    legend.position = c(0.65, 0.9),
+    legend.position = c(0.8, 0.9),
     panel.border = element_blank(),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank(),
