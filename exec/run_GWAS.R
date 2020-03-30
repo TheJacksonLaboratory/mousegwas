@@ -87,8 +87,19 @@ print(paste0("Working directory: ", args$basedir))
 # Read the input table
 complete_table <- read_csv(args$input, col_names=TRUE)
 
-# Generate a list of phenotypes
-pheno_names <- intersect(yamin$phenotypes, names(complete_table))
+# Generate a list of phenotypes and list of groups
+phegroups <- list()
+pheno_names <- c()
+i = 1
+for (n in names(yamin$phenotypes)){
+  if (n %in% names(complete_table)){
+    pheno_names <- c(pheno_names, n)
+    if ("group" %in% names(yamin$phenotypes[[n]]))
+      phegroups[[yamin$phenotypes[[n]]$group]] <- c(phegroups[[yamin$phenotypes[[n]]$group]], i)
+    i <- i+1
+  }
+}
+#pheno_names <- intersect(yamin$phenotypes, names(complete_table))
 # A list of covariates
 covar_names <- setdiff(intersect(yamin$covar, names(complete_table)), pheno_names)
 

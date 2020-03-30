@@ -17,6 +17,7 @@ library(viridis)
 library(gplots)
 library(argparse)
 library(enrichR)
+library(yaml)
 library(mousegwas)
 
 parser <- ArgumentParser()
@@ -27,6 +28,8 @@ parser$add_argument("--outdir", "-o",
                     help = "run_GEMMA.R output dir")
 parser$add_argument("--plotdir", "-p", default = ".",
                     help = "Where to put the plots")
+parser$add_argument("-y", "--yaml",
+                    help="Yaml file which includes the groups under phenotypes")
 parser$add_argument("--clusters",
                     '-c',
                     default = 7,
@@ -39,8 +42,6 @@ parser$add_argument("--sample",
                     type = "integer",
                     default = 10000,
                     help = "Number of SNPs to sample for the LD plotting")
-parser$add_argument("--names", "-n",
-                    help = "Translation of the phenotypes to paper names. The csv file should have the columns Group, OriginalName, PaperName")
 parser$add_argument("--pvalthr",
                     default = 5,
                     type = "double",
@@ -100,7 +101,23 @@ phenos <-
     header = FALSE,
     skip = 1
   )$V1)
-pnames <- read.csv(args$names, row.names = 2)
+#pnames <- read.csv(args$names, row.names = 2)
+pnames <- data.frame(PaperName = character(0), Group = character(0))
+yamin <- yaml.load_file(args$yaml)
+pheno_names <- c()
+for (n in names(yamin$phenotypes)) {
+  pheno_names <- c(pheno_names, n)
+  pnames <-
+    rbind(
+      pnames,
+      list(
+        Group = yamin$phenotypes[[n]]$group,
+        PaperName = yamin$phenotypes[[n]]$papername
+      )
+    )
+}
+row.names(pnames) <- pheno_names
+
 phenos <- as.character(pnames[phenos, "PaperName", drop = T])
 group_phenos <-
   # SNPs annotations
