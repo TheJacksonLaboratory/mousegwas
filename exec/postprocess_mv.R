@@ -365,6 +365,8 @@ heatmap.2(
   labRow = NA,
   hclustfun = function(x)
     hclust(x, method = "average"),
+  distfun = function(x)
+    dist(scale(x)),
   margins = c(12, 8),
   srtCol = 45,
   key = T,
