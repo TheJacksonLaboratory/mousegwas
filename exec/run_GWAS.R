@@ -328,7 +328,7 @@ if (args$method == "GEMMA"){
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
                               b$covars, args$basedir, loco=!args$noloco,
-                              groups = yamin$groups, runmetasoft=args$runmetasoft, metasoft_args = metasoft_args)
+                              groups = phegroups, runmetasoft=args$runmetasoft, metasoft_args = metasoft_args)
   # Run no LOCO to get the unified heritability for each phenotype
   if (!args$noloco){
     all_res <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
