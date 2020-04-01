@@ -102,7 +102,7 @@ phenos <-
     skip = 1
   )$V1)
 #pnames <- read.csv(args$names, row.names = 2)
-pnames <- data.frame(PaperName = character(0), Group = character(0))
+pnames <- data.frame(PaperName = character(0), Group = character(0), stringsAsFactors = FALSE)
 yamin <- yaml.load_file(args$yaml)
 pheno_names <- c()
 for (n in names(yamin$phenotypes)) {
@@ -110,9 +110,9 @@ for (n in names(yamin$phenotypes)) {
   pnames <-
     rbind(
       pnames,
-      list(
+      data.frame(
         Group = yamin$phenotypes[[n]]$group,
-        PaperName = yamin$phenotypes[[n]]$papername
+        PaperName = yamin$phenotypes[[n]]$papername, stringsAsFactors = FALSE
       )
     )
 }
@@ -167,8 +167,7 @@ annot <- write_genes_map(args$plotdir)
 lilp <- vector("list", 0)
 allpeaks <- NULL
 allsnps <- NULL
-all_ispeak <- NULL
-all_choose <- NULL
+
 for (i in 1:length(phenos)) {
   pp <-
     plot_gemma_lmm(
@@ -187,22 +186,10 @@ for (i in 1:length(phenos)) {
   if (is.null(pvalmat)) {
     pvalmat <-
       pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname))
-    all_ispeak <-
-      pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs, !!(pname))
-    all_choose <-
-      pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs, !!(pname))
   } else{
     pvalmat <-
       left_join(pvalmat,
                 pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
-                by = "rs")
-    all_ispeak <-
-      left_join(all_ispeak,
-                pp$gwas %>% mutate(!!(pname) := ispeak) %>% dplyr::select(rs, !!(pname)),
-                by = "rs")
-    all_choose <-
-      left_join(all_choose,
-                pp$gwas %>% mutate(!!(pname) := choose) %>% dplyr::select(rs, !!(pname)),
                 by = "rs")
   }
   allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
