@@ -153,7 +153,7 @@ PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
 pnames <-
-  left_join(pnames, tibble(Group = unique(pnames$Group), color = grpcol[1:length(unique(pnames$Group))]), by =
+  left_join(pnames, tibble(Group = yamin$groups, color = grpcol[1:length(yamin$groups)]), by =
               "Group")
 
 # We're all set
@@ -328,7 +328,7 @@ colrow <-
   tibble(rs = rownames(pgwas), cluster = kk$cluster[rowarr]) %>% left_join(clustcol, by =
                                                                              "cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 grptocol <-
-  tibble(Group = unique(PVE$Group), color = grpcol[1:length(unique(PVE$Group))])
+  tibble(Group = yamin$groups, color = grpcol[1:length(yamin$groups)])
 colcol <-
   PVE %>% left_join(grptocol) %>% column_to_rownames(var = "PaperName") %>% dplyr::select(color)
 colcol <- colcol$color
@@ -366,7 +366,7 @@ dev.off()
 pvep <-
   ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill = Group)) + geom_bar(color =
                                                                              "black", stat = "identity") +
-  scale_fill_manual(values = grpcol) +
+  scale_fill_manual(values = grpcol, labels=yamin$groups) +
   geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
   xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(
