@@ -280,7 +280,7 @@ for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]) | phenos[,c]==0)) phenos <-
 
 if (args$shuffle){
   set.seed(args$seed)
-  phenos <- phenos[sample(nrow(phenos)),]
+  phenos <- phenos[sample(nrow(phenos)),, drop=F]
 }
 
 # Take the betas of each strain and use it to run GEMMA
