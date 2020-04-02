@@ -252,9 +252,10 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
                     " && cat output/lmm*allpheno.assoc.txt |head -1 > output/all_lmm_LOCO_associations.assoc.txt",
                     " && cat output/lmm*allpheno.assoc.txt |grep -i -v beta >> output/all_lmm_LOCO_associations.assoc.txt"))
     }
-
-    system(paste0("cd ", basedir,
-                  " && cat output/lmm*allpheno.assoc.pasted.txt > output/all_lmm_LOCO_associations.assoc.pasted.txt"))
+    if (length(outfiles)>1){
+      system(paste0("cd ", basedir,
+                    " && cat output/lmm*allpheno.assoc.pasted.txt > output/all_lmm_LOCO_associations.assoc.pasted.txt"))
+    }
     for (i in names(groups)){
       system(paste0("cd ", basedir,
                     " && cat output/lmm*_phenotypes_", i, ".assoc.txt |head -1 > output/lmm_phenotypes_", i, "_all_LOCO.assoc.txt",
