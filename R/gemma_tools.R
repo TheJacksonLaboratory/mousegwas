@@ -144,6 +144,7 @@ combine_metaSOFT <- function(basedir, infiles, midfile, outfile, runit = FALSE, 
 #' @examples
 execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = NULL, loco=TRUE, runmetasoft=FALSE, metasoft_args=""){
   exec <- get_gemma(basedir)
+  dir.create(paste0(basedir, "/output"), recursive = TRUE, showWarnings = FALSE)
   # Write files to disk
   anotfile <- paste0(basedir, "/annotations.csv")
   fwrite(annot, anotfile, col.names = FALSE, na = "NA", sep=",")
