@@ -223,7 +223,7 @@ if (args$nomv) {
     }
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
-        allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak,-choose)
+        allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak,-choose, -rsq)
       } else{
         allpwas <-
           left_join(allpwas,
