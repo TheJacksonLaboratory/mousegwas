@@ -119,9 +119,9 @@ for (n in names(yamin$phenotypes)) {
 row.names(pnames) <- pheno_names
 
 phenos <- as.character(pnames[phenos, "PaperName", drop = T])
-group_phenos <-
-  # SNPs annotations
-  anno <-
+
+# SNPs annotations
+anno <-
   read_delim(
     paste0(args$outdir, "/annotations.csv"),
     ",",
@@ -363,10 +363,11 @@ dev.off()
 
 
 # Plot the PVE estimates with SE
+names(grpcol) <- yamin$groups
 pvep <-
   ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill = Group)) + geom_bar(color =
                                                                              "black", stat = "identity") +
-  scale_fill_manual(values = grpcol, labels=yamin$groups) +
+  scale_fill_manual(values = grpcol) +
   geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
   xlab("Phenotype") +
   theme_bw() + theme(axis.text.x = element_text(
@@ -406,8 +407,10 @@ for (i in names(lilp)) {
   ggsave(
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", i, ".pdf"),
     plot = pnoname + ggnewscale::new_scale_color() +
-      geom_point(aes(color = p$pwas$cluster), size = 0.9) +
+      geom_point(aes(color = p$pwas$cluster, size=P, alpha=rsq)) +
       scale_color_manual(values = ccols) +
+      scale_size_continuous(range=c(0.1,0.7), trans = "sqrt") +
+      scale_alpha_continuous(range = c(0.2,1)) +
       ggnewscale::new_scale_color() +
       geom_point(
         aes(alpha = p$pwas$ispeak),
@@ -458,13 +461,16 @@ for (g in names(grpwas)) {
     plot = ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
       # Show all points
-      geom_point(aes(color = as.factor(chr)) , alpha = 1, size = 0.7) +
+      geom_point(aes(color = as.factor(chr), size=P) , alpha = 1, size = 0.7) +
       scale_color_manual(values = c(rep(
         c("#CCCCCC", "#969696"), 10
       ))) +
+      scale_size_continuous(range=c(0.1,0.7), trans = "sqrt") +
       ggnewscale::new_scale_color() +
-      geom_point(aes(color = cluster), size = 0.9) +
+      geom_point(aes(color = cluster, size=P, alpha=rsq)) +
       scale_color_manual(values = ccols) +
+      scale_size_continuous(range=c(0.1,0.7), trans = "sqrt") +
+      scale_alpha_continuous(range = c(0.2,1)) +
       ggnewscale::new_scale_color() +
       geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
       scale_alpha_manual(values = c(0, 1)) +

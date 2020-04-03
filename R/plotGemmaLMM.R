@@ -28,6 +28,7 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
       while (changed){
         cvec <- cor(tmat[,rsset], subt)
         rel_rs <- colnames(cvec)[colSums(cvec^2 >= rs_thr, na.rm = T)>=1]
+        srt_pv[rel_rs, "rsq"] <- cvec[1,]^2
         #if (length(setdiff(rel_rs, rsset)) == 0) changed = F
         changed = F
         rsset <- c(rsset, rel_rs)
@@ -38,7 +39,7 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
     srt_pv[nr, "ispeak"] = TRUE
     peaknum = peaknum + 1
   }
-  return(srt_pv %>% dplyr::select(rs, choose, ispeak))
+  return(srt_pv %>% dplyr::select(rs, choose, ispeak, rsq))
 }
 
 #' Plot the GWAS results as a Manhattan plot and highlight specific genes
@@ -118,7 +119,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
     pnums <- rep_peaks(genotypes, gwas_results, rs_thr=corrthr, pthr=10^-redthr, mxd=maxdist, test=test)
     gwas_results <- gwas_results %>% left_join(pnums, by="rs")
   }else{
-    gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE)
+    gwas_results <- gwas_results %>% mutate(choose=0, ispeak=FALSE, rsq=0)
   }
   gwas_results <- gwas_results %>% mutate_("P" = paste0("-log10(",test,")"))
   ret_gwas <- gwas_results
@@ -167,8 +168,9 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point(aes(color=as.factor(chr)) , alpha=1, size=0.7) +
-    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10)))
+    geom_point(aes(color=as.factor(chr), size=P) , alpha=1) +
+    scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +
+    scale_size_continuous(range=c(0.1,0.7), trans = "sqrt")
 
   if (sum(don$ispeak) > 0){
     # Plot peaks in color
