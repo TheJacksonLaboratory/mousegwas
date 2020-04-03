@@ -14,6 +14,7 @@
 rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000, test="p_wald"){
   tmat <- base::t(genotypes)
   srt_pv <- gwas_pvs %>% dplyr::select_("rs", test) %>% arrange_(test) %>% mutate(choose = 0, ispeak=FALSE)
+  rssq <- tibble(rs=character(0), rsq=numeric(0))
   peaknum = 1
   while (any(srt_pv$choose[srt_pv[,test,drop=T] <= pthr] == 0)){
     nr <- which(srt_pv$choose == 0 & srt_pv[,test,drop=T] <= pthr)[1]
@@ -28,7 +29,10 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
       while (changed){
         cvec <- cor(tmat[,rsset], subt)
         rel_rs <- colnames(cvec)[colSums(cvec^2 >= rs_thr, na.rm = T)>=1]
-        srt_pv[rel_rs, "rsq"] <- cvec[1,]^2
+        if (length(rel_rs)>0){
+          rssq <- rbind(rssq, tibble(rs=rel_rs, rsq=cvec[1,rel_rs]^2))
+          #srt_pv$rsq[[rel_rs, "rsq"] <- cvec[1,rel_rs]^2
+        }
         #if (length(setdiff(rel_rs, rsset)) == 0) changed = F
         changed = F
         rsset <- c(rsset, rel_rs)
@@ -39,6 +43,8 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
     srt_pv[nr, "ispeak"] = TRUE
     peaknum = peaknum + 1
   }
+  srt_pv <- left_join(srt_pv, rssq, by="rs") %>% replace_na(list(rsq=0))
+
   return(srt_pv %>% dplyr::select(rs, choose, ispeak, rsq))
 }
 
