@@ -411,13 +411,13 @@ for (i in names(lilp)) {
       scale_color_manual(values = ccols) +
       scale_size_continuous(range=c(0.1,0.7), trans = "sqrt") +
       scale_alpha_continuous(range = c(0,1), trans="log") +
-      ggnewscale::new_scale_color() +
+      ggnewscale::new_scale_color() + ggnewscale::new_scale("alpha") +
       geom_point(
         aes(alpha = p$pwas$ispeak),
         size = 1.2,
         color = "black"
       ) +
-      scale_alpha_manual(values = c(0, 1)) +
+      scale_alpha_manual(values = c(0, 1)) + ggnewscale::new_scale("alpha") +
       ggnewscale::new_scale_color() +
       geom_point(aes(
         color = p$pwas$cluster,
@@ -471,10 +471,10 @@ for (g in names(grpwas)) {
       scale_color_manual(values = ccols) +
       scale_size_continuous(range=c(0.1,0.7), trans = "sqrt") +
       scale_alpha_continuous(range = c(0,1), trans="log") +
-      ggnewscale::new_scale_color() +
+      ggnewscale::new_scale_color() + ggnewscale::new_scale("alpha") +
       geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
       scale_alpha_manual(values = c(0, 1)) +
-      ggnewscale::new_scale_color() +
+      ggnewscale::new_scale_color() + ggnewscale::new_scale("alpha") +
       geom_point(aes(color = cluster,
                      alpha = ispeak), size = 0.9) +
       scale_color_manual(values = ccols) +
