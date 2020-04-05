@@ -43,6 +43,7 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
     srt_pv[nr, "ispeak"] = TRUE
     peaknum = peaknum + 1
   }
+  rssq <- rssq %>% group_by(rs) %>% summarize(rsq=max(rsq)) %>% ungroup()
   srt_pv <- left_join(srt_pv, rssq, by="rs") %>% tidyr::replace_na(list(rsq=0))
 
   return(srt_pv %>% dplyr::select(rs, choose, ispeak, rsq))

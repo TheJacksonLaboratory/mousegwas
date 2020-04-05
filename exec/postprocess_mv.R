@@ -234,7 +234,6 @@ if (args$nomv) {
         allpwas$p_wald <- pmin(allpwas$p_wald, allpwas$p_wald.x)
         allpwas <- allpwas %>% dplyr::select(-P.x,-p_wald.x)
       }
-      print(head(allpwas))
     }
     if (is.null(allpwas)) {
       print(g)
@@ -248,9 +247,7 @@ if (args$nomv) {
         pthr = 10 ^ -args$pvalthr,
         mxd = args$ldpeakdist
       )
-    print(head(pnums))
     allpwas <- allpwas %>% left_join(pnums, by = "rs")
-    print(head(allpwas))
     pname = g
     allpeaks <- c(allpeaks, allpwas$rs[allpwas$ispeak])
 #   pvalmat <-
