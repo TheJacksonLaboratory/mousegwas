@@ -175,7 +175,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   p <- ggplot2::ggplot(don, aes(x=BPcum, y=P)) +
 
     # Show all points
-    geom_point(aes(color=as.factor(chr), size=P) , alpha=1, shape=19) +
+    geom_point(aes(color=as.factor(chr), size=P) , alpha=1) +
     scale_color_manual(values = c(rep(c("#CCCCCC", "#969696"),10))) +
     scale_size_continuous(range=c(0.01,0.7), trans = "exp", limits = c(0,max(don$P))) +
     geom_segment(y = redthr, x=min(don$BPcum)-50000000, xend=max(don$BPcum)+50000000, yend=redthr,color="#FCBBA1" )
