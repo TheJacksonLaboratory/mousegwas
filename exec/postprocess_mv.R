@@ -461,7 +461,7 @@ for (g in names(grpwas)) {
     plot = ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
       # Show all points
-      geom_point(aes(color = as.factor(chr), size=P) , alpha = 1, size = 0.7) +
+      geom_point(aes(color = as.factor(chr), size=P) , alpha = 1) +
       scale_color_manual(values = c(rep(
         c("#CCCCCC", "#969696"), 10
       ))) +
