@@ -468,7 +468,7 @@ for (g in names(grpwas)) {
       scale_size_continuous(range=c(0,1), trans = "exp") +
       geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
       ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-      geom_point(aes(color = cluster, size=P, alpha=rsq)) +
+      geom_point(aes(color = cluster, size=rsq, alpha=rsq)) +
       scale_color_manual(values = ccols) +
       scale_size_continuous(range=c(0,1), trans = "exp") +
       scale_alpha_continuous(range = c(0,1), trans="exp") +
