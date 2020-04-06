@@ -406,7 +406,7 @@ for (i in names(lilp)) {
   pnoname$layers <- pnoname$layers[1:2]
   ggsave(
     filename = paste0(args$plotdir, "/replot_Manhattan_clusters_", i, ".pdf"),
-    plot = pnoname + ggnewscale::new_scale(c("alpha", "color", "size")) +
+    plot = pnoname + ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size") +
       geom_point(aes(color = p$pwas$cluster, size=P, alpha=rsq)) +
       scale_color_manual(values = ccols) +
       scale_size_continuous(range=c(0.1,0.7)) +
@@ -417,7 +417,7 @@ for (i in names(lilp)) {
         size = 1.2,
         color = "black"
       ) +
-      scale_alpha_manual(values = c(0, 1)) + ggnewscale::new_scale(c("alpha", "color", "size")) +
+      scale_alpha_manual(values = c(0, 1)) + ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size") +
       #ggnewscale::new_scale_color() +
       geom_point(aes(
         color = p$pwas$cluster,
@@ -466,15 +466,15 @@ for (g in names(grpwas)) {
         c("#CCCCCC", "#969696"), 10
       ))) +
       scale_size_continuous(range=c(0.1,0.7)) +
-      ggnewscale::new_scale(c("color", "size", "alpha")) +
+      ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
       geom_point(aes(color = cluster, size=P, alpha=rsq)) +
       scale_color_manual(values = ccols) +
       scale_size_continuous(range=c(0.1,0.7)) +
       scale_alpha_continuous(range = c(0,1), trans="log") +
-      ggnewscale::new_scale(c("color", "size", "alpha")) +
+      ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
       geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
       scale_alpha_manual(values = c(0, 1)) +
-      ggnewscale::new_scale(c("color", "size", "alpha")) +
+      ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
       geom_point(aes(color = cluster,
                      alpha = ispeak), size = 0.9) +
       scale_color_manual(values = ccols) +
