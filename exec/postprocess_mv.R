@@ -411,7 +411,7 @@ for (i in names(lilp)) {
       scale_color_manual(values = ccols) +
       scale_size_continuous(range=c(0.1,0.7)) +
       scale_alpha_continuous(range = c(0,1), trans="log") +
-      ggnewscale::new_scale_color() + ggnewscale::new_scale("alpha") +
+      ggnewscale::new_scale(c("alpha", "color", "size")) +
       geom_point(
         aes(alpha = p$pwas$ispeak),
         size = 1.2,
