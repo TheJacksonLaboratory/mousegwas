@@ -181,13 +181,13 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
 
   if (sum(don$ispeak) > 0){
     # Plot peaks in color
-    p <- p + ggnewscale::new_scale_color() + ggnewscale::new_scale("size")
-    geom_point(data= don %>% filter(ispeak), aes(color = "#377EB8"), alpha=1, size=0.9)
+    p <- p + ggnewscale::new_scale(c("color", "size")) +
+    geom_point(data= don %>% filter(ispeak), aes(color = "#377EB8"), alpha=1, size = 0.7)
 
     # Print names around peaks
     if (addgenes){
-      toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist, annot=annot) %>%
-      filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm"))
+      toprs <- get_genes(ret_gwas %>% filter(P>namethr, ispeak==TRUE), dist = genesdist, annot=annot) %>% dplyr::select(rs, mgi_symbol) %>%
+      filter(!is.na(mgi_symbol), !stringr::str_detect(mgi_symbol, "Rik$"), !stringr::str_detect(mgi_symbol, "^Gm")) %>% unique()
     # Add gene names
       p <- p + ggrepel::geom_text_repel(data = dplyr::filter(don, rs %in% toprs$rs) %>% left_join(dplyr::select(toprs, rs, mgi_symbol), by="rs"),
                                     aes(BPcum, P, label = mgi_symbol), alpha = 0.7, size=2, family="Courier")
