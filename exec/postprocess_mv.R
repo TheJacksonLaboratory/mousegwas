@@ -409,7 +409,7 @@ for (i in names(lilp)) {
     plot = pnoname + ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size") +
       geom_point(aes(color = p$pwas$cluster, size=P, alpha=rsq)) +
       scale_color_manual(values = ccols) +
-      scale_size_continuous(range=c(0.01,0.7), trans = "exp") +
+      scale_size_continuous(range=c(0.01,0.7), trans = "exp", limits = c(0,max(p$pwass$P))) +
       scale_alpha_continuous(range = c(0,1), trans="log") +
       ggnewscale::new_scale(c("alpha", "color", "size")) +
       geom_point(
@@ -465,12 +465,12 @@ for (g in names(grpwas)) {
       scale_color_manual(values = c(rep(
         c("#CCCCCC", "#969696"), 10
       ))) +
-      scale_size_continuous(range=c(0.01,0.7), trans = "exp") +
+      scale_size_continuous(range=c(0.01,0.7), trans = "exp", limits = c(0,max(allpwas$P))) +
       geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
       ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
       geom_point(aes(color = cluster, size=P, alpha=rsq)) +
       scale_color_manual(values = ccols) +
-      scale_size_continuous(range=c(0.01,0.7), trans = "exp") +
+      scale_size_continuous(range=c(0.01,0.7), trans = "exp", limits = c(0,max(allpwas$P))) +
       scale_alpha_continuous(range = c(0,1), trans="log") +
       ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
       geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
