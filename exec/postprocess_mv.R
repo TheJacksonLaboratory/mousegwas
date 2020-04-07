@@ -837,16 +837,6 @@ for (k in 1:args$clusters) {
   }
 }
 
-# Run INRICH
-write_inrich_phenotype(clusterpeaks, args$plotdir, "all_phenotypes")
-run_inrich(
-  args$plotdir,
-  "all_phenotypes",
-  exec = args$inrich,
-  i = args$inrich_i,
-  j = args$inrich_j
-)
-
 # Plot markers density
 chrord <- c("X", 19:1)
 densp <- geno_t %>% filter(chr != "Y", chr != "MT")  %>%
