@@ -125,6 +125,7 @@ run_inrich <-
            exec = "inrich",
            i = 5,
            j = 200) {
+    return()
     # Remove spaces from name
     name <- gsub(" ", "_", name)
     system(
