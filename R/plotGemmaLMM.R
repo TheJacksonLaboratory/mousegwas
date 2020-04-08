@@ -164,7 +164,7 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
 
   # Get the RSIDs to put names on
   # Prepare text description for each SNP:
-  don$text <- paste("SNP: ", don$rs, "\nPosition: ", don$ps, "\nChromosome: ", don$chr, "\nLOD score:", don$P %>% round(2), "\nWhat else do you wanna know", sep="")
+  #don$text <- paste("SNP: ", don$rs, "\nPosition: ", don$ps, "\nChromosome: ", don$chr, "\nLOD score:", don$P %>% round(2), "\nWhat else do you wanna know", sep="")
   log10P <- don$P
   ymax <- 1.25 * max(log10P, na.rm = TRUE)
   ymin <- 1.25 * min(log10P, na.rm = TRUE)
