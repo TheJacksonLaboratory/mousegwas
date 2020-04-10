@@ -375,13 +375,13 @@ pvep <-
     hjust = 1,
     vjust = 0.5
   )) +
-  theme(text = element_text(size = 10, family = ffam))
+  theme(text = element_text(size = 10, family = ffam), legend.position = "none")
 ggsave(
   paste0(args$plotdir, "/PVE_plot.pdf"),
   plot = pvep,
   device = cairo_pdf,
   dpi = "print",
-  width = fullw,
+  width = halfw,
   height = height,
   units = "in"
 )
