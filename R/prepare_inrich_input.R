@@ -76,7 +76,7 @@ write_genes_map <- function(basedir) {
   gotbl <- genes %>% dplyr::select(ensembl_gene_id, go_id)
 
   # Get the descriptions
-  gotbl <- gotbl[!is.na(gotbl$go),]
+  gotbl <- gotbl[!is.na(gotbl$go_id),]
   dectbl <-
     tibble(
       go_id = unique(gotbl$go_id),
