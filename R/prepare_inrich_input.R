@@ -73,24 +73,24 @@ write_genes_map <- function(basedir) {
     col_names = FALSE
   )
   # Read GO mapping and write it too
-  gotbl <- genes %>% dplyr::select(ensembl_gene_id, goslim_goa_accession)
+  gotbl <- genes %>% dplyr::select(ensembl_gene_id, go_id)
 
   # Get the descriptions
   gotbl <- gotbl[!is.na(gotbl$go),]
   dectbl <-
     tibble(
-      goslim_goa_accession = unique(gotbl$goslim_goa_accession),
-      ont = sapply(unique(gotbl$goslim_goa_accession), function(x) {
+      go_id = unique(gotbl$go_id),
+      ont = sapply(unique(gotbl$go_id), function(x) {
         GO.db::GOTERM[[x]]@Ontology
       }),
-      desc = sapply(unique(gotbl$goslim_goa_accession), function(x) {
+      desc = sapply(unique(gotbl$go_id), function(x) {
         paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
       })
     )
-  gotbl <- left_join(gotbl, dectbl, by = "goslim_goa_accession")
+  gotbl <- left_join(gotbl, dectbl, by = "go_id")
   for (ont in c("CC", "BP", "MF")) {
     write.table(
-      as.data.frame(gotbl)[gotbl$ont == ont, c("ensembl_gene_id", "goslim_goa_accession", "desc")],
+      as.data.frame(gotbl)[gotbl$ont == ont, c("ensembl_gene_id", "go_id", "desc")],
       file = paste0(basedir, "/GO_", ont, "_terms_link_for_INRICH.txt"),
       sep = "\t",
       col.names = F,
@@ -103,7 +103,7 @@ write_genes_map <- function(basedir) {
   system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MGI_PhenotypicAllele.rpt | awk -F\"\t\" '{split($11, sp, \",\"); for (a in sp) print $10\"\t\"sp[a]}' |grep ENS | sort -k2> tmp1"))
   system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MP_EMAPA.rpt | cut -f 1,2 | tr \" \" \"-\" | sort -k1 | join -1 2 -2 1 tmp1 - | awk '{print $2\"\t\"$1\"\t\"$3}' >", basedir, "/MP_terms_for_INRICH.txt && rm tmp1"))
 
-  return(unique(genes %>% dplyr::select(-goslim_goa_accession)))
+  return(unique(genes %>% dplyr::select(-go_id)))
 }
 
 
@@ -125,7 +125,7 @@ run_inrich <-
            exec = "inrich",
            i = 5,
            j = 200) {
-    return()
+
     # Remove spaces from name
     name <- gsub(" ", "_", name)
     system(
