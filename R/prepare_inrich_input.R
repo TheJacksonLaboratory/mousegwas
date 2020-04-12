@@ -76,15 +76,19 @@ write_genes_map <- function(basedir) {
   gotbl <- genes %>% dplyr::select(ensembl_gene_id, go_id)
 
   # Get the descriptions
-  gotbl <- gotbl[!is.na(gotbl$go_id),]
+  gotbl <- gotbl[gotbl$go_id!="",]
   dectbl <-
     tibble(
       go_id = unique(gotbl$go_id),
       ont = sapply(unique(gotbl$go_id), function(x) {
-        GO.db::GOTERM[[x]]@Ontology
+        g = GO.db::GOTERM[[x]]
+        if (!is.null(g)) g@Ontology else ""
       }),
       desc = sapply(unique(gotbl$go_id), function(x) {
+        g = GO.db::GOTERM[[x]]
+        if (!is.null(g))
         paste0(GO.db::GOTERM[[x]]@Term, " (", GO.db::GOTERM[[x]]@Ontology, ")")
+        else ""
       })
     )
   gotbl <- left_join(gotbl, dectbl, by = "go_id")
