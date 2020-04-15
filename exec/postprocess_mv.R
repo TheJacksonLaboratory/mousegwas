@@ -18,6 +18,7 @@ library(gplots)
 library(argparse)
 library(enrichR)
 library(yaml)
+library(cowplot)
 library(mousegwas)
 
 parser <- ArgumentParser()
@@ -92,6 +93,7 @@ grpcol <- RColorBrewer::brewer.pal(8, "Accent")
 fullw <- 7.25
 halfw <- 3.54
 height <- 3.54
+fheight <- 11-1.25
 ffam <- "Arial"
 # Read the data
 # Phenotypes names
@@ -434,7 +436,7 @@ for (i in names(lilp)) {
   )
 }
 
-
+mainplot = NULL
 for (g in names(grpwas)) {
   # Add cluster to ispeak
   allpwas <-
@@ -451,6 +453,41 @@ for (g in names(grpwas)) {
   ymin <- 1.25 * min(allpwas$P, na.rm = TRUE)
   chr_label <- axisdf$chr
   chr_label[chr_label == 20] = "X"
+  outplot <- ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
+
+    # Show all points
+    geom_point(aes(color = as.factor(chr), size=P) , alpha = 1) +
+    scale_color_manual(values = c(rep(
+      c("#CCCCCC", "#969696"), 10
+    ))) +
+    scale_size_continuous(range=c(0,1), trans = "exp") +
+    geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
+    ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
+    geom_point(aes(color = cluster, size=rsq, alpha=rsq)) +
+    scale_color_manual(values = ccols) +
+    scale_size_continuous(range=c(0,1), trans = "exp") +
+    scale_alpha_continuous(range = c(0,1), trans="exp") +
+    ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
+    geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
+    scale_alpha_manual(values = c(0, 1)) +
+    ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
+    geom_point(aes(color = cluster,
+                   alpha = ispeak), size = 1) +
+    scale_color_manual(values = ccols) +
+    scale_alpha_manual(values = c(0, 1)) +
+    scale_x_continuous(label = chr_label, breaks = axisdf$center) +
+    scale_y_continuous(expand = c(0, 0)) +     # remove space between plot area and x axis
+    ylim(ymin, ymax) +
+    xlab(g) +
+    ylab("-log(P-value)") +
+    theme_bw() +
+    theme(
+      legend.position = "none",
+      text = element_text(size = 10, family = ffam),
+      panel.border = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank()
+    )
   ggsave(
     filename = paste0(
       args$plotdir,
@@ -458,49 +495,15 @@ for (g in names(grpwas)) {
       gsub(" ", "_", g),
       ".pdf"
     ),
-    plot = ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
-
-      # Show all points
-      geom_point(aes(color = as.factor(chr), size=P) , alpha = 1) +
-      scale_color_manual(values = c(rep(
-        c("#CCCCCC", "#969696"), 10
-      ))) +
-      scale_size_continuous(range=c(0,1), trans = "exp") +
-      geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
-      ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-      geom_point(aes(color = cluster, size=rsq, alpha=rsq)) +
-      scale_color_manual(values = ccols) +
-      scale_size_continuous(range=c(0,1), trans = "exp") +
-      scale_alpha_continuous(range = c(0,1), trans="exp") +
-      ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-      geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
-      scale_alpha_manual(values = c(0, 1)) +
-      ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-      geom_point(aes(color = cluster,
-                     alpha = ispeak), size = 1) +
-      scale_color_manual(values = ccols) +
-      scale_alpha_manual(values = c(0, 1)) +
-      scale_x_continuous(label = chr_label, breaks = axisdf$center) +
-      scale_y_continuous(expand = c(0, 0)) +     # remove space between plot area and x axis
-      ylim(ymin, ymax) +
-      xlab(g) +
-      ylab("-log(P-value)") +
-      theme_bw() +
-      theme(
-        legend.position = "none",
-        text = element_text(size = 10, family = ffam),
-        panel.border = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()
-      ),
+    plot = outplot,
     device = cairo_pdf,
     dpi = "print",
     width = fullw,
     height = height,
     units = "in"
   )
+  if (g == "All Phenotypes") mainplot = outplot
 }
-
 
 # Plot the LD drop figure
 comp_LD_2 <-
@@ -568,25 +571,32 @@ pld <-
   xlim(c(0, 2.5)) + labs(x = "Distance (Mbp)", y = expression("Average LD" ~
                                                                 (r ^ {
                                                                   2
-                                                                })))
+                                                                }))) + theme_bw() + theme(
+                                                                  panel.border = element_blank(),
+                                                                  panel.grid.major.x = element_blank(),
+                                                                  panel.grid.minor.x = element_blank(),
+                                                                  panel.grid.major.y = element_blank(),
+                                                                  panel.grid.minor.y = element_blank(),
+                                                                  text = element_text(size = 10, family = ffam)
+                                                                )
 ggsave(
   filename = paste0(args$plotdir, "/plot_LD_drop.pdf"),
-  plot = pld + theme_bw() + theme(
-    panel.border = element_blank(),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor.x = element_blank(),
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor.y = element_blank(),
-    text = element_text(size = 10, family = ffam)
-  ),
+  plot = pld,
   device = cairo_pdf,
   dpi = "print",
   width = halfw,
   height = height,
   units = "in"
 )
-
-
+# Plot Figure 1: pvep pld and mainplot
+combp <- plot_grid(plot_grid(pvep, pld, NULL, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 12), mainplot, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 12)
+ggsave(filename = paste0(args$plotdir, "/combined_figure1.pdf"),
+       plot = combp,
+       device = cairo_pdf,
+       dpi = "print",
+       width = fullw,
+       height = fheight,
+       units = "in")
 # Plot MAF histogram
 mafdat <-
   tibble(rs = geno_t$rs, maf = rowSums(geno_t[, -1:-5]) / (2 * (ncol(geno_t) -

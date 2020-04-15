@@ -35,5 +35,6 @@ Imports:
   goseq,
   GO.db,
   org.Mm.eg.db,
-  AnnotationDbi
+  AnnotationDbi,
+  cowplot
 
