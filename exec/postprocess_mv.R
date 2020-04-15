@@ -369,7 +369,7 @@ pvep <-
                                                                              "black", stat = "identity") +
   scale_fill_manual(values = grpcol) +
   geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
-  xlab("Phenotype") +
+  xlab("Phenotype") + coord_flip() +
   theme_bw() + theme(axis.text.x = element_text(
     angle = 90,
     hjust = 1,
