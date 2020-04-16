@@ -93,7 +93,7 @@ grpcol <- RColorBrewer::brewer.pal(8, "Accent")
 fullw <- 7.25
 halfw <- 3.54
 fheight <- 11-1.25
-height <- fheight/4
+height <- 3.54#fheight/4
 
 ffam <- "Arial"
 # Read the data
