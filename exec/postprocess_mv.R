@@ -589,7 +589,7 @@ ggsave(
   units = "in"
 )
 # Plot Figure 1: pvep pld and mainplot
-combp <- plot_grid(plot_grid(pvep, pld, NULL, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 12), mainplot, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 12)
+combp <- plot_grid(plot_grid(pvep, pld, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 12), mainplot, NULL, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 12)
 ggsave(filename = paste0(args$plotdir, "/combined_figure1.pdf"),
        plot = combp,
        device = cairo_pdf,
