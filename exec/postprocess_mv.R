@@ -342,7 +342,7 @@ cairo_pdf(
   height = height + 1,
   family = ffam
 )
-heatmap.2(
+hplt <- heatmap.2(
   pgwas,
   col = hmcol,
   Rowv = F,
@@ -360,8 +360,10 @@ heatmap.2(
   margins = c(12, 8),
   srtCol = 45,
   key = T,
+  key.title = "-log(P-value)",
   density.info = "none"
 )
+hplt
 dev.off()
 
 
@@ -590,7 +592,7 @@ ggsave(
   units = "in"
 )
 # Plot Figure 1: pvep pld and mainplot
-combp <- plot_grid(plot_grid(pvep, pld, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 20, label_fontface = "plain", rel_widths = c(1.5,1)), mainplot, NULL, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 20, fontface="plain")
+combp <- plot_grid(plot_grid(pvep, pld, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 20, label_fontface = "plain", rel_widths = c(1.5,1)), mainplot, hplt, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 20, fontface="plain")
 ggsave(filename = paste0(args$plotdir, "/combined_figure1.svg"),
        plot = combp,
        device = svg,
