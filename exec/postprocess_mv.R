@@ -369,7 +369,7 @@ svg(paste0(args$plotdir, "/all_peaks_heatmap.svg"),
     width = fullw,
     height = height + 1,
     family = ffam)
-hplt
+eval(hplt$call)
 dev.off()
 
 # Plot the PVE estimates with SE
