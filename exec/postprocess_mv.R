@@ -378,7 +378,7 @@ pvep <-
     hjust = 1,
     vjust = 0.5
   )) +
-  theme(text = element_text(size = 10, family = ffam), legend.position = "none")
+  theme(text = element_text(size = 10, family = ffam), legend.position = "right")
 ggsave(
   paste0(args$plotdir, "/PVE_plot.pdf"),
   plot = pvep,
@@ -590,7 +590,7 @@ ggsave(
   units = "in"
 )
 # Plot Figure 1: pvep pld and mainplot
-combp <- plot_grid(plot_grid(pvep, pld, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 12), mainplot, NULL, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 12)
+combp <- plot_grid(plot_grid(pvep, pld, ncol=2, nrow=1, labels=c('A', 'B'), label_size = 20, label_fontface = "plain", rel_widths = c(1.5,1)), mainplot, NULL, nrow = 3, ncol = 1, labels = c('', 'C','D'), label_size = 20, fontface="plain")
 ggsave(filename = paste0(args$plotdir, "/combined_figure1.pdf"),
        plot = combp,
        device = cairo_pdf,
