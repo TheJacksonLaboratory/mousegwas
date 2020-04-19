@@ -79,6 +79,8 @@ parser$add_argument("--peakcorr",
                     type = "double",
                     default = 0.25,
                     help = "SNPs R^2 correlation cutoff for peak determination")
+parser$add_argument("--external_inrich", action="store_true", default=FALSE,
+                    help="Prepare INRICH files but don't run INRICH")
 
 args <- parser$parse_args()
 
@@ -683,6 +685,7 @@ for (i in 1:length(lilp)) {
     next
   expp <- ext_peak_sing(pp$gwas, maxdist = args$peakdist)
   write_inrich_phenotype(expp[expp$ispeak == T, ], args$plotdir, phenos[i])
+  if (! args$external_inrich){
   run_inrich(
     args$plotdir,
     phenos[i],
@@ -690,6 +693,7 @@ for (i in 1:length(lilp)) {
     i = args$inrich_i,
     j = args$inrich_j
   )
+  }
   exppc <-
     expp %>% dplyr::filter(ispeak) %>% left_join(pgc, by = "rs") %>% dplyr::select(cluster, chr, minps, maxps)
   clusterpeaks <- rbind(clusterpeaks, exppc)
@@ -754,6 +758,7 @@ for (n in names(grpwas)) {
     next
   expp <- ext_peak_sing(pp, maxdist = args$peakdist)
   write_inrich_phenotype(expp[expp$ispeak == T, ], args$plotdir, n)
+  if (! args$external_inrich){
   run_inrich(
     args$plotdir,
     n,
@@ -761,6 +766,7 @@ for (n in names(grpwas)) {
     i = args$inrich_i,
     j = args$inrich_j
   )
+  }
   affgen <-
     get_genes(expp[expp$ispeak == T, ], dist = 1000, annot = annot)
   if (nrow(affgen) > 0) {
@@ -818,13 +824,15 @@ for (k in 1:args$clusters) {
   write_inrich_phenotype(clusterpeaks %>% filter(cluster == k),
                          args$plotdir,
                          paste0("cluster_", k))
-  run_inrich(
+  if (! args$external_inrich){
+    run_inrich(
     args$plotdir,
     paste0("cluster_", k),
     exec = args$inrich,
     i = args$inrich_i,
     j = args$inrich_j
-  )
+  )}
+
 
   # Run enrichr
   glen = length(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) |

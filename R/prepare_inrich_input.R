@@ -41,7 +41,7 @@ write_inrich_expression <- function(basedir, genes){
   grpp <- merge(grpp, mgi_ens, by = "mgi_symbol")
   write.table(
     grpp[, c("ensembl_gene_id", "grname", "Group")],
-    file = paste0(basedir, "/brain_expression_link_for_INRICH.txt"),
+    file = paste0(basedir, "/groups_brain_expression_link_for_INRICH.txt"),
     sep = "\t",
     col.names = F,
     row.names = F,
@@ -98,7 +98,7 @@ write_genes_map <- function(basedir) {
   kgenes$kdesc <- paste0("KEGG map", kgenes$PATH)
   write_delim(
     kgenes %>% dplyr::select(ensembl_gene_id, PATH, kdesc) %>% filter(PATH != ""),
-    path = paste0(basedir, "/KEGG_pathway_link_for_INRICH.txt"),
+    path = paste0(basedir, "/groups_KEGG_pathway_link_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
   )
@@ -125,7 +125,7 @@ write_genes_map <- function(basedir) {
   for (ont in c("CC", "BP", "MF")) {
     write.table(
       as.data.frame(gotbl)[gotbl$ont == ont, c("ensembl_gene_id", "go_id", "desc")],
-      file = paste0(basedir, "/GO_", ont, "_terms_link_for_INRICH.txt"),
+      file = paste0(basedir, "/groups_GO_", ont, "_terms_link_for_INRICH.txt"),
       sep = "\t",
       col.names = F,
       row.names = F,
@@ -174,7 +174,7 @@ run_inrich <-
         "_for_INRICH.txt",
         " -m SNPs_map_for_INRICH.txt ",
         " -g genes_coordinates_for_INRICH.txt",
-        " -t KEGG_pathway_link_for_INRICH.txt",
+        " -t groups_KEGG_pathway_link_for_INRICH.txt",
         " -o ",
         name,
         "_KEGG_pathways",
@@ -195,7 +195,7 @@ run_inrich <-
         "_for_INRICH.txt",
         " -m SNPs_map_for_INRICH.txt ",
         " -g genes_coordinates_for_INRICH.txt",
-        " -t MP_terms_for_INRICH.txt",
+        " -t groups_MP_terms_for_INRICH.txt",
         " -o ",
         name,
         "_MP_terms",
@@ -217,7 +217,7 @@ run_inrich <-
         "_for_INRICH.txt",
         " -m SNPs_map_for_INRICH.txt ",
         " -g genes_coordinates_for_INRICH.txt",
-        " -t brain_expression_link_for_INRICH.txt",
+        " -t groups_brain_expression_link_for_INRICH.txt",
         " -o ",
         name,
         "_brain_expression",
@@ -239,7 +239,7 @@ run_inrich <-
           "_for_INRICH.txt",
           " -m SNPs_map_for_INRICH.txt ",
           " -g genes_coordinates_for_INRICH.txt",
-          " -t GO_",
+          " -t groups_GO_",
           ont,
           "_terms_link_for_INRICH.txt",
           " -o ",
