@@ -19,6 +19,36 @@ write_inrich_phenotype <- function(snps, basedir, name) {
   )
 }
 
+
+#' Title
+#'
+#' @param genes
+#' @param basedir
+#'
+#' @return
+#' @export
+#' @import reshape
+#'
+#' @examples
+write_inrich_expression <- function(basedir, genes){
+  grpf <- system.file("extdata", "groups_from_41598_2016_BFsrep19274_MOESM4_ESM.txt", package = "mousegwas")
+  grpp <- reshape::melt(read.delim(grpf, header=FALSE, sep="\t", stringsAsFactors = FALSE), id.vars = "V1")[,c(1,3)]
+  colnames(grpp) <- c("Group", "mgi_symbol")
+  grpp <- grpp[grpp$mgi_symbol != "",]
+  grpp$grname <- sapply(grpp$Group, function(x) paste(unlist(strsplit(x, " "))[1:2], sep = "_", collapse = "_"))
+  # Translate genes mgi_symblo to ensembl
+  mgi_ens <- unique(genes[,c("ensembl_gene_id", "mgi_symbol")])
+  grpp <- merge(grpp, mgi_ens, by = "mgi_symbol")
+  write.table(
+    grpp[, c("ensembl_gene_id", "grname", "Group")],
+    file = paste0(basedir, "/brain_expression_link_for_INRICH.txt"),
+    sep = "\t",
+    col.names = F,
+    row.names = F,
+    quote = 3
+  )
+
+}
 #' Write the SNPs map for INRICH execution
 #'
 #' @param snps a data.frame or tibble with the columns chr, minps an maxps describinf intervals
@@ -101,6 +131,7 @@ write_genes_map <- function(basedir) {
       row.names = F,
       quote = 3
     )
+    write_inrich_expression(basedir, genes)
   }
 
   # Download MP mammalian phenotypes annotations from MGI:
@@ -168,6 +199,28 @@ run_inrich <-
         " -o ",
         name,
         "_MP_terms",
+        " -i ",
+        i,
+        " -j ",
+        j
+      )
+    )
+
+    system(
+      paste0(
+        "cd ",
+        basedir,
+        " && ",
+        exec,
+        " -c -a intervals",
+        name,
+        "_for_INRICH.txt",
+        " -m SNPs_map_for_INRICH.txt ",
+        " -g genes_coordinates_for_INRICH.txt",
+        " -t brain_expression_link_for_INRICH.txt",
+        " -o ",
+        name,
+        "_brain_expression",
         " -i ",
         i,
         " -j ",

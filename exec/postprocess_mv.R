@@ -363,7 +363,7 @@ hplt <- heatmap.2(
   key.title = "-log(P-value)",
   density.info = "none"
 )
-hplt
+
 dev.off()
 svg(paste0(args$plotdir, "/all_peaks_heatmap.svg"),
     width = fullw,
