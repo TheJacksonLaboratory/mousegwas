@@ -382,11 +382,7 @@ pvep <-
   scale_fill_manual(values = grpcol) +
   geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
   xlab("Phenotype") + coord_flip() +
-  theme_bw() + theme(axis.text.x = element_text(
-    angle = 90,
-    hjust = 1,
-    vjust = 0.5
-  )) +
+  theme_bw()  +
   theme(text = element_text(size = 10, family = ffam), legend.position = "right")
 ggsave(
   paste0(args$plotdir, "/PVE_plot.pdf"),
