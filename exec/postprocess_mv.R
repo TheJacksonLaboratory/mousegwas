@@ -207,7 +207,7 @@ for (i in 1:length(phenos)) {
       phenos[i],
       ".pdf"
     ),
-    plot = pp$plot + theme(text = element_text(size = 10, family =
+    plot = pp$plot + ggtitle(pname) + theme(text = element_text(size = 10, family =
                                                  ffam)),
     dpi = "print",
     device = cairo_pdf,
@@ -299,7 +299,7 @@ if (args$nomv) {
         pname,
         ".pdf"
       ),
-      plot = pp$plot + theme(text = element_text(size = 10, family =
+      plot = pp$plot + ggtitle(pname) + theme(text = element_text(size = 10, family =
                                                    ffam)),
       dpi = "print",
       device = cairo_pdf,
@@ -433,6 +433,7 @@ for (i in names(lilp)) {
       ), size = 1) +
       scale_color_manual(values = ccols) +
       scale_alpha_manual(values = c(0, 1)) +
+      ggtitle(i) +
       theme(text = element_text(size = 10, family = ffam)),
     device = cairo_pdf,
     dpi = "print",
