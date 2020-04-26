@@ -72,6 +72,11 @@ parser$add_argument("--mvalue_method", default="mcmc",
                     help="Either mcmc (default) or exact if the number of phenotypes is small (<10)")
 parser$add_argument("--MDA", action="store_true", default=FALSE,
                     help="Use the pre-loaded MDA genotypes files in the package, replaces -g")
+parser$add_argument("--nomv",
+                    default = FALSE,
+                    action = "store_true",
+                    help = "Ignore multivariate results and use only single phenotypes")
+
 
 args <- parser$parse_args()
 
@@ -325,6 +330,7 @@ write.csv(sorder[b$indices], paste0(args$basedir, "/export_strains_order.csv"), 
 
 # Run gemma/pylmm using the helper function
 if (args$method == "GEMMA"){
+  if (args$nomv) phegroups = NULL
   results_file <- execute_lmm(data.table(b$genotypes), data.table(b$phenotypes),
                               as.data.table(complete.geno[,.(rs, bp38, chr)]),
                               b$covars, args$basedir, loco=!args$noloco,
