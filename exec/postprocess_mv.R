@@ -217,7 +217,7 @@ for (i in 1:length(phenos)) {
   )
 }
 # Plot all pdfs in one file
-cairo_pdf(filename = paste0(args$plotdir, "all_Manhattan_plots.pdf"), width = fullw, height = height)
+pdf(file = paste0(args$plotdir, "all_Manhattan_plots.pdf"), width = fullw, height = height, family = ffam)
 for (i in names(lilp)){
   print(pp$plot + ggtitle(i) + theme(text = element_text(size = 10, family =
                                                                   ffam)))
