@@ -217,7 +217,7 @@ for (i in 1:length(phenos)) {
   )
 }
 # Plot all pdfs in one file
-png(filename  = paste0(args$plotdir, "/all_Manhattan_plots.pdf"), width = fullw, height = height, units = "in", res=300, type="cairo")#family = ffam, onefile = TRUE)
+png(filename  = paste0(args$plotdir, "/all_Manhattan_plots.png"), width = fullw, height = height, units = "in", res=300, type="cairo")#family = ffam, onefile = TRUE)
 for (i in names(lilp)){
   print(lilp[[i]]$plot + ggtitle(i) + theme(text = element_text(size = 10, family =
                                                                   ffam)))
