@@ -158,28 +158,8 @@ execute_lmm <- function(genotypes, phenotypes, annot, covars, basedir, groups = 
   fwrite(genotypes, genofile, col.names = FALSE, na = "NA")
 
   # Write the phenotype files
-  # print(dim(phenotypes)[2])
   phenofile <- paste0(basedir,"/phenotypes.csv")
   fwrite(phenotypes, phenofile, col.names = FALSE, sep=",", na="NA")
-  #for (n in 1:dim(phenotypes)[2]){
-  #  print(n)
-  #  print(head(phenotypes))
-  #  print(head(as.data.table(phenotypes[,n,with=FALSE])))
-  #  fwrite(as.data.table(phenotypes[,n,with=FALSE]), paste0(basedir,"/phenotype_",n,".csv"), col.names=FALSE, sep=",", na="NA")
-  #}
-  # Convert the phenotypes to residuals and do svd to remove correlation
-  #  residuals <- get_residuals(covars, phenotypes)
-    # Change NAs to 0 meaning the phenotype's average, I tried imputing these values but it basically
-    # gave the same results
-  #  residuals[is.na(residuals)] <- 0
-  #  write_csv(residuals, paste0(basedir, "/residuals.csv"))
-
-  #  resid_comp <- svd(residuals)
-  #  print("SVD percent of variance explained by loadings:")
-  #  print(resid_comp$d^2/sum(resid_comp$d^2))
-  #  phenofile <- paste0(basedir, "/phenotypes.csv")
-  #  fwrite(resid_comp$u, phenofile, col.names = FALSE, na = "NA", sep=",")
-
 
   # Compute lmm without LOCO
   if (!loco){

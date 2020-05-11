@@ -149,6 +149,8 @@ dev.off()
 
 
 # Plot the PVE estimates with SE
+pvh <- height
+if (dim(PVE)[1]>40) pvh <- height*2
 pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(color="black", stat="identity") +
   scale_fill_manual(values = grpcol) +
   geom_errorbar(aes(ymin=PVE-PVESE, ymax=PVE+PVESE), width=.2) +
@@ -156,7 +158,7 @@ pvep <- ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill=Group)) + geom_bar(c
   theme_bw() + theme(axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)) +
   theme(text=element_text(size=10, family=ffam))
 ggsave(paste0(args$plotdir, "/PVE_plot.pdf"), plot = pvep, device = cairo_pdf, dpi = "print",
-       width = fullw, height = height, units = "in")
+       width = fullw, height = pvh, units = "in")
 
 
 # Plot the metasoft manhattan plot with clusters colors

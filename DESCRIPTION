@@ -1,13 +1,13 @@
 Package: mousegwas
 Type: Package
-Title: Read csv input file, genotypes ans run GEMMA
+Title: Run in-bred mouse GWAS
 Version: 0.1.0
-Author: Asaf Peer
-Maintainer: Asaf Peer <asaf.peer@jax.org>
-Description: Read an input csv file with a yaml file describing the input with data on 
-  which phenotypes to use and how to read the strain names. Read genotyping data in csv format
-  downloaded from phenome.jax.org and prepare the data for GEMMA
-License: MIT
+Author@R: c(person("Asaf", "Peer", email = "asaf.peer@jax.org", role = c("aut", "cre")),
+            person("The Jackson Laboratory", role=c("cph")))
+Description: With the availability of a lot of in-bred mice strains genotypes, Genome Wide Association Studies can 
+             easily be conducted when strains are being phenotyped. This package pre-process the phenotypic data,
+             run GEMMA or pyLMM and produce publication-ready figures of the results.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 BiocViews:
@@ -38,4 +38,6 @@ Imports:
   AnnotationDbi,
   cowplot,
   reshape
-
+URL: https://github.com/TheJacksonLaboratory/mousegwas
+BugReports: https://github.com/TheJacksonLaboratory/mousegwas/issues
+RoxygenNote: 7.0.2

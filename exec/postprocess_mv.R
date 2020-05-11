@@ -374,8 +374,11 @@ hplt <- heatmap.2(
 )
 
 dev.off()
+hwid <- fullw
+if (dim(PVE)[1]>40) hwid <- fullw*2
+
 svg(paste0(args$plotdir, "/all_peaks_heatmap.svg"),
-    width = fullw,
+    width = hwid,
     height = height + 1,
     family = ffam)
 eval(hplt$call)
@@ -383,6 +386,8 @@ dev.off()
 
 # Plot the PVE estimates with SE
 names(grpcol) <- yamin$groups
+pvh <- height
+if (dim(PVE)[1]>40) pvh <- height*2
 pvep <-
   ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill = Group)) + geom_bar(color =
                                                                              "black", stat = "identity") +
@@ -397,7 +402,7 @@ ggsave(
   device = cairo_pdf,
   dpi = "print",
   width = halfw,
-  height = height,
+  height = pvh,
   units = "in"
 )
 
