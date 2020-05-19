@@ -41,3 +41,7 @@ Imports:
 URL: https://github.com/TheJacksonLaboratory/mousegwas
 BugReports: https://github.com/TheJacksonLaboratory/mousegwas/issues
 RoxygenNote: 7.0.2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

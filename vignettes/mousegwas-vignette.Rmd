@@ -1,0 +1,133 @@
+---
+title: "mousegwas-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{mousegwas-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mousegwas)
+```
+This package was built for easier deployment of GWAS in mouse panels. Several mouse panels have been genotyped using different arrays like the Mouse Diversity Array (MDA) or the GigaMUGA (GMUGA), a lot of which are available throught The Jackson Laboratory phenome database (https://phenome.jax.org/about/snp_retrievals_help). This package use the genotyping downloaded the phenome database to run GWAS on mouse phenotypes, deploy GEMMA or pyLMM and plot the results.
+
+## Data preparation
+ 
+The phenotypes should be given as a csv file with at least one column to define the strain and other columns for the phenotypes and the covariates, a companion yaml file will describe the input data. 
+
+### The yaml file
+The yaml file should contain the following data:
+
+* phenotypes: A dictionary of dictionaries describing the phenotypes to test, their name in the figures and the group if desired. _e.g._: 
+
+```
+phenotypes:
+  OFA_Groom_first5m:
+      papername: GrTime5m
+      group: Grooming Quantity
+```
+
+* strain: The name of the column containing the strain name. _e.g._:
+
+```
+strain: Strain
+```
+
+* groups: A list of groups for combining p-values in the post-processing. The order will define their order in the plots. _e.g._:
+```
+groups:
+  - Activity
+  - Anxiety
+  - Grooming Pattern
+  - Grooming Quantity
+```
+
+* F1: A list of lists translating F1 strain names in the input csv file to their parent strains. The mother's strain should be the first in the list to determine the X chromosome _e.g._:
+```
+F1:
+  - B6129SF1/J:
+      - C57BL/6J
+      - 129S1/SvImJ
+  - B6129PF1/J:
+      - C57BL/6J
+      - 129P3/J
+  - B6AF1/J:
+      - C57BL/6J
+      - A/J
+```
+
+* covar: A list of covariate columns in the input file, _e.g._:
+```
+covar:
+  - Sex
+  - BodyLength
+```
+
+* sex: The column containing the sex data, used for down-sampling individuals from each strain. _e.g._:
+```
+sex: Sex
+```
+
+* translate: If names of strains in the input csv file are different than the strain names in the genotyping file you can use this dictionary to translate it. You can also use this to remove ceratin strains from the analysis. _e.g._:
+```
+translate:
+  - BTBRT...tf.J: BTBR T<+> Itpr3<tf>/J
+  - 129S1.SvImJ: 129S1/SvImJ
+  - MSM/MsJ: none
+  - MOLF/EiJ: none
+```
+
+* coat: This feature is optional and can be used to use the coat color as a covariate or as a phenotype, mainly good for testing. _e.g._:
+```
+coat:
+  - 129P3/J: albino
+  - 129S1/SvImJ: white-bellied agouti
+  - 129X1/SvJ: albino
+```
+
+*confSNPs: Confounding SNPs. A list of SNPs that will be used as covariates in the GWAS. This is useful to remove a massive selection factor. _e.g._:
+```
+confSNPs:
+  - rs32105080
+```
+
+## Running GWAS
+
+The script for running the GWAS is called `run_GWAS.R`
+
+### data preprocessing
+Mouse panel GWAS is different than human GWAS, the LD blocks are wider, the population structure is biased and the individuals are usually homozygous. It is unclear how many individuals from each strain should be included in the analysis so we implemented an option to select a defined number of individuals from each Strain x Sex combination or to get the average value of each strain while controlling for the covariates by taking the residuals of a linear model solving each phenotype with the covariates.
+
+This option can be specified using the parameter `--downsample` or `-d` with the number of individuals to select from each Strain x Sex group or 0 for average.
+
+If the input table contains strain names that are different than the names in the genotypes table then a translation dictionary can be given in the yaml file (phenotype -> genotype). When F1 strains are phenotyped then names of the parent strains should be specified in the yaml file under the F1 term, the female parent should be the first one to determine the X chromosome.
+
+After the table of phenotypes is ready for the individuals that will be used in the GWAS, the values are being scaled to have a mean of zero and variance of one. A quantile-quantile normalization is also optional with the `--qqnorm` option. Boolean phenotypes are not being scaled.
+
+### SNPs filtering
+SNPs can be filtered using the parameters `--missing` for the minimal fraction of missing data and `--MAF` for the minimal allele frequency thresohld.
+
+### LMM software
+By default the software for running the GWAS will be GEMMA, if it is not available it will be downloaded. The model will be LMM with all tests (`-lmm 4`). pyLMM is also an option and can be selected with `-m pyLMM` or `--method pyLMM` although pyLMM should be installed independently, if the executables are not available in the default path then they can be given using `--pylmm/-p pylmmGWAS.py` and `--pylmmkinship/-k pylmmKinship.py`.
+
+### Multivariate analysis
+Multivariate GWAS is implemented in GEMMA and can be used by specifying the groups of the phenotypes in the yaml file. Multivariate will be used by default on top of the univariate analysis unless disabled with `--nomv`. 
+
+### Combining results
+If multiple penotypes are being tested their results can be combined wit meta-analysis. The meta-analysis algoritmh used here is METASOFT. Care should be taken when using METASOFT because it assumes the beta factors have the same signs. If two phenotypes are anti-correlated then their p-values will not be combined, only the strongest will eventually used for thhe combined p-values. Deploying METASOFT can be done with h `--runmetaasoft`. After running METASOFT the lambda_mean and lambda_hetero scaling parameters can be obtained from the log file and given back using the `--labmda_mean` and `--lambda_hetero` parameters. 
+
+### Using coat color
+Coat color taht was defined in the yaml file can be used either as covariates with `--coat_covar` or as phenotypes with `--coat_phenotype` in which case no input file should be given. Anothher option to consider coat color as covariates is by specifying theh SNPs in coat color determining genes using the `confSNPs` feature in the yaml file. 
+### Shuhffling
+If the `--shuffle` option is selected, the phenotypes values will be shuhffled among all input individuals and the GWAS will carry on as normal after that. Make sure to change `--seed` to avoid running the same shuhffling more than once whhen trying to obtain an empirical p-value.
+
+## Plotting and post-processing
+The plotting part was adjusted for publication and can be changed as desired. 

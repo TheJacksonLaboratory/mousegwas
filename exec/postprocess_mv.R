@@ -36,8 +36,6 @@ parser$add_argument("--clusters",
                     default = 7,
                     type = "integer",
                     help = "Number of peaks clusters")
-parser$add_argument("--rotation", "-r", default = "",
-                    help = "comma separated list of phenotypes to plot in the ggbiplot. If empty plots all")
 parser$add_argument("--sample",
                     "-s",
                     type = "integer",
@@ -157,6 +155,7 @@ geno <-
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
+grpcol <- rep(grpcol, ceiling(length(yamin$groups)/length(grpcol)))
 pnames <-
   left_join(pnames, tibble(Group = yamin$groups, color = grpcol[1:length(yamin$groups)]), by =
               "Group")
@@ -344,10 +343,12 @@ grptocol <-
 colcol <-
   PVE %>% left_join(grptocol) %>% column_to_rownames(var = "PaperName") %>% dplyr::select(color)
 colcol <- colcol$color
+hwid <- fullw
+if (dim(PVE)[1]>40) hwid <- fullw*2
 
 cairo_pdf(
   paste0(args$plotdir, "/all_peaks_heatmap.pdf"),
-  width = fullw,
+  width = hwid,
   height = height + 1,
   family = ffam
 )
@@ -374,8 +375,6 @@ hplt <- heatmap.2(
 )
 
 dev.off()
-hwid <- fullw
-if (dim(PVE)[1]>40) hwid <- fullw*2
 
 svg(paste0(args$plotdir, "/all_peaks_heatmap.svg"),
     width = hwid,

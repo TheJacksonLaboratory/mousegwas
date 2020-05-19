@@ -228,14 +228,20 @@ for (comrow in 1:dim(complete_table)[1]){
       cname <- if (p1n==p2n) p1n else sname
       prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[cname,,drop=F])
     }
-    phenos <- rbind(phenos, prow, fill=TRUE)
     # Add the covariates to the table
     crow <- cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
     if (args$coat_covar){
       crow <- cbind(crow, coat=ct)
     }
-    covars <- rbind(covars, crow, fill=TRUE)
-    sexvec <- c(sexvec, if (is.null(yamin$sex)) 1 else complete_table[comrow, yamin$sex])
+    if (all(!is.na(crow))) {
+      phenos <- rbind(phenos, prow, fill = TRUE)
+      covars <- rbind(covars, crow, fill = TRUE)
+      sexvec <-
+        c(sexvec, if (is.null(yamin$sex))
+          1
+          else
+            complete_table[comrow, yamin$sex])
+    }
   }else{
     if (p1n==p2n){
       if (!p1n %in% notfounds){

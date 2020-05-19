@@ -1,16 +1,21 @@
-# Remove correlated peaks
-#' Title
+#' Find peaks and LD blocks in the LMM results
 #'
-#' @param genotypes
-#' @param gwas_pvs
-#' @param rs_thr
-#' @param pthr
-#' @param mxd
+#' \code{rep_peaks} use the individual starins genomtypes matrix to find LD blocks in a greedy way
+#' it starts by sorting the GWAS p-values and then choosing the lowest p-value and removing all
+#' markers with a high correlation. It then selects the next marker and so on until all markers with
+#' p-values smaller than the threshold are in peak regions.
 #'
-#' @return
+#'
+#' @param genotypes The genotypes matrix, one column for each strain, used for computing correlations
+#' @param gwas_pvs GWAS output pvalues
+#' @param rs_thr Threshold for correlation, \eqn{r^2} larger than this value will be considered same peak
+#' @param pthr P-value threshold
+#' @param mxd Maximal peak width
+#' @param test Test name in the results data frmae
+#'
+#' @return a table with the marker name, choose = peak region number, ispeak = marker is peak, rsq = r square value
 #' @export
 #'
-#' @examples
 rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000, test="p_wald"){
   tmat <- base::t(genotypes)
   srt_pv <- gwas_pvs %>% dplyr::select_("rs", test) %>% arrange_(test) %>% mutate(choose = 0, ispeak=FALSE)
@@ -62,9 +67,12 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
 #' @param genotypes The genotypes of the input strains to compute correlation. If given (as data.frame with row.names) every peak will be colored
 #' @param maxdist maximal distance between peak and related SNPs
 #' @param corrthr r-square threshold to consider SNPs in the same peak, combined with maxdist
+#' @param test Name of test to use
+#' @param addgenes A boolean. Add gene names or not
+#' @param annot Genes table, optional. If NULL pull from biomaRt
 #'
 #'
-#' @return A plot
+#' @return An object with the plot object, (plot), The GWAS results (gwas) and the plotted object (pwas)
 #' @export
 #'
 #' @import dplyr
@@ -73,7 +81,6 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
 #' @import ggnewscale
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
-#' @examples
 plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE, annot=NULL) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
@@ -211,22 +218,3 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   return(list(plot=p, gwas=ret_gwas, pwas=don))
 }
 
-#' Title
-#'
-#' @param snps snps table
-#' @param chr chromosome to plot
-#' @param from_mb from position in mega bp
-#' @param to_mb to position in mega bp
-#'
-#' @return
-#' @export
-#' @import qtl2
-#' @examples
-plot_zoom <- function(snps, chr, from_mb, to_mb, width=1){
-  # Download the genes data if not found
-  if (!file.exists("mouse_genes_mgi.sqlite")){
-    download.file("https://ndownloader.figshare.com/files/17609252", "mouse_genes_mgi.sqlite")
-  }
-  query_genes <- create_gene_query_func("mouse_genes_mgi.sqlite")
-  genes_reg <- query_genes(chr, from_mb, to_mb)
-}
