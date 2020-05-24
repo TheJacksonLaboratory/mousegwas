@@ -126,8 +126,18 @@ If multiple penotypes are being tested their results can be combined wit meta-an
 
 ### Using coat color
 Coat color taht was defined in the yaml file can be used either as covariates with `--coat_covar` or as phenotypes with `--coat_phenotype` in which case no input file should be given. Anothher option to consider coat color as covariates is by specifying theh SNPs in coat color determining genes using the `confSNPs` feature in the yaml file. 
+
 ### Shuhffling
 If the `--shuffle` option is selected, the phenotypes values will be shuhffled among all input individuals and the GWAS will carry on as normal after that. Make sure to change `--seed` to avoid running the same shuhffling more than once whhen trying to obtain an empirical p-value.
 
 ## Plotting and post-processing
-The plotting part was adjusted for publication and can be changed as desired. 
+The plotting part was adjusted for publication and can be changed as desired. It can be used with the postprocess_mv.R scriptwith the output directory of run_GWAS.R as input (`--outdir` or `-o`) and the directory to put the figures in (`--plotdir` or `-p`).
+
+### Manhattan plots
+First, the script will plot simple Manhattan plots with the threshold for significant SNP as defined by `--pvalthr` ($-log_{10}(\tt P-value))$). To remove SNPs in the same LD blocks, correlated SNPs are removed after the bet SNP is selected, the correlation threshohld ($r^{2}$) can be changed with `--peakcorr`, width of the peak region is limited by `--ldpeakdist`.
+
+### Grouping parameters
+Each parameter can be assigned to a group. All phenotypes in a group can be combined together and ran as a multivariate GWAS in `run_GWAS.R` was used without `--nomv`. Another option to combine phenotypes is to take the minimal p-value of each SNP across all phenotypes in the group. This can be done by applying the `--nomv` flag when runnign `postprocess_mv.R`. It will also add a Manhattan plot that combines _all_ of the phenotypes. 
+
+### clustering peaks
+After the peaks were selected for each phenotype, all the peak SNPs from all of the phenotypes are being colleted and the p-values of these SNPs in all the phenotypes are used for clustering the peaks using k-means algorithm. The number of clusters can be set using the `--clusters` option. Each cluster gets its own color, the p-values table is being plotted as a heatmap along with the cluster colors. After assigning clusters for the oeak SNPs the Manhhattan plots are being repainted with the cluster colors. Peaks correlated to the peak SNP will get the same color and the alpha will be proportional to the correlation coefficient. 

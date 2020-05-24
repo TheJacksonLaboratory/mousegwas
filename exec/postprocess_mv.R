@@ -61,14 +61,6 @@ parser$add_argument("--inrich_j",
                     type = "double",
                     default = 200,
                     help = "Maximal group size for inrich (-j), default 200")
-parser$add_argument("--drop",
-                    type = "double",
-                    default = 2,
-                    help = "Log p-value drop to include in peak")
-parser$add_argument("--peakdist",
-                    type = "integer",
-                    default = 1000000,
-                    help = "Half the interval width")
 parser$add_argument("--ldpeakdist",
                     type = "integer",
                     default = 10000000,
@@ -281,13 +273,11 @@ if (args$nomv) {
         genotypes = geno,
         namethr = args$pvalthr,
         redthr = args$pvalthr,
-        maxdist = args$lgpeakdist,
+        maxdist = args$ldpeakdist,
         corrthr = args$peakcorr,
         test = "p_score",
         annot = annot
       )
-    if (is.null(mp))
-      mp <- pp$plot
     pname <-
       gsub(".*phenotypes_(.*)_all_LOCO.assoc.txt", "\\1", grpf)
     grpwas[[pname]] = pp$pwas
@@ -691,7 +681,7 @@ for (i in 1:length(lilp)) {
   pp <- lilp[[i]]
   if (sum(pp$gwas$ispeak) == 0)
     next
-  expp <- ext_peak_sing(pp$gwas, maxdist = args$peakdist)
+  expp <- ext_peak_sing(pp$gwas, maxdist = args$ldpeakdist)
   write_inrich_phenotype(expp[expp$ispeak == T, ], args$plotdir, phenos[i])
   if (! args$external_inrich){
   run_inrich(
@@ -764,7 +754,7 @@ for (n in names(grpwas)) {
   pp$chr[pp$chr == "20"] <- "X"
   if (sum(pp$ispeak) == 0)
     next
-  expp <- ext_peak_sing(pp, maxdist = args$peakdist)
+  expp <- ext_peak_sing(pp, maxdist = args$ldpeakdist)
   write_inrich_phenotype(expp[expp$ispeak == T, ], args$plotdir, n)
   if (! args$external_inrich){
   run_inrich(
