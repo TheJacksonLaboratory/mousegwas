@@ -283,10 +283,10 @@ if (args$nomv) {
     grpwas[[pname]] = pp$pwas
 
     allpeaks <- c(allpeaks, pp$gwas$rs[pp$gwas$ispeak])
-    pvalmat <-
-      left_join(pvalmat,
-                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
-                by = "rs")
+#    pvalmat <-
+#      left_join(pvalmat,
+#                pp$gwas %>% mutate(!!(pname) := P) %>% dplyr::select(rs, !!(pname)),
+#                by = "rs")
 
     ggsave(
       filename = paste0(
