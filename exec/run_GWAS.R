@@ -284,10 +284,11 @@ if (args$coat_phenotype){
     p2n <- strains$p2[rnum]
     cname <- if (p1n==p2n) p1n else sname
     prow <- coat_table_mm[cname,,drop=F]
-    phenos <- rbind(phenos, prow, fill = TRUE)
+
     if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
       sorder <- c(sorder, sname)
-      strains_genomes[, sname:=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+      strains_genomes[, eval(sname):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+      phenos <- rbind(phenos, prow, fill = TRUE)
     }
   }
 }
