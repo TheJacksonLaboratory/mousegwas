@@ -234,6 +234,10 @@ for (comrow in 1:dim(complete_table)[1]){
   }
   p1n <- strains$p1[rnum]
   p2n <- strains$p2[rnum]
+  print(comrow)
+  print(sname)
+  print(p1n)
+  print(p2n)
   if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
     sorder <- c(sorder, sname)
     strains_genomes[, eval(paste0('X',comrow)):=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
