@@ -90,8 +90,11 @@ if (!grepl("^/", args$basedir)) args$basedir <- paste(getwd(), args$basedir, sep
 dir.create(args$basedir, recursive = TRUE)
 print(paste0("Working directory: ", args$basedir))
 # Read the input table
-complete_table <- read_csv(args$input, col_names=TRUE)
-
+if (!is.na(args$input)){
+  complete_table <- read_csv(args$input, col_names = TRUE)
+}else{
+  complete_table <- tibble()
+}
 # Generate a list of phenotypes and list of groups
 phegroups <- list()
 pheno_names <- c()
@@ -107,9 +110,38 @@ for (n in names(yamin$phenotypes)){
 #pheno_names <- intersect(yamin$phenotypes, names(complete_table))
 # A list of covariates
 covar_names <- setdiff(intersect(yamin$covar, names(complete_table)), pheno_names)
+# Read the coat from the yaml file
+coat_table <- tibble(strain=character(), coat=character(), eyes=character())
+if (args$coat_phenotype |args$coat_covar){
+  for (ct in yamin$coat){
+    eyec = "normal"
+    coat = unlist(ct)[1]
+    if (grepl(",", coat)){
+      spl <- strsplit(coat, ",")[[1]]
+      eyec <- spl[1]
+      coat <- gsub("^ *", "", spl[2])
+    }
+    coat_table <- add_row(coat_table, strain=names(ct), coat=coat, eyes=eyec)
+  }
+  if (length(unique(coat_table$eyes)) > 1)
+    coat_table_mm <- model.matrix(~coat+eyes+0, coat_table)
+  else
+    coat_table_mm <- model.matrix(~coat+0, coat_table)
+  rownames(coat_table_mm) <- coat_table$strain
+  # Remove columns with one strain
+  coat_table_mm <- coat_table_mm[,colSums(ccoat_table_mm)>1, drop=F]
+}
 
 # Get the strain names
-strains <- complete_table %>% select(input_name=one_of(yamin$strain)) %>% unique() %>% mutate(p1=input_name, p2=input_name)
+if (args$coat_phenotype) {
+  strains <-
+    tibble(input_name = rownames(coat_table_mm)) %>% mutate(p1 = input_name, p2 =
+                                                              input_name)
+}else{
+  strains <-
+    complete_table %>% select(input_name = one_of(yamin$strain)) %>% unique() %>% mutate(p1 =
+                                                                                           input_name, p2 = input_name)
+}
 # Translate F1
 a <- tibble(input_name=character(), p1=character(), p2=character())
 for (fl in yamin$F1){
@@ -130,18 +162,6 @@ strains <- strains %>% left_join(t, by=c("p2" = "name")) %>% mutate(p2=ifelse(is
 
 valid_strains <- unique(c(strains$p1, strains$p2))
 
-# Read the coat from the yaml file
-coat_table <- tibble(strain=character(), coat=character())
-if (args$coat_phenotype |args$coat_covar){
-  for (ct in yamin$coat){
-    coat_table <- add_row(coat_table, strain=names(ct), coat=unlist(ct)[1])
-  }
-  coat_table_mm <- model.matrix(~coat+0, coat_table)
-  row.names(coat_table_mm) <- coat_table$strain
-  #coat_table_mm <- coat_table_mm[,"coatagouti", drop=F]-coat_table_mm[,"coatblack", drop=F]
-  #coat_table_mm[coat_table_mm==0] = NA
-  #coat_table_mm[coat_table_mm==-1] = 0
-}
 
 # For each genotype file read it and add to the long file, use only genotypes in the input
 # Read the genotype csv file
@@ -220,20 +240,16 @@ for (comrow in 1:dim(complete_table)[1]){
     # Add the phenotypes to the table
 
     ct <- if (p1n==p2n) as.character(coat_table %>% filter(strain==p1n) %>% select(coat)) else as.character(coat_table %>% filter(strain==sname) %>% select(coat))
-    if (is.null(ct) & (args$coat_phenotype | args$coat_covar)){
+    if (is.null(ct) & (args$coat_covar)){
       print(paste0("Can't find coat color for ", p1n, " or ", sname))
     }
     prow <- complete_table[comrow, pheno_names]
-    if (args$coat_phenotype){
-      cname <- if (p1n==p2n) p1n else sname
-      prow <- cbind(complete_table[comrow, pheno_names], coat_table_mm[cname,,drop=F])
-    }
     # Add the covariates to the table
-    crow <- cbind(complete_table[comrow, covar_names], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
+    crow <- cbind(complete_table[comrow, covar_names, drop=F], tibble(isWild=as.numeric(p1n %in% yamin$wild | p2n %in% yamin$wild)))
     if (args$coat_covar){
       crow <- cbind(crow, coat=ct)
     }
-    if (all(!is.na(crow))) {
+    if (all(!is.na(prow))) {
       phenos <- rbind(phenos, prow, fill = TRUE)
       covars <- rbind(covars, crow, fill = TRUE)
       sexvec <-
@@ -256,7 +272,20 @@ for (comrow in 1:dim(complete_table)[1]){
     }
   }
 }
-
+if (args$coat_phenotype){
+  for (rnum in 1:dim(strains)[1]){
+    sname <- strains$input_name[rnum]
+    p1n <- strains$p1[rnum]
+    p2n <- strains$p2[rnum]
+    cname <- if (p1n==p2n) p1n else sname
+    prow <- coat_table_mm[cname,,drop=F]
+    phenos <- rbind(phenos, prow, fill = TRUE)
+    if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
+      sorder <- c(sorder, sname)
+      strains_genomes[, sname:=(complete.geno[,..p1n] + complete.geno[,..p2n])/2]
+    }
+  }
+}
 # Generate a covar table based on the confounding SNPs provided in the yaml file
 snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
