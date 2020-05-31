@@ -95,6 +95,7 @@ if (length(args$input)){
 }else{
   complete_table <- tibble()
 }
+print(complete_table)
 # Generate a list of phenotypes and list of groups
 phegroups <- list()
 pheno_names <- c()
