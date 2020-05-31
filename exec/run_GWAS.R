@@ -129,7 +129,7 @@ if (args$coat_phenotype |args$coat_covar){
     coat_table_mm <- model.matrix(~coat+0, coat_table)
   rownames(coat_table_mm) <- coat_table$strain
   # Remove columns with one strain
-  coat_table_mm <- coat_table_mm[,colSums(ccoat_table_mm)>1, drop=F]
+  coat_table_mm <- coat_table_mm[,colSums(coat_table_mm)>1, drop=F]
 }
 
 # Get the strain names
