@@ -292,6 +292,8 @@ if (args$coat_phenotype){
     }
   }
 }
+print(strains_genomes)
+print(phenos)
 # Generate a covar table based on the confounding SNPs provided in the yaml file
 snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
