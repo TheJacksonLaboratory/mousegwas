@@ -292,8 +292,8 @@ if (args$coat_phenotype){
     }
   }
 }
-print(strains_genomes)
-print(phenos)
+print(dim(strains_genomes))
+print(dim(phenos))
 # Generate a covar table based on the confounding SNPs provided in the yaml file
 snpcovar <- NULL
 if (!is.null(yamin$confSNPs)){
@@ -333,7 +333,7 @@ if (args$shuffle){
 
 # Take the betas of each strain and use it to run GEMMA
 if (args$coat_phenotype){
-  b <- list(phenotypes = phenos, genomes = strains_genomes, indices = 1:nrow(phenos), covars=NULL)
+  b <- list(phenotypes = phenos, genotypes = strains_genomes, indices = 1:nrow(phenos), covars=NULL)
 }else{
   b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec, sorder)
 }
