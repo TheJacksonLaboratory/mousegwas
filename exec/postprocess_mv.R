@@ -106,7 +106,7 @@ for (n in names(yamin$phenotypes)) {
     rbind(
       pnames,
       data.frame(
-        Group = yamin$phenotypes[[n]]$group,
+        Group = if (length(yamin$phenotypes[[n]]$group)) yamin$phenotypes[[n]]$group else "NoGroup",
         PaperName = yamin$phenotypes[[n]]$papername, stringsAsFactors = FALSE
       )
     )
@@ -145,11 +145,12 @@ geno <-
   )
 
 PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
+groupsOrder = if (length(yamin$groups)) yamin$groups else unique(pnames$Group)
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
-grpcol <- rep(grpcol, ceiling(length(yamin$groups)/length(grpcol)))
+grpcol <- rep(grpcol, ceiling(length(groupsOrder)/length(grpcol)))
 pnames <-
-  left_join(pnames, tibble(Group = yamin$groups, color = grpcol[1:length(yamin$groups)]), by =
+  left_join(pnames, tibble(Group = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
               "Group")
 
 # We're all set
@@ -329,7 +330,7 @@ colrow <-
   tibble(rs = rownames(pgwas), cluster = kk$cluster[rowarr]) %>% left_join(clustcol, by =
                                                                              "cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
 grptocol <-
-  tibble(Group = yamin$groups, color = grpcol[1:length(yamin$groups)])
+  tibble(Group = groupsOrder, color = grpcol[1:length(groupsOrder)])
 colcol <-
   PVE %>% left_join(grptocol) %>% column_to_rownames(var = "PaperName") %>% dplyr::select(color)
 colcol <- colcol$color
@@ -374,7 +375,7 @@ eval(hplt$call)
 dev.off()
 
 # Plot the PVE estimates with SE
-names(grpcol) <- yamin$groups
+names(grpcol) <- groupsOrder
 pvh <- height
 if (dim(PVE)[1]>40) pvh <- height*2
 pvep <-
