@@ -71,6 +71,8 @@ parser$add_argument("--peakcorr",
                     help = "SNPs R^2 correlation cutoff for peak determination")
 parser$add_argument("--external_inrich", action="store_true", default=FALSE,
                     help="Prepare INRICH files but don't run INRICH")
+parser$add_argument("--coat_phenotype", action="store_true", default=FALSE,
+                    help="GWAS of coat color, no phenotypes in yaml file")
 
 args <- parser$parse_args()
 
@@ -110,6 +112,12 @@ for (n in names(yamin$phenotypes)) {
         PaperName = yamin$phenotypes[[n]]$papername, stringsAsFactors = FALSE
       )
     )
+}
+if (args$coat_phenotype){
+  for (p in phenos){
+    pheno_names <- c(pheno_names, p)
+    pnames <- rbind(pnames, data.frame(Group="NoGroup", Papername=gsub("(color|eyes)", "", p)))
+  }
 }
 row.names(pnames) <- pheno_names
 
