@@ -136,12 +136,12 @@ if (args$coat_phenotype |args$coat_covar){
 # Get the strain names
 if (args$coat_phenotype) {
   strains <-
-    tibble(
+    unique(tibble(
       input_name = rownames(coat_table_mm),
       p1 = rownames(coat_table_mm),
       p2 =
         rownames(coat_table_mm)
-    )
+    ))
 }else{
   strains <-
     complete_table %>% select(input_name = one_of(yamin$strain)) %>% unique() %>% mutate(p1 =
