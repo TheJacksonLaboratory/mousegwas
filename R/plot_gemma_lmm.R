@@ -54,6 +54,33 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
   return(srt_pv %>% dplyr::select(rs, choose, ispeak, rsq))
 }
 
+#' Get blocks as computed by the paper A sequence-based variation map of 8.27 million SNPs in inbred mouse strains
+#' https://www.nature.com/articles/nature06067
+#' Downloaded from: http://mouse.cs.ucla.edu/perlegen/
+#'
+#' @param gwas_pvs The gwas results with p-values
+#' @param blocks The blocks file, found in the extdata folder
+#' @param test which test to use (default p_wald)
+#' @param pthr p-value threshold
+#'
+#' @return
+#' @export
+#'
+#' @import dplyr
+get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.txt", package = "mousegwas"), test="p_wald", pthr=1e-6){
+  blks <- read.delim(blocks, header = TRUE, sep = "\t")
+  blks$chr <- gsub("^0", "", blks$chrom)
+  blks <- blks[,c("blockid", "chr", "startbp", "endbp")]
+  comb <- merge(gwas_pvs, blks, by="chr", all.x = TRUE, all.y = FALSE)
+  comb <- comb[comb$ps <= comb$endbp & comb$ps >= comb$startbp, ]
+  comb$choose <- comb$blockid
+  comb$ispeak <- FALSE
+  for (bl in unique(comb$blockid)){
+    comb$ispeak <- comb$ispeak | (comb[, test] <= pthr & comb[, test] == min(comb[comb$choose==bl, test]))
+  }
+  return (comb)
+}
+
 #' Plot the GWAS results as a Manhattan plot and highlight specific genes
 #'
 #' @param results_file A GEMMA results file
@@ -81,7 +108,7 @@ rep_peaks <- function(genotypes, gwas_pvs, rs_thr=0.4, pthr=1e-20, mxd=10000000,
 #' @import ggnewscale
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
-plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE, annot=NULL) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE, annot=NULL, blocks = TRUE) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% dplyr::select_("rs"="X1", test="X9")  # RSID and PVALUE_RE2
@@ -127,7 +154,10 @@ plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, py
   #"1"     "rs32166183"    3046097 0       "A"     "C"     0.300   4.737279e-02    1.737096e-02    6.561576e-02    1.160875e-03    9.232757e-04    2.029432e-03    1.757942e-03    2.437142e-03    4.390245e-03    5.048649e-01
   # Add peak color if genotypes are supplied
   genesdist = 10000
-  if (!is.null(genotypes)){
+  if (blocks){
+    gwas_results <- get_blocks(gwas_results, pthr = 10^-redthr)
+  }
+  else if (!is.null(genotypes)){
     #allgeno <- read.csv(genotypes, header = FALSE, row.names = 1)
     #allgeno <- allgeno[, 3:ncol(allgeno)]
     pnums <- rep_peaks(genotypes, gwas_results, rs_thr=corrthr, pthr=10^-redthr, mxd=maxdist, test=test)
