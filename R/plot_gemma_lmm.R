@@ -89,6 +89,7 @@ get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.tx
         (comb1[, test] <= pthr &
            comb1[, test] == min(comb1[comb1$choose == bl, test]))
     }
+    print(head(comb1))
     comb <- rbind(comb, comb1)
   }
   return (comb)
