@@ -71,12 +71,25 @@ get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.tx
   blks <- read.delim(blocks, header = TRUE, sep = "\t")
   blks$chr <- gsub("^0", "", blks$chrom)
   blks <- blks[,c("blockid", "chr", "startbp", "endbp")]
-  comb <- merge(gwas_pvs, blks, by="chr", all.x = TRUE, all.y = FALSE)
-  comb <- comb[comb$ps <= comb$endbp & comb$ps >= comb$startbp, ]
-  comb$choose <- comb$blockid
-  comb$ispeak <- FALSE
-  for (bl in unique(comb$blockid)){
-    comb$ispeak <- comb$ispeak | (comb[, test] <= pthr & comb[, test] == min(comb[comb$choose==bl, test]))
+  comb <- NULL
+  for (c in uniqe(gwas_pvs$chr)) {
+    comb1 <-
+      merge(gwas_pvs[gwas_pvs$chr == c, ],
+            blks,
+            by = "chr",
+            all.x = TRUE,
+            all.y = FALSE)
+    comb1 <-
+      comb1[comb1$ps <= comb1$endbp & comb1$ps >= comb1$startbp,]
+    comb1$choose <- comb1$blockid
+    comb1$ispeak <- FALSE
+    for (bl in unique(comb1$blockid)) {
+      comb1$ispeak <-
+        comb1$ispeak |
+        (comb1[, test] <= pthr &
+           comb1[, test] == min(comb1[comb1$choose == bl, test]))
+    }
+    comb <- rbind(comb, comb1)
   }
   return (comb)
 }
