@@ -72,6 +72,7 @@ get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.tx
   blks$chr <- gsub("^0", "", blks$chrom)
   blks <- blks[,c("blockid", "chr", "startbp", "endbp")]
   comb <- NULL
+  gwas_pvs <- as.data.frame(gwas_pvs)
   for (c in unique(gwas_pvs$chr)) {
     comb1 <-
       merge(gwas_pvs[gwas_pvs$chr == c, ],
