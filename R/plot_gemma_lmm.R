@@ -84,7 +84,7 @@ get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.tx
       comb1[comb1$ps <= comb1$endbp & comb1$ps >= comb1$startbp,]
     comb1$choose <- comb1$blockid
     comb1$ispeak <- FALSE
-    for (bl in unique(comb1$blockid)) {
+    for (bl in unique(comb1$blockid[comb1[,test] <= pthr])) {
       comb1$ispeak <-
         comb1$ispeak |
         (comb1[, test] <= pthr &
