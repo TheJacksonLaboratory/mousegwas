@@ -317,6 +317,7 @@ if (length(covar_names) > 0){
 }
 
 # scale to have mean=0 var=1 if there are more than 2 values (0,1)
+raw_phenos <- phenos
 if (!all(is.na(phenos) | phenos==0 | phenos==1)){
   phenos <- scale(phenos)
 }else{
@@ -324,11 +325,13 @@ if (!all(is.na(phenos) | phenos==0 | phenos==1)){
 }
 
 # Remove columns with NaNs
-for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]) | phenos[,c]==0)) phenos <- phenos[,-c, drop=F]}
+for (c in ncol(phenos):1){ if (all(is.na(phenos[,c]) | phenos[,c]==0)) {phenos <- phenos[,-c, drop=F]; raw_phenos <- raw_phenos[,-c,drop=F]}}
 
 if (args$shuffle){
   set.seed(args$seed)
-  phenos <- phenos[sample(nrow(phenos)),, drop=F]
+  neword <- sample(nrow(phenos))
+  phenos <- phenos[neword,, drop=F]
+  raw_phenos <- raw_phenos[neword,,drop=F]
 }
 
 # Take the betas of each strain and use it to run GEMMA
@@ -338,6 +341,8 @@ if (args$coat_phenotype){
   b <- average_strain(strains_genomes, phenos, covars, args$downsample, sexvec, sorder)
 }
 # Print the phenotypes order
+raw_phenos <- raw_phenos[b$indices,,drop=F]
+write.csv(raw_phenos, file=paste0(args$basedir, "/raw_phenotypes.csv"))
 write.csv(colnames(b$phenotypes), file=paste0(args$basedir, "/phenotypes_order.txt"), quote = FALSE, col.names = FALSE, row.names = FALSE)
 
 
