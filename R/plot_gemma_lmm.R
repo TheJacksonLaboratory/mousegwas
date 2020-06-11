@@ -93,6 +93,7 @@ get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.tx
     print(head(comb1))
     comb <- rbind(comb, comb1)
   }
+  comb <- comb[!is.na(comb$chr),]
   return (comb)
 }
 
