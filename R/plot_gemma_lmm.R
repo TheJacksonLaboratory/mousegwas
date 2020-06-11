@@ -124,7 +124,7 @@ get_blocks <- function(gwas_pvs, blocks=system.file("extdata", "block_summary.tx
 #' @import ggnewscale
 #' @importFrom magrittr `%>%`
 #' @importFrom readr read_delim
-plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE, annot=NULL, blocks = TRUE) {
+plot_gemma_lmm <- function(results_file, name="GWAS results", metasoft=FALSE, pyLMM=FALSE, annotations=NULL, namethr=5, redthr=4, diff=NULL, genotypes=NULL, maxdist=1000000, corrthr=0.6, test="p_wald", addgenes=TRUE, annot=NULL, blocks = FALSE) {
   if (metasoft){
     gwas_results <- read_delim(results_file, "\t", col_names = FALSE, skip=1, guess_max = Inf)
     gwas_results <- gwas_results %>% dplyr::select_("rs"="X1", test="X9")  # RSID and PVALUE_RE2
