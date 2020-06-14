@@ -254,7 +254,7 @@ for (comrow in 1:dim(complete_table)[1]){
     if (args$coat_covar){
       crow <- cbind(crow, coat=ct)
     }
-    if (all(!is.na(prow))) {
+    #if (all(!is.na(prow))) {
       phenos <- rbind(phenos, prow, fill = TRUE)
       covars <- rbind(covars, crow, fill = TRUE)
       sexvec <-
@@ -262,7 +262,7 @@ for (comrow in 1:dim(complete_table)[1]){
           1
           else
             complete_table[comrow, yamin$sex])
-    }
+    #}
   }else{
     if (p1n==p2n){
       if (!p1n %in% notfounds){
