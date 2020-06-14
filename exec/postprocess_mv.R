@@ -345,6 +345,7 @@ colcol <- colcol$color
 hwid <- fullw
 if (dim(PVE)[1]>40) hwid <- fullw*2
 
+write.csv(cbind(pgwas, cbind(colrow, kk$cluster[rowarr])), file = paste0(args$plotdir, "/all_peaks_values_clusters.csv"))
 cairo_pdf(
   paste0(args$plotdir, "/all_peaks_heatmap.pdf"),
   width = hwid,
