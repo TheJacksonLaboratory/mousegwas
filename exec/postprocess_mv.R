@@ -315,6 +315,8 @@ if (args$nomv) {
   }
 }
 
+# Plot the effectplots for all the peaks
+plot_effect(args$outdir, args$plotdir, allpeaks, fullw, height, ffam)
 # Cluster the peaks using the P values
 
 pgwas <-
