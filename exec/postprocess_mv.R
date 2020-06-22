@@ -482,7 +482,7 @@ for (g in names(grpwas)) {
     colorby = "grpcolor"
     pallete = left_join(tibble(grpcolor=unique(allpwas$grpcolor)), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
                                                               "grpcolor")
-    pallete <- pallete$color
+    pallete <- as.character(pallete$color)
   }
   print(pallete)
   outplot <- ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
