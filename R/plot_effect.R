@@ -21,7 +21,7 @@ plot_effect <- function(basedir, plotdir, rsnames, fullw = 7.25, height=3.45, ff
     cairo_pdf(paste0(plotdir, "/effect_plot_", r, ".pdf"), width = fullw, height = height, family = ffam, onefile = TRUE)
     for (p in colnames(pheno)){
       df <- data.frame(base::t(geno[r, -1:-2, drop=F]), pheno[,p,drop=F])
-      print(ggplot(df, aes_string(r, p, group=r)) + geom_boxplot() + geom_jitter(alpha = 0.5) + theme_bw() +
+      print(ggplot(df, aes_string(r, p, group=r)) + geom_boxplot() + geom_jitter(alpha = 0.5, height=0) + theme_bw() +
         scale_x_continuous(
         breaks = c(0,1,2), labels = c(as.character(geno[r,1]),
                    paste0(geno[r,1], "/", geno[r,2]),

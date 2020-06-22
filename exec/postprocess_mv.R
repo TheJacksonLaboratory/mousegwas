@@ -73,6 +73,8 @@ parser$add_argument("--external_inrich", action="store_true", default=FALSE,
                     help="Prepare INRICH files but don't run INRICH")
 parser$add_argument("--coat_phenotype", action="store_true", default=FALSE,
                     help="GWAS of coat color, no phenotypes in yaml file")
+parser$add_argument("--colorgroup", action="store_true", default=FALSE,
+                    help="Color the Group Manhattan plots by group rather than cluster")
 
 args <- parser$parse_args()
 
@@ -236,6 +238,7 @@ if (args$nomv) {
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak,-choose, -rsq)
+        allpwas$grpcolor <- pnames$color[pnames$PaperName==p][1]
       } else{
         allpwas <-
           left_join(allpwas,
@@ -245,6 +248,7 @@ if (args$nomv) {
         allpwas$P <- pmax(allpwas$P, allpwas$P.x)
         allpwas$p_wald <- pmin(allpwas$p_wald, allpwas$p_wald.x)
         allpwas <- allpwas %>% dplyr::select(-P.x,-p_wald.x)
+        allpwas$grpcolor[allpwas$p_wald == lilp[[p]]$pwas$p_wald] <- pnames$color[pnames$PaperName==p][1]
       }
     }
     if (is.null(allpwas)) {
@@ -473,6 +477,9 @@ for (g in names(grpwas)) {
   ymin <- 1.25 * min(allpwas$P, na.rm = TRUE)
   chr_label <- axisdf$chr
   chr_label[chr_label == 20] = "X"
+  colorby <- "cluster"
+  pallete <- ccols
+  if (args$colorgroup) {colorby = "grpcolor"; pallete = unique(allpwas$grpcolor)}
   outplot <- ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
     # Show all points
@@ -483,17 +490,17 @@ for (g in names(grpwas)) {
     scale_size_continuous(range=c(0,1), trans = "exp") +
     geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-    geom_point(aes(color = cluster, size=rsq, alpha=rsq)) +
-    scale_color_manual(values = ccols) +
+    geom_point(aes(color = !!eval(colorby), size=rsq, alpha=rsq)) +
+    scale_color_manual(values = pallete) +
     scale_size_continuous(range=c(0,1), trans = "exp") +
     scale_alpha_continuous(range = c(0,1), trans="exp") +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
     geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
     scale_alpha_manual(values = c(0, 1)) +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-    geom_point(aes(color = cluster,
+    geom_point(aes(color = !!eval(colorby),
                    alpha = ispeak), size = 1) +
-    scale_color_manual(values = ccols) +
+    scale_color_manual(values = pallete) +
     scale_alpha_manual(values = c(0, 1)) +
     scale_x_continuous(label = chr_label, breaks = axisdf$center) +
     scale_y_continuous(expand = c(0, 0)) +     # remove space between plot area and x axis
