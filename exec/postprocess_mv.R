@@ -238,7 +238,7 @@ if (args$nomv) {
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak,-choose, -rsq)
-        allpwas$grpcolor <- pnames$color[pnames$PaperName==p][1]
+        allpwas$grpcolor <- pnames$Group[pnames$PaperName==p][1]
       } else{
         allpwas <-
           left_join(allpwas,
@@ -247,7 +247,7 @@ if (args$nomv) {
                     suffix = c("", ".x"))
         allpwas$P <- pmax(allpwas$P, allpwas$P.x)
         allpwas$p_wald <- pmin(allpwas$p_wald, allpwas$p_wald.x)
-        allpwas$grpcolor[allpwas$p_wald == allpwas$p_wald.x] <- pnames$color[pnames$PaperName==p][1]
+        allpwas$grpcolor[allpwas$p_wald == allpwas$p_wald.x] <- pnames$Group[pnames$PaperName==p][1]
         allpwas <- allpwas %>% dplyr::select(-P.x,-p_wald.x)
 
       }
@@ -478,7 +478,12 @@ for (g in names(grpwas)) {
   chr_label[chr_label == 20] = "X"
   colorby <- "cluster"
   pallete <- ccols
-  if (args$colorgroup) {colorby = "grpcolor"; pallete = unique(allpwas$grpcolor)}
+  if (args$colorgroup) {
+    colorby = "grpcolor"
+    pallete = left_join(unique(allpwas$grpcolor), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
+                                                              "grpcolor")
+    pallete <- pallete$color
+  }
   print(pallete)
   outplot <- ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
