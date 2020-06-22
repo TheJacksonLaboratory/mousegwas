@@ -479,6 +479,7 @@ for (g in names(grpwas)) {
   colorby <- "cluster"
   pallete <- ccols
   if (args$colorgroup) {colorby = "grpcolor"; pallete = unique(allpwas$grpcolor)}
+  print(pallete)
   outplot <- ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
     # Show all points
