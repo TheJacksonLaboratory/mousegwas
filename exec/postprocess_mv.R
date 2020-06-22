@@ -480,7 +480,7 @@ for (g in names(grpwas)) {
   pallete <- ccols
   if (args$colorgroup) {
     colorby = "grpcolor"
-    pallete = left_join(unique(allpwas$grpcolor), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
+    pallete = left_join(tibble(grpcolor=unique(allpwas$grpcolor)), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
                                                               "grpcolor")
     pallete <- pallete$color
   }
