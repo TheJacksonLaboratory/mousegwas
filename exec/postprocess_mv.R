@@ -247,8 +247,9 @@ if (args$nomv) {
                     suffix = c("", ".x"))
         allpwas$P <- pmax(allpwas$P, allpwas$P.x)
         allpwas$p_wald <- pmin(allpwas$p_wald, allpwas$p_wald.x)
+        allpwas$grpcolor[allpwas$p_wald == allpwas$p_wald.x] <- pnames$color[pnames$PaperName==p][1]
         allpwas <- allpwas %>% dplyr::select(-P.x,-p_wald.x)
-        allpwas$grpcolor[allpwas$p_wald == lilp[[p]]$pwas$p_wald] <- pnames$color[pnames$PaperName==p][1]
+
       }
     }
     if (is.null(allpwas)) {
@@ -319,8 +320,6 @@ if (args$nomv) {
   }
 }
 
-# Plot the effectplots for all the peaks
-plot_effect(args$outdir, args$plotdir, allpeaks, fullw, height, ffam)
 # Cluster the peaks using the P values
 
 pgwas <-
@@ -901,3 +900,6 @@ ggsave(
   height = height,
   units = "in"
 )
+
+# Plot the effectplots for all the peaks
+plot_effect(args$outdir, args$plotdir, allpeaks, fullw, height, ffam)
