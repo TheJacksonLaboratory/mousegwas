@@ -495,7 +495,7 @@ for (g in names(grpwas)) {
     scale_size_continuous(range=c(0,1), trans = "exp") +
     geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-    geom_point(aes(color = !!eval(colorby), size=rsq, alpha=rsq)) +
+    geom_point(aes_string(color = colorby, size="rsq", alpha="rsq")) +
     scale_color_manual(values = pallete) +
     scale_size_continuous(range=c(0,1), trans = "exp") +
     scale_alpha_continuous(range = c(0,1), trans="exp") +
@@ -503,8 +503,8 @@ for (g in names(grpwas)) {
     geom_point(aes(alpha = ispeak), size = 1.2, color = "black") +
     scale_alpha_manual(values = c(0, 1)) +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
-    geom_point(aes(color = !!eval(colorby),
-                   alpha = ispeak), size = 1) +
+    geom_point(aes_string(color = colorby,
+                   alpha = "ispeak"), size = 1) +
     scale_color_manual(values = pallete) +
     scale_alpha_manual(values = c(0, 1)) +
     scale_x_continuous(label = chr_label, breaks = axisdf$center) +
