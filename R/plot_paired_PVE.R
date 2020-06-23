@@ -1,6 +1,6 @@
 paired_PVE_plot <- function(PVE, mean_name="Mean", var_name = "Variance"){
-  meanPVE <- PVE[grepl(paste0(mean_name, "$") PVE$PaperName), ]
-  varPVE <- PVE[grepl(paste0(var_name, "$") PVE$PaperName), ]
+  meanPVE <- PVE[grepl(paste0(mean_name, "$"), PVE$PaperName), ]
+  varPVE <- PVE[grepl(paste0(var_name, "$"), PVE$PaperName), ]
   # Add non-mean/variance to mean table
   meanPVE <- rbind(meanPVE, PVE[!(PVE$PaperName %in% c(meanPVE$PaperName, varPVE$PaperName)),])
   varPVE <- rbind(varPVE, PVE[!(PVE$PaperName %in% c(meanPVE$PaperName, varPVE$PaperName)),])
