@@ -69,12 +69,24 @@ parser$add_argument("--peakcorr",
                     type = "double",
                     default = 0.25,
                     help = "SNPs R^2 correlation cutoff for peak determination")
-parser$add_argument("--external_inrich", action="store_true", default=FALSE,
-                    help="Prepare INRICH files but don't run INRICH")
-parser$add_argument("--coat_phenotype", action="store_true", default=FALSE,
-                    help="GWAS of coat color, no phenotypes in yaml file")
-parser$add_argument("--colorgroup", action="store_true", default=FALSE,
-                    help="Color the Group Manhattan plots by group rather than cluster")
+parser$add_argument(
+  "--external_inrich",
+  action = "store_true",
+  default = FALSE,
+  help = "Prepare INRICH files but don't run INRICH"
+)
+parser$add_argument(
+  "--coat_phenotype",
+  action = "store_true",
+  default = FALSE,
+  help = "GWAS of coat color, no phenotypes in yaml file"
+)
+parser$add_argument("--colorgroup",
+                    action = "store_true",
+                    default = FALSE,
+                    help = "Color the Group Manhattan plots by group rather than cluster")
+parser$add_argument("--meanvariance", action="store_true", default=FALSE,
+                    help="Plot the PVE of mean and variance phenotypes in different plots")
 
 args <- parser$parse_args()
 
@@ -391,21 +403,42 @@ dev.off()
 # Plot the PVE estimates with SE
 names(grpcol) <- groupsOrder
 pvh <- height
-if (dim(PVE)[1]>40) pvh <- height*2
-pvep <-
-  ggplot(PVE, aes(reorder(PaperName, -PVE), PVE, fill = Group)) + geom_bar(color =
-                                                                             "black", stat = "identity") +
-  scale_fill_manual(values = grpcol) +
-  geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
-  xlab("Phenotype") + coord_flip() +
-  theme_bw()  +
-  theme(text = element_text(size = 10, family = ffam), legend.position = "right")
+if (args$meanvariance) {
+  pveplots <- paired_PVE_plot(PVE)
+  pvep <-
+    plot_grid(
+      pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
+        theme(
+          text = element_text(size = 10, family = ffam),
+          legend.position = "none"
+        ),
+      pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
+        theme(
+          text = element_text(size = 10, family = ffam),
+          legend.position = "right"
+        ),
+      nrow = 1,
+      ncol = 2
+    )
+} else{
+  if (dim(PVE)[1] > 40)
+    pvh <- height * 2
+  pvep <-
+    ggplot(PVE, aes(reorder(PaperName,-PVE), PVE, fill = Group)) + geom_bar(color =
+                                                                              "black", stat = "identity") +
+    scale_fill_manual(values = grpcol) +
+    geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
+    xlab("Phenotype") + coord_flip() +
+    theme_bw()  +
+    theme(text = element_text(size = 10, family = ffam),
+          legend.position = "right")
+}
 ggsave(
   paste0(args$plotdir, "/PVE_plot.pdf"),
   plot = pvep,
   device = cairo_pdf,
   dpi = "print",
-  width = halfw,
+  width = halfw * 1.5,
   height = pvh,
   units = "in"
 )
