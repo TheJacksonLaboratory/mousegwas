@@ -1,0 +1,167 @@
+F1:
+  - B6129SF1/J:
+      - C57BL/6J
+      - 129S1/SvImJ
+  - B6129PF1/J:
+      - C57BL/6J
+      - 129P3/J
+  - B6AF1/J:
+      - C57BL/6J
+      - A/J
+  - B6C3F1/J:
+      - C57BL/6J
+      - C3H/HeJ
+  - B6CBAF1/J:
+      - C57BL/6J
+      - CBA/J
+  - B6D2F1/J:
+      - C57BL/6J
+      - DBA/2J
+  - B6SJLF1/J:
+      - C57BL/6J
+      - SJL/J
+  - CAF1/J:
+      - BALB/cJ
+      - A/J
+  - CB6F1/J:
+      - BALB/cJ
+      - C57BL/6J
+  - CByB6F1/J:
+      - BALB/cByJ
+      - C57BL/6J
+  - NZBWF1/J:
+      - NZB/BlNJ
+      - NZW/LacJ
+  - B6FVBF1/J:
+      - C57BL/6J
+      - FVB/NJ
+coat:
+  - 129P1/ReJ: pink-eyed, light-bellied chinchilla
+  - 129S1/SvImJ: white-bellied agouti
+  - 129T2/SvEmsJ: light-bellied agouti chinchilla
+  - A/HeJ: albino
+  - A/J: albino
+  - AKR/J: albino
+  - ALR/LtJ: albino
+  - ALS/LtJ: albino
+  - ATEB/LeJ: dilute grey
+  - A/WySnJ: albino
+  - B6.Cg-Tubtub/J: black
+  - B6.V-Lepob/J: black
+  - BALB/cByJ: albino
+  - BALB/cJ: albino
+  - BDP/J: pink-eyed, fawn
+  - BKS.Cg-m +/+ Leprdb/J: black
+  - BKSChpLt.HRS-Cpefat/J: black
+  - BPH/2J: albino
+  - BPL/1J: misty toned grey
+  - BPN/3J: black
+  - BTBR T<+> Itpr3<tf>/J: black and tan, tufted
+  - BUB/BnJ: albino
+  - BXSB/MpJ: white-bellied agouti
+  - C3HeB/FeJ: agouti
+  - C3H/HeJ: agouti
+  - C3H/HeSnJ: agouti
+  - C57BL/10J: black
+  - C57BL/10ScNJ: black
+  - C57BL/10ScSnJ: black
+  - C57BL/6ByJ: black
+  - C57BL/6J: black
+  - C57BLKS/J: black
+  - C57BR/cdJ: brown
+  - C57L/J: leaden
+  - C58/J: black
+  - CALB/RkJ: light-bellied agouti
+  - CAST/EiJ: agouti
+  - CAROLI/EiJ: light-bellied agouti
+  - CBA/CaJ: agouti
+  - CASA/RkJ: agouti
+  - CAST/EiJ: agouti
+  - CBA/CaJ: agouti
+  - CBA/J: agouti
+  - CE/J: greyish white
+  - CZECHII/EiJ: white-bellied agouti
+  - DBA/1J: dilute brown
+  - DBA/1LacJ: dilute brown
+  - DBA/2J: dilute brown
+  - DBA/2DeJ: dilute brown
+  - DBA/2HaSmnJ: dilute brown
+  - DDY/JclSidSeyFrkJ: albino
+  - EL/SuzSeyFrkJ: albino
+  - FVB/NJ: albino
+  - GR/J: albino
+  - HPG/BmJ: agouti
+  - I/LnJ: pink-eyed, dilute brown
+  - ICR/HaJ: albino
+  - ILS/IbgTejJ: pink-eyed, brown
+  - IS/CamRkJ: agouti
+  - ISS/IbgTejJ: albino
+  - JF1/MsJ: black-eyed, black spotted white coat
+  - KK/HlJ: albino
+  - LEWES/EiJ: white-bellied agouti
+  - LG/J: albino
+  - LP/J: white-bellied agouti
+  - LT/SvEiJ: grey-brown
+  - MA/MyJ: albino
+  - MOLD/RkJ: white-bellied agouti
+  - MOLF/EiJ: white-bellied agouti
+  - MOLG/DnJ: white-bellied agouti
+  - MRL/MpJ: albino
+  - MRL/MpJ-Fas<lpr>/J: albino
+  - MSM/MsJ: white-bellied agouti
+  - NH/KiPtJ: pink-eyed, grey with white spotting
+  - NOD.B10Sn-H2<b>/J: albino
+  - NOD.CB17-Prkdc<scid>/J: albino
+  - NOD.Cg-Prkdc<scid> Il2rg<tm1Wjl>/SzJ: albino
+  - NOD/ShiLtJ: albino
+  - NONcNZO10/LtJ: albino
+  - NON/ShiLtJ: albino
+  - NONcNZO5/LtJ: albino
+  - NOR/LtJ: albino
+  - NU/J: albino
+  - NZB/BlNJ: black
+  - NZL/LtJ: agouti
+  - NZM2410/J: tan
+  - NZO/HlLtJ: agouti
+  - NZW/LacJ: albino
+  - PAHARI/EiJ: white-bellied agouti
+  - PANCEVO/EiJ: white-bellied agouti
+  - PERA/EiJ: agouti
+  - PERC/EiJ: agouti
+  - P/J: pink-eyed, fawn
+  - PL/J: albino
+  - PN/nBSwUmabJ: albino
+  - PWD/PhJ: agouti
+  - PWK/PhJ: agouti
+  - RBF/DnJ: albino
+  - RF/J: albino
+  - RIIIS/J: albino
+  - SB/LeJ: pale grey
+  - SEA/GnJ: light brown agouti
+  - SEC/1GnLeJ: pink-eyed, chinchilla
+  - SF/CamEiJ: agouti
+  - SH1/LeJ: chinchilla
+  - SI/Col Tyrp1<b> Dnah11<iv>/J: brown agouti
+  - SJL/Bm: albino
+  - SJL/J: albino
+  - SKIVE/EiJ: white-bellied agouti
+  - SOD1/EiJ: agouti
+  - SPRET/EiJ: white-bellied agouti
+  - ST/bJ: albino
+  - SWR/J: albino
+  - TKDU/DnJ: dilute grey
+  - TSJ/LeJ: agouti brown
+  - WSB/EiJ: white-bellied agouti
+  - YBR/EiJ: brown
+  - B6FVBF1/J: agouti
+  - B6AF1/J: black
+  - CAF1/J: albino
+  - B6D2F1/J: black
+  - CB6F1/J: agouti
+  - NZBWF1/J: agouti
+  - CByB6F1/J: agouti
+  - B6C3F1/J: agouti
+  - B6CBAF1/J: agouti
+  - B6SJLF1/J: agouti
+  - B6129PF1/J: white-bellied agouti
+  - B6129SF1/J: white-bellied agouti
