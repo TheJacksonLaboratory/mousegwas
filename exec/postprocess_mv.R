@@ -404,7 +404,7 @@ dev.off()
 names(grpcol) <- groupsOrder
 pvh <- height
 if (args$meanvariance) {
-  pveplots <- paired_PVE_plot(PVE)
+  pveplot <- paired_PVE_plot(PVE)
   pvep <-
     plot_grid(
       pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
