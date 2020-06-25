@@ -7,6 +7,7 @@ paired_PVE_plot <- function(PVE, var_name = "Variance"){
   # Adding false variance rows for non-mean/variance phenotypes
   novar <- setdiff(meanPVE$PaperName, varPVE$basename)
   addv <- meanPVE[meanPVE$PaperName %in% novar,]
+  addv$basename <- addv$PaperName
   addv[,"PVE"] <- 0
   addv[, "PaperName"] <- ""
   addv[, "PVESE"] <- 0
