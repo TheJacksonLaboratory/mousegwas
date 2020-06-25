@@ -1,16 +1,18 @@
-paired_PVE_plot <- function(PVE, mean_name="Mean", var_name = "Variance"){
-  meanPVE <- PVE[grepl(paste0(mean_name, "$"), PVE$PaperName), ]
-  varPVE <- PVE[grepl(paste0(var_name, "$"), PVE$PaperName), ]
+paired_PVE_plot <- function(PVE, var_name = "Variance"){
+  meanPVE <- PVE[!grepl(paste0(var_name), PVE$PaperName), ]
+  varPVE <- PVE[grepl(paste0(var_name), PVE$PaperName), ]
   # Add non-mean/variance to mean table
-  meanPVE <- rbind(meanPVE, PVE[!(PVE$PaperName %in% c(meanPVE$PaperName, varPVE$PaperName)),])
   varPVE <- rbind(varPVE, PVE[!(PVE$PaperName %in% c(meanPVE$PaperName, varPVE$PaperName)),])
-  meanPVE$basename <- gsub(paste0(mean_name, "$"), "", meanPVE$PaperName)
-  varPVE$basename <- gsub(paste0(var_name, "$"), "", varPVE$PaperName)
+  varPVE$basename <- gsub(paste0(var_name), "", varPVE$PaperName)
   # Adding false variance rows for non-mean/variance phenotypes
-  novar <- grepl(paste0(var_name, "$"), varPVE$PaperName)
-  varPVE[novar, "PVE"] <- 0
-  varPVE[novar, "PaperName"] <- ""
-  varPVE[novar, "PVESE"] <- 0
+  novar <- setdiff(meanPVE$PaperName, varPVE$basename)
+  addv <- meanPVE[meanPVE$PaperName %in% novar,]
+  addv[,"PVE"] <- 0
+  addv[, "PaperName"] <- ""
+  addv[, "PVESE"] <- 0
+  varPVE <- rbind(varPVE, addv)
+  rownames(varPVE) <- varPVE$basename
+  varPVE <- varPVE[meanPVE$PaperName, ]
 
   pvorder <- sort(meanPVE$PVE, decreasing = T)
   # Plot the plots
