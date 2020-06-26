@@ -404,6 +404,8 @@ dev.off()
 names(grpcol) <- groupsOrder
 pvh <- height
 if (args$meanvariance) {
+  if (dim(PVE)[1] > 40)
+    pvh <- height * 1.5
   pveplot <- paired_PVE_plot(PVE)
   pvep <-
     plot_grid(
@@ -415,10 +417,13 @@ if (args$meanvariance) {
       pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
-          legend.position = "right"
+          legend.position = "none"
         ),
       nrow = 1,
-      ncol = 2
+      ncol = 2,
+      labels = c("Mean", "Variance"),
+      label_size = 12,
+      label_fontfamily = ffam
     )
 } else{
   if (dim(PVE)[1] > 40)
