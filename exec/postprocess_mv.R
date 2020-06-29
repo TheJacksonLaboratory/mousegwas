@@ -946,4 +946,4 @@ ggsave(
 )
 
 # Plot the effectplots for all the peaks
-plot_effect(args$outdir, args$plotdir, allpeaks, fullw, height, ffam)
+plot_effect(args$outdir, args$plotdir, allpeaks, pnames, fullw, fheight, ffam)
