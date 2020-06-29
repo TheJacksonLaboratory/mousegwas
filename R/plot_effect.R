@@ -27,6 +27,8 @@ plot_effect <- function(basedir, plotdir, rsnames, pnames, fullw = 7.25, height=
     pvec <- list()
     i=1
     for (p in colnames(pheno)){
+      print(p)
+      print(head(pheno))
       df <- data.frame(base::t(geno[r, -1:-2, drop=F]), pheno[,p,drop=F], strains = factor(strains))
       df[,r] <- as.factor(df[,r])
       pvec[[i]] <- ggplot(df, aes_string(x=r, y=p, group=r)) + geom_violin(aes_string(fill = r), scale="area") +

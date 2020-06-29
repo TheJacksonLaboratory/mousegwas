@@ -332,6 +332,9 @@ if (args$nomv) {
   }
 }
 
+# Plot the effectplots for all the peaks
+plot_effect(args$outdir, args$plotdir, allpeaks, pnames, fullw, fheight, ffam)
+
 # Cluster the peaks using the P values
 
 pgwas <-
@@ -945,5 +948,3 @@ ggsave(
   units = "in"
 )
 
-# Plot the effectplots for all the peaks
-plot_effect(args$outdir, args$plotdir, allpeaks, pnames, fullw, fheight, ffam)
