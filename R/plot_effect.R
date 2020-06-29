@@ -28,6 +28,7 @@ plot_effect <- function(basedir, plotdir, rsnames, pnames, fullw = 7.25, height=
     i=1
     for (p in colnames(pheno)){
       print(p)
+      print(pnames)
       print(head(pheno))
       df <- data.frame(base::t(geno[r, -1:-2, drop=F]), pheno[,p,drop=F], strains = factor(strains))
       df[,r] <- as.factor(df[,r])
