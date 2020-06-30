@@ -174,6 +174,7 @@ grpcol <- rep(grpcol, ceiling(length(groupsOrder)/length(grpcol)))
 pnames <-
   left_join(pnames, tibble(Group = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
               "Group")
+row.names(pnames) <- pheno_names
 
 # We're all set
 dir.create(args$plotdir, recursive = TRUE)
