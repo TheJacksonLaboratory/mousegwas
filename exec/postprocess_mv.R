@@ -424,10 +424,10 @@ if (args$meanvariance) {
           legend.position = "none"
         ),
       nrow = 1,
-      ncol = 2,
-      labels = c("Mean", "Variance"),
-      label_size = 12,
-      label_fontfamily = ffam
+      ncol = 2
+    # labels = c("Mean", "Variance"),
+    #  label_size = 12,
+    #  label_fontfamily = ffam
     )
 } else{
   if (dim(PVE)[1] > 40)

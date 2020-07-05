@@ -24,7 +24,8 @@ paired_PVE_plot <- function(PVE, var_name = "Variance"){
     ggplot(varPVE, aes(reorder(basename, -meanPVE$PVE), PVE, fill = Group)) + geom_bar(color =
                                                                                       "black", stat = "identity") +
     geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
-    xlab("Phenotype") + coord_flip()
+    xlab("Phenotype") + coord_flip() + theme(axis.title.x=element_blank(),
+                                             axis.text.x=element_blank())
 
   return(list(mean_plot = mean_pvep, var_plot = var_pvep))
 
