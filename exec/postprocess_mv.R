@@ -19,6 +19,8 @@ library(argparse)
 library(enrichR)
 library(yaml)
 library(cowplot)
+library(grid)
+library(gtable)
 library(mousegwas)
 
 parser <- ArgumentParser()
@@ -188,25 +190,29 @@ if (args$meanvariance) {
     pvh <- height * 1.5
   pveplot <- paired_PVE_plot(PVE)
   pvep <-
-    plot_grid(
-      pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
+    cbind(
+      ggplotGrob(pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
           legend.position = "none"
-        ),
-      pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
+        )),
+      ggplotGrob(pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
           legend.position = "none",
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank()
-        ),
-      nrow = 1,
-      ncol = 2
-      # labels = c("Mean", "Variance"),
-      #  label_size = 12,
-      #  label_fontfamily = ffam
+        )),
+
     )
+  cairo_pdf(
+    paste0(args$plotdir, "/PVE_plot.pdf"),
+    width = halfw * 1.5,
+    height = pvh,
+    family = ffam
+  )
+  grid.draw(pvep)
+  dev.off()
 } else{
   if (dim(PVE)[1] > 40)
     pvh <- height * 2
@@ -219,7 +225,7 @@ if (args$meanvariance) {
     theme_bw()  +
     theme(text = element_text(size = 10, family = ffam),
           legend.position = "right")
-}
+
 ggsave(
   paste0(args$plotdir, "/PVE_plot.pdf"),
   plot = pvep,
@@ -229,7 +235,7 @@ ggsave(
   height = pvh,
   units = "in"
 )
-
+}
 
 # Write the genes for INRICH, get the gene annotations and pass them on
 annot <- write_genes_map(args$plotdir)
