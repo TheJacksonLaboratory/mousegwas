@@ -97,7 +97,7 @@ ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 pigr <- RColorBrewer::brewer.pal(name = "PiYG", n = 11)
 hmcol <-
   viridis(128)#colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
-grpcol <- RColorBrewer::brewer.pal(8, "Accent")
+grpcol <- RColorBrewer::brewer.pal(12, "Set3")
 fullw <- 7.25
 halfw <- 3.54
 fheight <- 11-1.25
@@ -197,10 +197,7 @@ if (args$meanvariance) {
       pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
-          legend.position = "none",
-          axis.title.x = element_blank(),
-          axis.text.x = element_blank(),
-          axis.ticks.x = element_blank()
+          legend.position = "none"
         ),
       nrow = 1,
       ncol = 2
