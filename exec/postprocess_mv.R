@@ -180,6 +180,58 @@ row.names(pnames) <- pheno_names
 dir.create(args$plotdir, recursive = TRUE)
 set.seed(490)
 
+# Plot the PVE estimates with SE
+names(grpcol) <- groupsOrder
+pvh <- height
+if (args$meanvariance) {
+  if (dim(PVE)[1] > 40)
+    pvh <- height * 1.5
+  pveplot <- paired_PVE_plot(PVE)
+  pvep <-
+    plot_grid(
+      pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
+        theme(
+          text = element_text(size = 10, family = ffam),
+          legend.position = "none"
+        ),
+      pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
+        theme(
+          text = element_text(size = 10, family = ffam),
+          legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank()
+        ),
+      nrow = 1,
+      ncol = 2
+      # labels = c("Mean", "Variance"),
+      #  label_size = 12,
+      #  label_fontfamily = ffam
+    )
+} else{
+  if (dim(PVE)[1] > 40)
+    pvh <- height * 2
+  pvep <-
+    ggplot(PVE, aes(reorder(PaperName,-PVE), PVE, fill = Group)) + geom_bar(color =
+                                                                              "black", stat = "identity") +
+    scale_fill_manual(values = grpcol) +
+    geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
+    xlab("Phenotype") + coord_flip() +
+    theme_bw()  +
+    theme(text = element_text(size = 10, family = ffam),
+          legend.position = "right")
+}
+ggsave(
+  paste0(args$plotdir, "/PVE_plot.pdf"),
+  plot = pvep,
+  device = cairo_pdf,
+  dpi = "print",
+  width = halfw * 1.5,
+  height = pvh,
+  units = "in"
+)
+
+
 # Write the genes for INRICH, get the gene annotations and pass them on
 annot <- write_genes_map(args$plotdir)
 
@@ -231,13 +283,7 @@ for (i in 1:length(phenos)) {
     units = "in"
   )
 }
-# Plot all pdfs in one file
-cairo_pdf(filename  = paste0(args$plotdir, "/all_Manhattan_plots.pdf"), width = fullw, height = height, family = ffam, onefile = TRUE)
-for (i in names(lilp)){
-  print(lilp[[i]]$plot + ggtitle(i) + theme(text = element_text(size = 10, family =
-                                                                  ffam)))
-}
-dev.off()
+
 # Plot the groups MAnhattan plots
 grpwas <- list()
 if (args$nomv) {
@@ -401,57 +447,6 @@ svg(paste0(args$plotdir, "/all_peaks_heatmap.svg"),
     family = ffam)
 eval(hplt$call)
 dev.off()
-
-# Plot the PVE estimates with SE
-names(grpcol) <- groupsOrder
-pvh <- height
-if (args$meanvariance) {
-  if (dim(PVE)[1] > 40)
-    pvh <- height * 1.5
-  pveplot <- paired_PVE_plot(PVE)
-  pvep <-
-    plot_grid(
-      pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
-        theme(
-          text = element_text(size = 10, family = ffam),
-          legend.position = "none"
-        ),
-      pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
-        theme(
-          text = element_text(size = 10, family = ffam),
-          legend.position = "none",
-          axis.title.x = element_blank(),
-          axis.text.x = element_blank(),
-          axis.ticks.x = element_blank()
-        ),
-      nrow = 1,
-      ncol = 2
-    # labels = c("Mean", "Variance"),
-    #  label_size = 12,
-    #  label_fontfamily = ffam
-    )
-} else{
-  if (dim(PVE)[1] > 40)
-    pvh <- height * 2
-  pvep <-
-    ggplot(PVE, aes(reorder(PaperName,-PVE), PVE, fill = Group)) + geom_bar(color =
-                                                                              "black", stat = "identity") +
-    scale_fill_manual(values = grpcol) +
-    geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
-    xlab("Phenotype") + coord_flip() +
-    theme_bw()  +
-    theme(text = element_text(size = 10, family = ffam),
-          legend.position = "right")
-}
-ggsave(
-  paste0(args$plotdir, "/PVE_plot.pdf"),
-  plot = pvep,
-  device = cairo_pdf,
-  dpi = "print",
-  width = halfw * 1.5,
-  height = pvh,
-  units = "in"
-)
 
 
 # Plot the phenotypes manhattan plots with clusters colors
