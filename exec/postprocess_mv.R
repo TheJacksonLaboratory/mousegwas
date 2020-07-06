@@ -194,14 +194,16 @@ if (args$meanvariance) {
       ggplotGrob(pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
-          legend.position = "none"
+          legend.position = "none",
+          plot.title = element_text(hjust = 0.5)
         )),
       ggplotGrob(pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
           legend.position = "none",
           axis.text.y = element_blank(),
-          axis.ticks.y = element_blank()
+          axis.ticks.y = element_blank(),
+          plot.title = element_text(hjust = 0.5)
         ))
     )
   cairo_pdf(
