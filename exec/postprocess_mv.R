@@ -202,8 +202,7 @@ if (args$meanvariance) {
           legend.position = "none",
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank()
-        )),
-
+        ))
     )
   cairo_pdf(
     paste0(args$plotdir, "/PVE_plot.pdf"),
