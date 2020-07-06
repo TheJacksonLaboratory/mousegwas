@@ -198,8 +198,8 @@ if (args$meanvariance) {
         theme(
           text = element_text(size = 10, family = ffam),
           legend.position = "none",
-          axis.text.x = element_blank(),
-          axis.ticks.x = element_blank()
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank()
         ),
       nrow = 1,
       ncol = 2
