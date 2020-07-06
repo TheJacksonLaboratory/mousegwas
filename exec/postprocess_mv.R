@@ -419,7 +419,10 @@ if (args$meanvariance) {
       pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
-          legend.position = "none"
+          legend.position = "none",
+          axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.ticks.x = element_blank()
         ),
       nrow = 1,
       ncol = 2
