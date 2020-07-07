@@ -99,7 +99,7 @@ ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 pigr <- RColorBrewer::brewer.pal(name = "PiYG", n = 11)
 hmcol <-
   viridis(128)#colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
-grpcol <- RColorBrewer::brewer.pal(12, "Set3")
+grpcol <- RColorBrewer::brewer.pal(12, "Set3")[2:12]
 fullw <- 7.25
 halfw <- 3.54
 fheight <- 11-1.25
