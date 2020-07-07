@@ -89,7 +89,8 @@ parser$add_argument("--colorgroup",
                     help = "Color the Group Manhattan plots by group rather than cluster")
 parser$add_argument("--meanvariance", action="store_true", default=FALSE,
                     help="Plot the PVE of mean and variance phenotypes in different plots")
-
+parser$add_argument("--set3", action="store_true", default=FALSE,
+                    help="Use Set3 color palette for groups, default is Accent")
 args <- parser$parse_args()
 
 # Step 1: Read the color pallete
@@ -99,7 +100,11 @@ ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 pigr <- RColorBrewer::brewer.pal(name = "PiYG", n = 11)
 hmcol <-
   viridis(128)#colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
-grpcol <- RColorBrewer::brewer.pal(12, "Set3")[2:12]
+if (args$set3) {
+  grpcol <- RColorBrewer::brewer.pal(12, "Set3")[2:12]
+} else{
+  grpcol <- RColorBrewer::brewer.pal(8, "Accent")
+}
 fullw <- 7.25
 halfw <- 3.54
 fheight <- 11-1.25
