@@ -178,7 +178,7 @@ PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 groupsOrder = if (length(yamin$groups)) yamin$groups else unique(pnames$Group)
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
-grpcol <- rep(grpcol, ceiling(length(groupsOrder)/length(grpcol)))
+grpcol <- rep(grpcol[1:length(groupsOrder)], ceiling(length(groupsOrder)/length(grpcol)))
 pnames <-
   left_join(pnames, tibble(Group = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
               "Group")
