@@ -13,7 +13,6 @@ library(readr)
 library(tibble)
 library(ggplot2)
 library(RColorBrewer)
-library(pals)
 library(viridis)
 library(gplots)
 library(argparse)
@@ -102,7 +101,7 @@ pigr <- RColorBrewer::brewer.pal(name = "PiYG", n = 11)
 hmcol <-
   viridis(128)#colorRampPalette(pigr[c(2,5,10)])(128)#viridis(128, option="cividis")
 if (args$set3) {
-  grpcol <- pals::kelly()[3:22]#RColorBrewer::brewer.pal(12, "Set3")[2:12]
+  grpcol <- RColorBrewer::brewer.pal(12, "Set3")[2:12]
 } else{
   grpcol <- RColorBrewer::brewer.pal(8, "Accent")
 }

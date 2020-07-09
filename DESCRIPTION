@@ -39,8 +39,7 @@ Imports:
   cowplot,
   reshape,
   gtable,
-  grid,
-  pals
+  grid
 URL: https://github.com/TheJacksonLaboratory/mousegwas
 BugReports: https://github.com/TheJacksonLaboratory/mousegwas/issues
 RoxygenNote: 7.0.2
