@@ -40,7 +40,7 @@ Imports:
   reshape,
   gtable,
   grid,
-  jcolors
+  pals
 URL: https://github.com/TheJacksonLaboratory/mousegwas
 BugReports: https://github.com/TheJacksonLaboratory/mousegwas/issues
 RoxygenNote: 7.0.2
