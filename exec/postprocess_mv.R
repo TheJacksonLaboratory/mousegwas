@@ -93,7 +93,7 @@ parser$add_argument("--set3", action="store_true", default=FALSE,
                     help="Use Set3 color palette for groups, default is Accent")
 args <- parser$parse_args()
 
-# Step 1: Read the color pallete
+# Step 1: Read the color palette
 # Cluster colors
 ccols <- brewer.pal(args$clusters, "Dark2")[1:args$clusters]
 # Heatmap plot for m-values
@@ -527,14 +527,17 @@ for (g in names(grpwas)) {
   chr_label <- axisdf$chr
   chr_label[chr_label == 20] = "X"
   colorby <- "cluster"
-  pallete <- ccols
+  palette <- ccols
+  pbreaks <- 1:args$clusters
   if (args$colorgroup) {
     colorby = "grpcolor"
-    pallete = left_join(tibble(grpcolor=unique(allpwas$grpcolor)), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
+   # palette = left_join(tibble(grpcolor=unique(allpwas$grpcolor)), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
                                                               "grpcolor")
-    pallete <- as.character(pallete$color)
+  #  palette <- as.character(palette$color)
+    pbreaks <- names(grpcol)
+    palette <- grpcol
   }
-  print(pallete)
+  print(palette)
   outplot <- ggplot2::ggplot(allpwas, aes(x = BPcum, y = P)) +
 
     # Show all points
@@ -546,7 +549,7 @@ for (g in names(grpwas)) {
     geom_segment(y = args$pvalthr, x=min(allpwas$BPcum)-50000000, xend=max(allpwas$BPcum)+50000000, yend=args$pvalthr,color="#FCBBA1") +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
     geom_point(aes_string(color = colorby, size="rsq", alpha="rsq")) +
-    scale_color_manual(values = pallete) +
+    scale_color_manual(breaks=pbreaks, values = palette) +
     scale_size_continuous(range=c(0,1), trans = "exp") +
     scale_alpha_continuous(range = c(0,1), trans="exp") +
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
@@ -555,7 +558,7 @@ for (g in names(grpwas)) {
     ggnewscale::new_scale("alpha") + ggnewscale::new_scale("color") + ggnewscale::new_scale("size")  +
     geom_point(aes_string(color = colorby,
                    alpha = "ispeak"), size = 1) +
-    scale_color_manual(values = pallete) +
+    scale_color_manual(breaks = pbreaks, values = palette) +
     scale_alpha_manual(values = c(0, 1)) +
     scale_x_continuous(label = chr_label, breaks = axisdf$center) +
     scale_y_continuous(expand = c(0, 0)) +     # remove space between plot area and x axis
