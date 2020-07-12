@@ -532,7 +532,7 @@ for (g in names(grpwas)) {
   if (args$colorgroup) {
     colorby = "grpcolor"
    # palette = left_join(tibble(grpcolor=unique(allpwas$grpcolor)), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
-                                                              "grpcolor")
+  #                                                            "grpcolor")
   #  palette <- as.character(palette$color)
     pbreaks <- names(grpcol)
     palette <- grpcol
