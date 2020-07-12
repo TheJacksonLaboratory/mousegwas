@@ -196,14 +196,14 @@ if (args$meanvariance) {
   pveplot <- paired_PVE_plot(PVE)
   pvep <-
     cbind(
-      ggplotGrob(pveplot$mean_plot + scale_fill_manual(breaks=names(grpcol), values = grpcol) + theme_bw()  +
+      ggplotGrob(pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
           legend.position = "none",
           axis.ticks.y = element_blank(),
           plot.title = element_text(hjust = 0.5)
         )),
-      ggplotGrob(pveplot$var_plot + scale_fill_manual(breaks=names(grpcol), values = grpcol) + theme_bw()  +
+      ggplotGrob(pveplot$var_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
         theme(
           text = element_text(size = 10, family = ffam),
           legend.position = "none",
