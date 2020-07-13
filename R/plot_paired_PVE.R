@@ -13,7 +13,6 @@ paired_PVE_plot <- function(PVE, var_name = "Variance"){
   varPVE <- rbind(varPVE, addv)
   rownames(varPVE) <- varPVE$basename
   varPVE <- varPVE[meanPVE$PaperName, ]
-  varPVE$Group <- gsub(var_name, "", varPVE$Group)
   # Plot the plots
   mean_pvep <-
     ggplot(meanPVE, aes(reorder(PaperName, -meanPVE$PVE), PVE, fill = Group)) + geom_bar(color =
