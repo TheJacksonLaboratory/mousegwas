@@ -177,7 +177,7 @@ PVE <- read_csv(paste0(args$outdir, "/PVE_GEMMA_estimates.txt"))
 groupsOrder = if (length(yamin$groups)) yamin$groups else unique(pnames$Group)
 PVE <-
   left_join(PVE, as_tibble(pnames, rownames = "phenotype"), by = ("phenotype"))
-grpcol <- rep(grpcol[1:length(groupsOrder)], ceiling(length(groupsOrder)/length(grpcol)))
+grpcol <- rep(grpcol[1:min(length(groupsOrder), length(grpcol))], ceiling(length(groupsOrder)/length(grpcol)))
 pnames <-
   left_join(pnames, tibble(Group = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
               "Group")
@@ -189,6 +189,9 @@ set.seed(490)
 
 # Plot the PVE estimates with SE
 names(grpcol) <- groupsOrder
+if (args$meanvariance){
+  grpcol <- grpcol[!grepl("Variance", names(grpcol))]
+}
 pvh <- height
 if (args$meanvariance) {
   if (dim(PVE)[1] > 40)
@@ -530,6 +533,9 @@ for (g in names(grpwas)) {
   palette <- ccols
   pbreaks <- 1:args$clusters
   if (args$colorgroup) {
+    if (args$meanvariance){
+      allpwas$grpcolor <- gsub("Variance", "", allpwas$grpcolor)
+    }
     colorby = "grpcolor"
    # palette = left_join(tibble(grpcolor=unique(allpwas$grpcolor)), tibble(grpcolor = groupsOrder, color = grpcol[1:length(groupsOrder)]), by =
   #                                                            "grpcolor")
