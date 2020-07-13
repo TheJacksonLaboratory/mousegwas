@@ -202,9 +202,7 @@ dir.create(args$plotdir, recursive = TRUE)
 set.seed(490)
 
 # Plot the PVE estimates with SE
-if (args$meanvariance){
-  grpcol <- grpcol[!grepl("Variance", names(grpcol))]
-}
+
 pvh <- height
 if (args$meanvariance) {
   if (dim(PVE)[1] > 40)
