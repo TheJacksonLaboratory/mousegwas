@@ -206,7 +206,7 @@ set.seed(490)
 pvh <- height
 if (args$meanvariance) {
   if (dim(PVE)[1] > 40)
-    pvh <- height * 1.5
+    pvh <- height * 2
   pveplot <- paired_PVE_plot(PVE)
   pvep <-
     cbind(
