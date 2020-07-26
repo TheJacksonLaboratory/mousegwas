@@ -692,6 +692,16 @@ ggsave(filename = paste0(args$plotdir, "/combined_figure1.svg"),
        width = fullw,
        height = fheight,
        units = "in")
+if (args$meanvriance){
+  combp <- plot_grid(pvep, mainplot, nrow = 2, ncol = 1, labels = c('A', 'B'), label_size = 12, fontface="plain", rel_heights = c(1.5, 1))
+  ggsave(filename = paste0(args$plotdir, "/combined_figure2.svg"),
+         plot = combp,
+         device = svg,
+         dpi = "print",
+         width = fullw,
+         height = fheight * 2.5/3,
+         units = "in")
+}
 # Plot MAF histogram
 mafdat <-
   tibble(rs = geno_t$rs, maf = rowSums(geno_t[, -1:-5]) / (2 * (ncol(geno_t) -
