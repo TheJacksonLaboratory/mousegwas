@@ -314,11 +314,22 @@ for (i in 1:length(phenos)) {
 grpwas <- list()
 if (args$nomv) {
   # Plot each group's max P
-  for (g in c(unique(as.character(pnames$Group)), "All Phenotypes")) {
+  # Add "All Phenotypes" to the list of groups. If meanvariance add two groups for the mean and the variance
+  grplist <- c(unique(as.character(pnames$Group)), "All Phenotypes")
+  if (args$meanvariance){
+    grplist <- c(grplist, "All Mean Phenotypes", "All Variance Phenotypes")
+  }
+  for (g in grplist) {
     allpwas = NULL
     plist <- pnames$PaperName[pnames$Group == g]
     if (g == "All Phenotypes") {
       plist <- pnames$PaperName
+    }
+    if (g == "All Mean Phenotypes"){
+      plist <- pnames$PaperName[!grepl("Variance", pnames$PaperName)]
+    }
+    if (g == "All Variance Phenotypes"){
+      plist <- pnames$PaperName[grepl("Variance", pnames$PaperName)]
     }
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
@@ -598,6 +609,8 @@ for (g in names(grpwas)) {
     units = "in"
   )
   if (g == "All Phenotypes") mainplot = outplot
+  if (g == "All Mean Phenotypes") meanplot = outplot
+  if (g == "All Variance Phenotypes") varplot = outplot
 }
 
 # Plot the LD drop figure
@@ -693,13 +706,13 @@ ggsave(filename = paste0(args$plotdir, "/combined_figure1.svg"),
        height = fheight,
        units = "in")
 if (args$meanvariance){
-  combp <- plot_grid(pvep, mainplot, nrow = 2, ncol = 1, labels = c('A', 'B'), label_size = 12, fontface="plain", rel_heights = c(1.5, 1))
+  combp <- plot_grid(pvep, mainplot, meanplot, varplot, nrow = 4, ncol = 1, labels = c('A', 'B', 'C', 'D'), label_size = 12, fontface="plain", rel_heights = c(1.5, 1, 1, 1))
   ggsave(filename = paste0(args$plotdir, "/combined_figure2.svg"),
          plot = combp,
          device = svg,
          dpi = "print",
          width = fullw,
-         height = fheight * 2.5/3,
+         height = fheight,
          units = "in")
 }
 # Plot MAF histogram
