@@ -819,6 +819,13 @@ for (i in 1:length(lilp)) {
     allgenes <- unique(c(allgenes, clustp$mgi_symbol))
     write_csv(affgen,
               path = paste0(args$plotdir, "/genes_for_phenotype_", i, ".csv"))
+    t2 <- ungroup(summarize(group_by(filter(affgen, gene_biotype=="protein_coding"), rs), protein_coding_genes = n()))
+    ngene_tbl <- left_join(expp[expp$ispeak == T, ], t2, by = "rs")
+    write_csv(ngene_tbl,
+              path = paste0(args$plotdir,
+                            "/intervals_for_phenotype_",
+                            i,
+                            ".csv"))
     # Run enrichr
     # enrr <-
     #   enrichr(unique(affgen$mgi_symbol[!(
@@ -886,6 +893,15 @@ for (n in names(grpwas)) {
                 gsub(" ", "_", n),
                 ".csv"
               ))
+    # Get the number of protein-coding genes
+    t2 <- ungroup(summarize(group_by(filter(affgen, gene_biotype=="protein_coding"), rs), protein_coding_genes = n()))
+    ngene_tbl <- left_join(expp[expp$ispeak == T, ], t2, by = "rs")
+    write_csv(ngene_tbl, path = paste0(
+      args$plotdir,
+      "/intervals_for_phenotype_Group_",
+      gsub(" ", "_", n),
+      ".csv"
+    ))
     # Run enrichr
     # enrr <-
     #   enrichr(unique(affgen$mgi_symbol[!(
