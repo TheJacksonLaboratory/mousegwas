@@ -896,6 +896,18 @@ for (n in names(grpwas)) {
     # Get the number of protein-coding genes
     t2 <- ungroup(summarize(group_by(filter(affgen, gene_biotype=="protein_coding"), rs), protein_coding_genes = n()))
     ngene_tbl <- left_join(expp[expp$ispeak == T, ], t2, by = "rs")
+    if (n == "All Phenotypes"){
+      ngene_tbl$groups <- ""
+      # Add a column with ';' separated phenotype groups names that overlap the peak
+      for (n1 in names(grpwas)){
+        if (n1 != "All phenotypes" && n1 != "All Variance Phenotypes" && n1 != "All Mean Phenotypes"){
+          j1 <- left_join(ngene_tbl, grpwas[[n1]], by = "chr")
+          # Filter to where ps is in the minps-maxps range
+          j1 <- filter(j1, ps.y >= minps.x & ps.y <= maxps.x)
+          ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x] <- sapply(j1$groups[ngene_tbl$rs %in% j1$rs.x], function(x) if(x=="") n1 else paste(x, n1, sep=";"))
+        }
+      }
+    }
     write_csv(ngene_tbl, path = paste0(
       args$plotdir,
       "/intervals_for_phenotype_Group_",
