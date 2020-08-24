@@ -333,7 +333,7 @@ if (args$nomv) {
     }
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
-        allpwas <- lilp[[p]]$pwas %>% dplyr::select(-ispeak,-choose, -rsq)
+        allpwas <- lilp[[p]]$pwas %>% dplyr::select(chr, rs, ps, allele0, allele1, af, P, p_wald)
         allpwas$grpcolor <- pnames$Group[pnames$PaperName==p][1]
       } else{
         allpwas <-
@@ -348,6 +348,7 @@ if (args$nomv) {
 
       }
     }
+    allpwas$chr <- as.character(allpwas$chr)
     if (is.null(allpwas)) {
       print(g)
       next
