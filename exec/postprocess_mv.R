@@ -333,7 +333,7 @@ if (args$nomv) {
     }
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
-        allpwas <- lilp[[p]]$pwas %>% dplyr::select(chr, rs, ps, allele0, allele1, af, P, p_wald)
+        allpwas <- lilp[[p]]$pwas %>% dplyr::select(chr, rs, ps, allele0, allele1, af, P, p_wald, BPcum)
         allpwas$grpcolor <- pnames$Group[pnames$PaperName==p][1]
       } else{
         allpwas <-
@@ -708,7 +708,7 @@ ggsave(filename = paste0(args$plotdir, "/combined_figure1.svg"),
        height = fheight,
        units = "in")
 if (args$meanvariance){
-  combp <- plot_grid(pvep, mainplot, meanplot, varplot, nrow = 4, ncol = 1, labels = c('A', 'B', 'C', 'D'), label_size = 12, fontface="plain", rel_heights = c(1.5, 1, 1, 1))
+  combp <- plot_grid(pvep, mainplot, meanplot, varplot, nrow = 4, ncol = 1, labels = c('A', 'B', 'C', 'D'), label_size = 12, fontface="plain", rel_heights = c(2, 1, 1, 1))
   ggsave(filename = paste0(args$plotdir, "/combined_figure2.svg"),
          plot = combp,
          device = svg,
