@@ -909,7 +909,14 @@ for (n in names(grpwas)) {
           j1 <- left_join(ngene_tbl, ot[ot$ispeak == T, ], by = "chr")
           # Filter to where ps is in the minps-maxps range
           j1 <- filter(j1, ps.y >= minps & ps.y <= maxps)
-          ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x] <- sapply(j1$groups[ngene_tbl$rs %in% j1$rs.x], function(x) if(x=="") n1 else paste(x, n1, sep=";"))
+          if (nrow(j1) > 0) {
+            ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x] <-
+              sapply(j1$groups[ngene_tbl$rs %in% j1$rs.x], function(x)
+                if (x == "")
+                  n1
+                else
+                  paste(x, n1, sep = ";"))
+          }
         }
       }
     }
