@@ -902,7 +902,7 @@ for (n in names(grpwas)) {
       ngene_tbl$groups <- ""
       # Add a column with ';' separated phenotype groups names that overlap the peak
       for (n1 in names(grpwas)){
-        if (n1 != "All phenotypes" && n1 != "All Variance Phenotypes" && n1 != "All Mean Phenotypes"){
+        if (n1 != "All Phenotypes" && n1 != "All Variance Phenotypes" && n1 != "All Mean Phenotypes"){
           ot <- grpwas[[n1]]
           ot$chr <- as.character(ot$chr)
           ot$chr[ot$chr == "20"] <- "X"
