@@ -899,14 +899,14 @@ for (n in names(grpwas)) {
     t2 <- ungroup(summarize(group_by(filter(affgen, gene_biotype=="protein_coding"), rs), protein_coding_genes = n()))
     ngene_tbl <- left_join(expp[expp$ispeak == T, ], t2, by = "rs")
     if (n == "All Phenotypes"){
-      ngene_tbl$chr <- as.character(ngene_tbl$chr)
       ngene_tbl$groups <- ""
       # Add a column with ';' separated phenotype groups names that overlap the peak
       for (n1 in names(grpwas)){
         if (n1 != "All phenotypes" && n1 != "All Variance Phenotypes" && n1 != "All Mean Phenotypes"){
           ot <- grpwas[[n1]]
           ot$chr <- as.character(ot$chr)
-          j1 <- left_join(ngene_tbl, ot, by = "chr")
+          ot$chr[ot$chr == "20"] <- "X"
+          j1 <- left_join(ngene_tbl, ot[ot$ispeak == T, ], by = "chr")
           # Filter to where ps is in the minps-maxps range
           j1 <- filter(j1, ps.y >= minps & ps.y <= maxps)
           ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x] <- sapply(j1$groups[ngene_tbl$rs %in% j1$rs.x], function(x) if(x=="") n1 else paste(x, n1, sep=";"))
