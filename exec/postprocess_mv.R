@@ -913,7 +913,7 @@ for (n in names(grpwas)) {
             print(n1)
             print(j1)
             ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x] <-
-              sapply(j1$groups[ngene_tbl$rs %in% j1$rs.x], function(x)
+              sapply(ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x], function(x)
                 if (x == "")
                   n1
                 else
