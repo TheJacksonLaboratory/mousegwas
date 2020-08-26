@@ -908,7 +908,7 @@ for (n in names(grpwas)) {
           ot$chr <- as.character(ot$chr)
           j1 <- left_join(ngene_tbl, ot, by = "chr")
           # Filter to where ps is in the minps-maxps range
-          j1 <- filter(j1, ps.y >= minps.x & ps.y <= maxps.x)
+          j1 <- filter(j1, ps.y >= minps & ps.y <= maxps)
           ngene_tbl$groups[ngene_tbl$rs %in% j1$rs.x] <- sapply(j1$groups[ngene_tbl$rs %in% j1$rs.x], function(x) if(x=="") n1 else paste(x, n1, sep=";"))
         }
       }
