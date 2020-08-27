@@ -708,7 +708,7 @@ ggsave(filename = paste0(args$plotdir, "/combined_figure1.svg"),
        height = fheight,
        units = "in")
 if (args$meanvariance){
-  combp <- plot_grid(pvep, meanplot, varplot, mainplot, nrow = 4, ncol = 1, labels = c('A', 'B', 'C', 'D'), label_size = 12, fontface="plain", rel_heights = c(2, 1, 1, 1))
+  combp <- plot_grid(pvep, meanplot, varplot, mainplot, nrow = 4, ncol = 1, labels = c('A', 'B', 'C', 'D'), label_size = 12, fontface="plain", rel_heights = c(2.5, 1, 1, 1))
   ggsave(filename = paste0(args$plotdir, "/combined_figure2.svg"),
          plot = combp,
          device = svg,
