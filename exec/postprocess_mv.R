@@ -906,7 +906,7 @@ for (n in names(grpwas)) {
           ot <- grpwas[[n1]]
           ot$chr <- as.character(ot$chr)
           ot$chr[ot$chr == "20"] <- "X"
-          j1 <- left_join(ngene_tbl, ot[ot$ispeak == T, ], by = "chr")
+          j1 <- left_join(ngene_tbl, ot[ot$P >= args$pvalthr, ], by = "chr")
           # Filter to where ps is in the minps-maxps range
           j1 <- filter(j1, ps.y >= minps & ps.y <= maxps)
           if (nrow(j1) > 0) {
