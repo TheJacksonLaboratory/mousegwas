@@ -40,7 +40,8 @@ get_genes <- function(snps = NULL,
                 "gene_biotype",
                 "go_id"
               ),
-              mart = ensembl
+              mart = ensembl,
+              useCache = FALSE
             ))
     }
   }

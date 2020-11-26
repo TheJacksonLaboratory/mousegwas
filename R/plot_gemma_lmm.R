@@ -1,6 +1,6 @@
 #' Find peaks and LD blocks in the LMM results
 #'
-#' \code{rep_peaks} use the individual starins genomtypes matrix to find LD blocks in a greedy way
+#' \code{rep_peaks} use the individual strains genotypes matrix to find LD blocks in a greedy way
 #' it starts by sorting the GWAS p-values and then choosing the lowest p-value and removing all
 #' markers with a high correlation. It then selects the next marker and so on until all markers with
 #' p-values smaller than the threshold are in peak regions.
