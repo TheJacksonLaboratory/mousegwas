@@ -18,7 +18,6 @@
  *   - addgwas: Additional parameters for run_GWAS.R 
  */
 
-params.input = ""
 params.yaml = ""
 params.outdir = "."
 params.clusters = 7
