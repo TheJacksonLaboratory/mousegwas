@@ -29,7 +29,8 @@ params.shufyaml = ""
 params.pvalue = 0.05
 params.addpostp = ""
 params.addgwas = ""
-Channel.fromPath(params.input).into{input; shinput}
+params.input = "NO_FILE"
+input = file(params.input)
 Channel.fromPath(params.yaml).into{yaml; yaml2}
 Channel.fromPath(params.shufyaml).set{shufyml}
 process GWAS{
@@ -44,8 +45,9 @@ process GWAS{
     file "outdir" into outdir, outdir2
 
   script:
+  def instr = infile.name != "NO_FILE" ? "-i $infile" : ''
   """
-  Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' -i $infile -y $yamfile --basedir outdir -d ${params.downsample} ${params.genotype} ${params.addgwas}
+  Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' $instr -y $yamfile --basedir outdir -d ${params.downsample} ${params.genotype} ${params.addgwas}
   """
 }
 
@@ -55,13 +57,14 @@ process shuffle{
   label 'single_cpu'
   input:
     file yaml from shufyml.collect()
-    file infile from shinput.collect()
+    file infile from input
     val shnum from shuffs
   output:
     file "best_${shnum}.txt" into shout
   script:
+  def instr = infile.name != "NO_FILE" ? "-i $infile" : ''
   """
-  Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' -i $infile -y $yaml --basedir outdir -d ${params.downsample} --nomv ${params.genotype} --shuffle ${params.addgwas} --seed ${shnum}
+  Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' $instr -y $yaml --basedir outdir -d ${params.downsample} --nomv ${params.genotype} --shuffle ${params.addgwas} --seed ${shnum}
   cut -f 13 outdir/output/lmm_pheno_1_all_LOCO.assoc.txt |tail -n +2 |sort -k1g |head -1 > best_${shnum}.txt
   """
 }
