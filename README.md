@@ -9,7 +9,7 @@ This package was built to manage the GWAS analysis of mouse phenotypes. The mice
 Installation
 ------------
 ```bash
-Rscript -e 'library(devtools); install_git("https://bitbucket.jax.org/scm/~peera/gemmawarpper.git")'
+Rscript -e 'library(devtools); install_github("TheJacksonLaboratory/mousegwas")'
 ```
 
 Input
@@ -32,12 +32,25 @@ By default LOCO will be used, use the `--noloco` argument to disable it.
 A quantile-quantile normalizatin of each phenotype meausrement could be done using the `--qqnorm` argument. 
 Other parameters will control the final Manhattan plot, it is a bit unnecessary since the `postprocess_GWAS.R` script will generate more and publication ready figures. 
 
-Using the supplied data that was used in the paper, you can regenerate the results:
+Nextflow pipeline
+-----------------
+To execute the scripts in an easy way we included a nextflow pipeline that runs the initial GWAS, the shuffled executions, 
+determine a p-value and run the postprocess.
+To run coat color phenotype GWAS you can simply install `nextflow`, make sure that `singularity` is installed and run:
 ```bash
-Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))'  -i example/StrainSurvey_Output_2019-11-21.csv  -y example/grooming_nowild.yaml  -g example/*.gz  --basedir GWAS_output -d 10
+nextflow run TheJacksonLaboratory/mousegwas \
+  --yaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/coat_color_MDA.yaml \
+  --shufyaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/coat_color_MDA.yaml \
+  --addgwas="--coat_phenotype" --outdir coatout -profile singularity,slurm
 ```
-Running the post-process script will be done as follows:
+`slurm` can be changed to `pbs` or ignored for local execution.
+
+To regenerate the results in the paper: https://www.biorxiv.org/content/10.1101/2020.10.08.331017v1 :
 ```bash
-Rscript -e 'source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -s 100000 -n example/GroomingPaperPhenoTranslationTable.csv -o GWAS_output -p GWAS_figures -c 7 --nomv --pvalthr 5 -inrich ~/bin/inrich
+nextflow run TheJacksonLaboratory/mousegwas \
+  --yaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/grooming_nowild.yaml \
+  --shufyaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/grooming_shuffle.yaml \
+  --input https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/grooming_paper_strain_survey_2019_11_21.csv \ \
+  --outdir grooming_output -profile slurm,singularity
 ```
-Assuming INRICH is installed in `~/bin/inrich`
+
