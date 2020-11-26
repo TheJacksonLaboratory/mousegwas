@@ -1,0 +1,143 @@
+strain: Strain
+phenotypes:
+  OFA_DistanceTraveled_first20m:
+      papername: OFDistTraveled20m
+      group: Activity
+groups:
+  - Activity
+F1:
+  - B6129SF1/J:
+      - C57BL/6J
+      - 129S1/SvImJ
+  - B6129PF1/J:
+      - C57BL/6J
+      - 129P3/J
+  - B6AF1/J:
+      - C57BL/6J
+      - A/J
+  - B6C3F1/J:
+      - C57BL/6J
+      - C3H/HeJ
+  - B6CBAF1/J:
+      - C57BL/6J
+      - CBA/J
+  - B6D2F1/J:
+      - C57BL/6J
+      - DBA/2J
+  - B6SJLF1/J:
+      - C57BL/6J
+      - SJL/J
+  - CAF1/J:
+      - BALB/cJ
+      - A/J
+  - CB6F1/J:
+      - BALB/cJ
+      - C57BL/6J
+  - CByB6F1/J:
+      - BALB/cByJ
+      - C57BL/6J
+  - NZBWF1/J:
+      - NZB/BlNJ
+      - NZW/LacJ
+covar:
+  - Sex
+sex: Sex
+translate:
+  - BTBRT...tf.J: BTBR T<+> Itpr3<tf>/J
+  - 129S1.SvImJ: 129S1/SvImJ
+  - C3H/HeOuJ: C3H/HeJ
+  - NON/LtJ: NON/ShiLtJ
+  - NOD/LtJ: NOD/ShiLtJ
+  - CAST/EiJ: none
+  - PWD/PhJ: none
+  - CZECHII/EiJ: none
+  - PWK/PhJ: none
+  - MSM/MsJ: none
+  - MOLF/EiJ: none
+coat:
+  - 129P3/J: albino
+  - 129S1/SvImJ: white-bellied agouti
+  - 129X1/SvJ: albino
+  - A/HeJ: albino
+  - A/J: albino
+  - AKR/J: albino
+  - B6.Cg-Ay/J: yellow or black
+  - B6.Cg-Tubtub/J: black
+  - B6.V-Lepob/J: black
+  - BALB/cByJ: albino
+  - BALB/cJ: albino
+  - BKS.Cg-m +/+ Leprdb/J: black
+  - BKSChpLt.HRS-Cpefat/J: black
+  - BPH/2J: albino
+  - BPL/1J: misty
+  - BPN/3J: black
+  - BTBR T+ Itpr3tf/J: black
+  - BUB/BnJ: albino
+  - C3HeB/FeJ: agouti
+  - C3H/HeJ: agouti
+  - C3H/HeSnJ: agouti
+  - C57BL/10J: black
+  - C57BL/6J: black
+  - C57BLKS/J: black
+  - C57BR/cdJ: brown
+  - C57L/J: leaden
+  - C58/J: black
+  - CAST/EiJ: agouti
+  - CBA/CaJ: agouti
+  - CBA/J: agouti
+  - CE/J: greyish white
+  - CZECHII/EiJ: white-bellied agouti
+  - DBA/1J: dilute brown
+  - DBA/2J: dilute brown
+  - FVB/NJ: albino
+  - I/LnJ: dilute brown
+  - JF1/MsJ: white w/ black spots
+  - KK/HlJ: albino
+  - LP/J: white-bellied agouti
+  - MA/MyJ: albino
+  - MOLF/EiJ: white-bellied agouti
+  - MSM/MsJ: white-bellied agouti
+  - NOD/ShiLtJ: albino
+  - NON/ShiLtJ: albino
+  - NZB/BlNJ: black
+  - NZW/LacJ: albino
+  - PERA/EiJ: agouti
+  - P/J: fawn; pink eyes
+  - PL/J: albino
+  - PWD/PhJ: agouti
+  - PWK/PhJ: agouti
+  - RBF/DnJ: albino
+  - RF/J: albino
+  - RIIIS/J: albino
+  - SEA/GnJ: light brown agouti
+  - SJL/J: albino
+  - SM/J: white-bellied agouti
+  - SPRET/EiJ: white-bellied agouti
+  - SWR/J: albino
+  - WSB/EiJ: white-bellied agouti
+  - YBR/EiJ: brown
+  - B6FVBF1/J: agouti
+  - B6AF1/J: black
+  - CAF1/J: albino
+  - B6D2F1/J: black
+  - CB6F1/J: agouti
+  - NZBWF1/J: agouti
+  - CByB6F1/J: agouti
+  - B6C3F1/J: agouti
+  - B6CBAF1/J: agouti
+  - B6SJLF1/J: agouti
+  - B6129PF1/J: white-bellied agouti
+  - B6129SF1/J: white-bellied agouti
+  - NOR/LtJ: albino
+  - TALLYHO/JngJ: albino
+  - NU/J: albino, without hair
+  - MRL/MpJ: albino
+  - LG/J: albino
+  - 129S1/SvlmJ: white-bellied agouti
+  - C3H/HeOuJ: agouti
+  - C57BL/10SnJ: black
+  - C57BL/6NJ: black
+  - KK/HiJ: albino
+  - NZO/HILtJ: agouti
+confSNPs:
+  - rs32105080

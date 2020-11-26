@@ -1,29 +1,82 @@
 strain: Strain
 phenotypes:
-  - OFA_DistanceTraveled_first5m
-  - OFA_DistanceTraveled_first20m
-  - OFA_DistanceTraveled_first55m
-  - OFA_PeripheryTime_first5m
-  - OFA_PeripheryTime_first20m
-  - OFA_PeripheryTime_first55m
-  - OFA_CornerTime_first5m
-  - OFA_CornerTime_first20m
-  - OFA_CornerTime_first55m
-  - OFA_Groom_first5m
-  - OFA_Groom_first20m
-  - OFA_Groom_first55m
-  - OFA_Groom_first55m_linearslope
-  - OFA_GroomBouts_first5m
-  - OFA_GroomBouts_first20m
-  - OFA_GroomBouts_first55m
-  - OFA_GroomBouts_first55m_linearslope
-  - OFA_GroomAvgBout_first5m
-  - OFA_GroomAvgBout_first20m
-  - OFA_GroomAvgBout_first55m
-  - OFA_GroomAvgBout_first55m_linearslope
-  - OFA_GroomPeakMidBin
-  - OFA_GroomPeakVal
-  - OFA_GroomPeakSlope
+  OFA_Groom_first5m:
+      papername: GrTime5m
+      group: Grooming Quantity
+  OFA_Groom_first20m:
+      papername: GrTime20m
+      group: Grooming Quantity
+  OFA_Groom_first55m:
+      papername: GrTime55m
+      group: Grooming Quantity
+  OFA_Groom_first55m_linearslope:
+      papername: GrTimeSlope55m
+      group: Grooming Pattern
+  OFA_GroomBouts_first5m:
+      papername: GrBoutNum5m
+      group: Grooming Quantity
+  OFA_GroomBouts_first20m:
+      papername: GrBoutNum20m
+      group: Grooming Quantity
+  OFA_GroomBouts_first55m:
+      papername: GrBoutNum55m
+      group: Grooming Quantity
+  OFA_GroomBouts_first55m_linearslope:
+      papername: GrBoutNumSlope55m
+      group: Grooming Quantity
+  OFA_GroomAvgBout_first5m:
+      papername: GrBoutLength5m
+      group: Grooming Pattern
+  OFA_GroomAvgBout_first20m:
+      papername: GrBoutLength20m
+      group: Grooming Pattern
+  OFA_GroomAvgBout_first55m:
+      papername: GrBoutLength55m
+      group: Grooming Pattern
+  OFA_GroomAvgBout_first55m_linearslope:
+      papername: GrBoutLengthSlope55m
+      group: Grooming Pattern
+  OFA_CornerTime_first5m:
+      papername: OFCornerTime5m
+      group: Anxiety
+  OFA_CornerTime_first20m:
+      papername: OFCornerTime20m
+      group: Anxiety
+  OFA_CornerTime_first55m:
+      papername: OFCornerTime55m
+      group: Anxiety
+  OFA_DistanceTraveled_first5m:
+      papername: OFDistTraveled5m
+      group: Activity
+  OFA_DistanceTraveled_first20m:
+      papername: OFDistTraveled20m
+      group: Activity
+  OFA_DistanceTraveled_first55m:
+      papername: OFDistTraveled55m
+      group: Activity
+  OFA_PeripheryTime_first5m:
+      papername: OFPeripheryTime5m
+      group: Anxiety
+  OFA_PeripheryTime_first20m:
+      papername: OFPeripheryTime20m
+      group: Anxiety
+  OFA_PeripheryTime_first55m:
+      papername: OFPeripheryTime55m
+      group: Anxiety
+  OFA_GroomPeakMidBin:
+      papername: GrPeakMidBin
+      group: Grooming Pattern
+  OFA_GroomPeakVal:
+      papername: GrPeakVal
+      group: Grooming Quantity
+  OFA_GroomPeakSlope:
+      papername: GrPeakSlope
+      group: Grooming Pattern
+groups:
+  - Activity
+  - Anxiety
+  - Grooming Pattern
+  - Grooming Quantity
 F1:
   - B6129SF1/J:
       - C57BL/6J
