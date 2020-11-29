@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-/* 
+/*
  * A pipeline for running mousegwas with shuffling and figure generation
  * https://github.com/TheJacksonLaboratory/mousegwas
  *
@@ -15,7 +15,7 @@
  *   - shufyaml: A yaml file describing the shuffle run, should include one phenotype
  *   - pvalue: Threshold for calling a QTL (default 0.05)
  *   - addpostp: Additional parameters for postprocess_mv.R
- *   - addgwas: Additional parameters for run_GWAS.R 
+ *   - addgwas: Additional parameters for run_GWAS.R
  */
 
 params.yaml = ""
@@ -67,19 +67,19 @@ process shuffle{
   cut -f 13 outdir/output/lmm_pheno_1_all_LOCO.assoc.txt |tail -n +2 |sort -k1g |head -1 > best_${shnum}.txt
   """
 }
-    
+
 process collectShf{
   publishDir path:params.outdir, mode:'copy'
   input:
     file allsh from shout.collect()
   output:
-    stdout into threshold 
+    stdout into threshold
     file "sorted_shuffled_pvalues.txt" into shflist
 
   script:
   int heads = params.shuffles * params.pvalue
   """
-  cat $allsh | sort -k1g |tee sorted_shuffled_pvalues.txt| head -n $heads |tail -1 
+  cat $allsh | sort -k1g |tee sorted_shuffled_pvalues.txt| head -n $heads |tail -1
   """
 }
 
@@ -102,10 +102,7 @@ process postp{
   """
   outval=$thr
   echo \$outval > pvalue-threshold.txt
-  Rscript -e 'dir.create("libs", recursive=T); \
-  .libPaths("libs"); \
-  library(devtools); install_github("TheJacksonLaboratory/mousegwas");\
-  source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -p postprocess_nomv -c ${params.clusters} --external_inrich -s 10000 --nomv --pvalthr \$(awk -v o=\$outval 'BEGIN{print -(log(o)/log(10))}') --peakcorr 0.2 -o $outdir -i 20 -j 200 -y $yml ${params.addpostp}
+  Rscript -e 'source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -p postprocess_nomv -c ${params.clusters} --external_inrich -s 10000 --nomv --pvalthr \$(awk -v o=\$outval 'BEGIN{print -(log(o)/log(10))}') --peakcorr 0.2 -o $outdir -i 20 -j 200 -y $yml ${params.addpostp}
   """
 }
 
@@ -131,4 +128,4 @@ process runINRICH{
   inrich  -c -a $interv -m $snps -g $genes -t $groups -o ${interv.baseName}_${groups.baseName} -i 20 -j 200
   """
 }
-        
+
