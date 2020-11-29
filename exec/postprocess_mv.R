@@ -16,7 +16,6 @@ library(RColorBrewer)
 library(viridis)
 library(gplots)
 library(argparse)
-library(enrichR)
 library(yaml)
 library(cowplot)
 library(grid)
@@ -762,11 +761,6 @@ ggsave(
 )
 
 
-
-
-# Run enrichR for each phenotype
-dbs <- listEnrichrDbs()
-
 # Expand each peak to include the entire peak, not just the single SNP
 ext_peak_sing <- function(snps, maxdist = 500000) {
   csum <-
@@ -828,40 +822,6 @@ for (i in 1:length(lilp)) {
                             "/intervals_for_phenotype_",
                             i,
                             ".csv"))
-    # Run enrichr
-    # enrr <-
-    #   enrichr(unique(affgen$mgi_symbol[!(
-    #     grepl(pattern = "^Gm", x =  affgen$mgi_symbol) |
-    #       grepl("Rik$", affgen$mgi_symbol) |
-    #       affgen$mgi_symbol == ""
-    #   )]), dbs$libraryName)
-    # for (d in dbs$libraryName) {
-    #   if (length(dim(enrr[[d]])) > 1 && dim(enrr[[d]])[2] > 1) {
-    #     rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05)
-    #     if (nrow(rtb) > 0)
-    #       write_csv((
-    #         rtb %>% mutate(
-    #           total.genes = length(affgen$mgi_symbol[!(
-    #             grepl(pattern = "^Gm", x =  affgen$mgi_symbol) |
-    #               grepl("Rik$", affgen$mgi_symbol) |
-    #               affgen$mgi_symbol == ""
-    #           )]),
-    #           phenotype = pnames$PaperName[i],
-    #           library = d
-    #         )
-    #       ),
-    #       path = paste0(
-    #         args$plotdir,
-    #         "/enrichR_phenotype_",
-    #         i,
-    #         "_db_",
-    #         d,
-    #         "p005.csv"
-    #       )
-    #       )
-    #
-    #   }
-    # }
   }
 }
 
@@ -928,40 +888,6 @@ for (n in names(grpwas)) {
       gsub(" ", "_", n),
       ".csv"
     ))
-    # Run enrichr
-    # enrr <-
-    #   enrichr(unique(affgen$mgi_symbol[!(
-    #     grepl(pattern = "^Gm", x =  affgen$mgi_symbol) |
-    #       grepl("Rik$", affgen$mgi_symbol) |
-    #       affgen$mgi_symbol == ""
-    #   )]), dbs$libraryName)
-    # for (d in dbs$libraryName) {
-    #   if (length(dim(enrr[[d]])) > 1 && dim(enrr[[d]])[2] > 1) {
-    #     rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05)
-    #     if (nrow(rtb) > 0)
-    #       write_csv((
-    #         rtb %>% mutate(
-    #           total.genes = length(affgen$mgi_symbol[!(
-    #             grepl(pattern = "^Gm", x =  affgen$mgi_symbol) |
-    #               grepl("Rik$", affgen$mgi_symbol) |
-    #               affgen$mgi_symbol == ""
-    #           )]),
-    #           phenotype = n,
-    #           library = d
-    #         )
-    #       ),
-    #       path = paste0(
-    #         args$plotdir,
-    #         "/enrichR_phenotype_Group_",
-    #         gsub(" ", "_", n),
-    #         "_db_",
-    #         d,
-    #         "p005.csv"
-    #       )
-    #       )
-    #
-    #   }
-    # }
   }
 }
 
@@ -984,33 +910,6 @@ for (k in unique(kk$cluster)) {
   )}
 
 
-  # Run enrichr
-  glen = length(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) |
-                                  grepl("Rik$", clustmgi[[k]]))])
-  # enrr <-
-  #   enrichr(unique(clustmgi[[k]][!(grepl(pattern = "^Gm", x = clustmgi[[k]]) |
-  #                                    grepl("Rik$", clustmgi[[k]]))]), dbs$libraryName)
-  # for (d in dbs$libraryName) {
-  #   if (dim(enrr[[d]])[2] > 1) {
-  #     rtb <- as_tibble(enrr[[d]]) %>% filter(Adjusted.P.value <= 0.05)
-  #     if (nrow(rtb) > 0)
-  #       write_csv((rtb %>% mutate(
-  #         total.genes = glen,
-  #         cluster = k,
-  #         library = d
-  #       )),
-  #       path = paste0(
-  #         args$plotdir,
-  #         "/enrichR_cluster_",
-  #         k,
-  #         "_db_",
-  #         d,
-  #         "p005.csv"
-  #       )
-  #       )
-  #
-  #   }
-  # }
 }
 
 # Plot markers density
