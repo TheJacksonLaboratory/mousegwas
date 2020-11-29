@@ -431,12 +431,12 @@ kk <- kmeans(pgwas, args$clusters)
 # Plot the m-value heatmap
 # Order the columns
 rowarr <- NULL
-for (i in 1:args$cluster) {
+for (i in unique(kk$cluster)) {
   cc <- hclust(dist(pgwas[kk$cluster == i, , drop = F]))
   rowarr <- c(rowarr, row.names(pgwas)[kk$cluster == i][cc$order])
 }
 pgwas <- pgwas[rowarr,]
-clustcol <- tibble(cluster = 1:args$clusters, color = ccols)
+clustcol <- tibble(cluster = unique(kk$cluster), color = ccols)
 colrow <-
   tibble(rs = rownames(pgwas), cluster = kk$cluster[rowarr]) %>% left_join(clustcol, by =
                                                                              "cluster") %>% column_to_rownames(var = "rs") %>% dplyr::select(color)
@@ -555,7 +555,7 @@ for (g in names(grpwas)) {
   chr_label[chr_label == 20] = "X"
   colorby <- "cluster"
   palette <- ccols
-  pbreaks <- 1:args$clusters
+  pbreaks <- unique(kk$cluster)
   if (args$colorgroup) {
     colorby = "grpcolor"
     palette <- grpcol
@@ -965,7 +965,7 @@ for (n in names(grpwas)) {
   }
 }
 
-for (k in 1:args$clusters) {
+for (k in unique(kk$cluster)) {
   write_csv(
     data.frame(genes = clustgene[[k]]),
     path = paste0(args$plotdir, "/genes_for_cluster_", k, ".csv")

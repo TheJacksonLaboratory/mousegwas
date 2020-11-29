@@ -16,7 +16,7 @@
 #' @examples
 plot_effect <- function(basedir, plotdir, rsnames, pnames, fullw = 7.25, height=11-1.25, ffam = "Arial"){
   # Read the genotypes table
-  geno <- read.csv(paste0(basedir, "/all_genotypes.csv"), header = F, row.names = 1)
+  geno <- read.csv(paste0(basedir, "/all_genotypes.csv"), header = F, row.names = 1, check.names = FALSE)
   geno <- geno[rsnames,]
   pheno <- read.csv(paste0(basedir, "/raw_phenotypes.csv"), row.names = 1)
   colnames(pheno) <- pnames$PaperName[match(colnames(pheno),rownames(pnames))]
