@@ -41,7 +41,7 @@ To run coat color phenotype GWAS you can simply install `nextflow`, make sure th
 nextflow run TheJacksonLaboratory/mousegwas \
   --yaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/coat_color_MDA.yaml \
   --shufyaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/coat_color_MDA.yaml \
-  --addgwas="--coat_phenotype" --outdir coatout -profile singularity,slurm
+  --addgwas="--coat_phenotype" --addpostp="--coat_phenotype" --outdir coatout -profile singularity,slurm
 ```
 `slurm` can be changed to `pbs` or ignored for local execution.
 
