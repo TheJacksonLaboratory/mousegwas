@@ -18,7 +18,7 @@ plot_effect <- function(basedir, plotdir, rsnames, pnames, fullw = 7.25, height=
   # Read the genotypes table
   geno <- read.csv(paste0(basedir, "/all_genotypes.csv"), header = F, row.names = 1, check.names = FALSE)
   geno <- geno[rsnames,]
-  pheno <- read.csv(paste0(basedir, "/raw_phenotypes.csv"), row.names = 1)
+  pheno <- read.csv(paste0(basedir, "/raw_phenotypes.csv"), row.names = 1, , check.names = FALSE)
   colnames(pheno) <- pnames$PaperName[match(colnames(pheno),rownames(pnames))]
   grows <- c(sample(nrow(geno), min(nrow(geno), 1000)))
   strains <- match(geno[grows, -1:-2], geno[grows, -1:-2])
