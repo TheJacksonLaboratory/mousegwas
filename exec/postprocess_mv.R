@@ -136,7 +136,7 @@ for (n in names(yamin$phenotypes)) {
 if (args$coat_phenotype){
   for (p in phenos){
     pheno_names <- c(pheno_names, p)
-    pnames <- rbind(pnames, data.frame(Group="NoGroup", PaperName=gsub(" ", "", gsub("(coat|eyes)", "", p))))
+    pnames <- rbind(pnames, data.frame(Group=if(grepl("coat", p)) "Coat" else "Eyes", PaperName=gsub(" ", "-", gsub("(coat|eyes)", "", p))))
   }
 }
 row.names(pnames) <- pheno_names
