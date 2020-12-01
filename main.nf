@@ -64,7 +64,7 @@ process shuffle{
   def instr = infile.name != "NO_FILE" ? "-i $infile" : ''
   """
   Rscript -e 'source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' $instr -y $yaml --basedir outdir -d ${params.downsample} --nomv ${params.genotype} --shuffle ${params.addgwas} --seed ${shnum}
-  cut -f 13 outdir/output/lmm_pheno_1_all_LOCO.assoc.txt |tail -n +2 |sort -k1g |head -1 > best_${shnum}.txt
+  cut -f 13 outdir/output/lmm_pheno_*_all_LOCO.assoc.txt |grep -v p_wald |sort -k1g |head -1 > best_${shnum}.txt
   """
 }
 
