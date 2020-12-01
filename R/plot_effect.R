@@ -29,14 +29,35 @@ plot_effect <- function(basedir, plotdir, rsnames, pnames, fullw = 7.25, height=
     for (p in colnames(pheno)){
       df <- data.frame(base::t(geno[r, -1:-2, drop=F]), pheno[,p,drop=F], strains = factor(strains))
       df[,r] <- as.factor(df[,r])
-      pvec[[i]] <- ggplot(df, aes_string(x=r, y=p, group=r)) + geom_violin(aes_string(fill = r), scale="area") +
-              geom_boxplot(width=0.1) +
-              scale_fill_brewer(palette = "Pastel1") +
-              #geom_jitter(alpha = 0.5, height=0, width=0.1) + theme_bw() +
-        scale_x_discrete(
-        breaks = c(0,1,2), labels = c(as.character(geno[r,1]),
-                   paste0(geno[r,1], "/", geno[r,2]),
-                   as.character(geno[r,2]))) + theme_bw() + theme(legend.position = "none", axis.title.x = element_blank())
+      # Test if it's a binary trait. If so plot as geom_bar. Else - violin plot
+      if (length(unique(df[, p])) <= 2) {
+        df[, p] <- as.factor(df[, p])
+        pvec[[i]] <-
+          ggplot(df, aes_string(x = r, fill = p)) + geom_bar() +
+          scale_fill_brewer(palette = "Pastel1") +
+          scale_x_discrete(
+            breaks = c(0, 1, 2),
+            labels = c(
+              as.character(geno[r, 1]),
+              paste0(geno[r, 1], "/", geno[r, 2]),
+              as.character(geno[r, 2])
+            )
+          ) + theme_bw() + theme(legend.position = "top", legend.direction = "vertical", axis.title.x = element_blank())
+      } else{
+        pvec[[i]] <-
+          ggplot(df, aes_string(x = r, y = p, group = r)) + geom_violin(aes_string(fill = r), scale =
+                                                                          "area") +
+          geom_boxplot(width = 0.1) +
+          scale_fill_brewer(palette = "Pastel1") +
+          scale_x_discrete(
+            breaks = c(0, 1, 2),
+            labels = c(
+              as.character(geno[r, 1]),
+              paste0(geno[r, 1], "/", geno[r, 2]),
+              as.character(geno[r, 2])
+            )
+          ) + theme_bw() + theme(legend.position = "none", axis.title.x = element_blank())
+      }
       i <- i + 1
     }
     print(plot_grid(plotlist = pvec, ncol = 4))
