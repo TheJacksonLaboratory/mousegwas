@@ -62,6 +62,8 @@ parser$add_argument("--coat_covar", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a covariate")
 parser$add_argument("--coat_phenotype", default=FALSE, action="store_true",
                     help="Use coat color as defined in yaml file as a phenotype")
+parser$add_argument("--coat_fraction", default=0.05,
+                    help="Fraction of strains with a coat color to use as a phenotype, default 0.05")
 parser$add_argument("--runmetasoft", default=FALSE, action="store_true",
                     help="Run metasoft on the given phenotypes. This assumes the phenotypes have the same effect")
 parser$add_argument("--lambda_mean", default=1, type="double",
@@ -283,8 +285,8 @@ if (args$coat_phenotype){
     p1n <- strains$p1[rnum]
     p2n <- strains$p2[rnum]
     cname <- if (p1n==p2n) p1n else sname
-    # Filter to include colors with at least 3% positives
-    prow <- coat_table_mm[cname,colSums(coat_table_mm) > 0.03*nrow(coat_table_mm),drop=F]
+    # Filter to include colors with at least 5% positives
+    prow <- coat_table_mm[cname,colSums(coat_table_mm) > args$coat_fraction*nrow(coat_table_mm),drop=F]
 
     if (p1n %in% names(complete.geno) & p2n %in% names(complete.geno)){
       sorder <- c(sorder, sname)
