@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(mousegwas)
 ```
-This package was built for easier deployment of GWAS in mouse panels. Several mouse panels have been genotyped using different arrays like the Mouse Diversity Array (MDA) or the GigaMUGA (GMUGA), a lot of which are available throught The Jackson Laboratory phenome database (https://phenome.jax.org/about/snp_retrievals_help). This package use the genotyping downloaded the phenome database to run GWAS on mouse phenotypes, deploy GEMMA or pyLMM and plot the results.
+This package was built for easier deployment of GWAS in mouse panels. Several mouse panels have been genotyped using different arrays like the Mouse Diversity Array (MDA) or the GigaMUGA (GMUGA), a lot of which are available through The Jackson Laboratory Mouse Phenome Database (MPD: https://phenome.jax.org/about/snp_retrievals_help). This package use the genotyping downloaded from MPD to run GWAS on mouse phenotypes using GEMMA or pyLMM and plot the results.
 
 ## Data preparation
  
@@ -26,7 +26,7 @@ The phenotypes should be given as a csv file with at least one column to define 
 ### The yaml file
 The yaml file should contain the following data:
 
-* phenotypes: A dictionary of dictionaries describing the phenotypes to test, their name in the figures and the group if desired. _e.g._: 
+* phenotypes: A dictionary of dictionaries describing the phenotypes to test, their name in the figures and the group, if desired. _e.g._: 
 
 ```
 phenotypes:
@@ -76,7 +76,7 @@ covar:
 sex: Sex
 ```
 
-* translate: If names of strains in the input csv file are different than the strain names in the genotyping file you can use this dictionary to translate it. You can also use this to remove ceratin strains from the analysis. _e.g._:
+* translate: If names of strains in the input csv file are different than the strain names in the genotyping file you can use this dictionary to translate it. You can also use this to remove certain strains from the analysis. _e.g._:
 ```
 translate:
   - BTBRT...tf.J: BTBR T<+> Itpr3<tf>/J
@@ -108,36 +108,36 @@ Mouse panel GWAS is different than human GWAS, the LD blocks are wider, the popu
 
 This option can be specified using the parameter `--downsample` or `-d` with the number of individuals to select from each Strain x Sex group or 0 for average.
 
-If the input table contains strain names that are different than the names in the genotypes table then a translation dictionary can be given in the yaml file (phenotype -> genotype). When F1 strains are phenotyped then names of the parent strains should be specified in the yaml file under the F1 term, the female parent should be the first one to determine the X chromosome.
+If the input table contains strain names that are different than the names in the genotypes table then a translation dictionary can be given in the yaml file (phenotype -> genotype). When F1 strains are phenotyped then names of the parent strains should be specified in the yaml file under the F1 term, *the female parent should be the first one to determine the X chromosome*.
 
 After the table of phenotypes is ready for the individuals that will be used in the GWAS, the values are being scaled to have a mean of zero and variance of one. A quantile-quantile normalization is also optional with the `--qqnorm` option. Boolean phenotypes are not being scaled.
 
 ### SNPs filtering
-SNPs can be filtered using the parameters `--missing` for the minimal fraction of missing data and `--MAF` for the minimal allele frequency thresohld.
+SNPs can be filtered using the parameters `--missing` for the minimal fraction of missing data and `--MAF` for the minimal allele frequency threshold.
 
 ### LMM software
-By default the software for running the GWAS will be GEMMA, if it is not available it will be downloaded. The model will be LMM with all tests (`-lmm 4`). pyLMM is also an option and can be selected with `-m pyLMM` or `--method pyLMM` although pyLMM should be installed independently, if the executables are not available in the default path then they can be given using `--pylmm/-p pylmmGWAS.py` and `--pylmmkinship/-k pylmmKinship.py`.
+By default the software for running the GWAS will be GEMMA, if it is not available it will be downloaded. The model will be LMM with all tests (`-lmm 4`). pyLMM is also an option and can be selected with `-m pyLMM` or `--method pyLMM`, although pyLMM should be installed independently, if the executables are not available in the default path they can be given using `--pylmm/-p pylmmGWAS.py` and `--pylmmkinship/-k pylmmKinship.py`.
 
 ### Multivariate analysis
 Multivariate GWAS is implemented in GEMMA and can be used by specifying the groups of the phenotypes in the yaml file. Multivariate will be used by default on top of the univariate analysis unless disabled with `--nomv`. 
 
 ### Combining results
-If multiple penotypes are being tested their results can be combined wit meta-analysis. The meta-analysis algoritmh used here is METASOFT. Care should be taken when using METASOFT because it assumes the beta factors have the same signs. If two phenotypes are anti-correlated then their p-values will not be combined, only the strongest will eventually used for thhe combined p-values. Deploying METASOFT can be done with h `--runmetaasoft`. After running METASOFT the lambda_mean and lambda_hetero scaling parameters can be obtained from the log file and given back using the `--labmda_mean` and `--lambda_hetero` parameters. 
+If multiple penotypes are being tested, their results can be combined with meta-analysis. The meta-analysis algorithm used here is METASOFT. Care should be taken when using METASOFT as it assumes the beta factors have the same signs. If two phenotypes are anti-correlated then their p-values will not be combined, only the strongest will eventually be used for the combined p-values. Deploying METASOFT can be done with h `--runmetaasoft`. After running METASOFT the lambda_mean and lambda_hetero scaling parameters can be obtained from the log file and given back using the `--labmda_mean` and `--lambda_hetero` parameters. 
 
 ### Using coat color
-Coat color taht was defined in the yaml file can be used either as covariates with `--coat_covar` or as phenotypes with `--coat_phenotype` in which case no input file should be given. Anothher option to consider coat color as covariates is by specifying theh SNPs in coat color determining genes using the `confSNPs` feature in the yaml file. 
+Coat colors defined in the yaml file can be used either as covariates with `--coat_covar` or as phenotypes with `--coat_phenotype` in which case no input file should be given. Another option to consider coat color as covariates is by specifying the SNPs in coat color determining genes using the `confSNPs` feature in the yaml file. 
 
 ### Shuhffling
-If the `--shuffle` option is selected, the phenotypes values will be shuhffled among all input individuals and the GWAS will carry on as normal after that. Make sure to change `--seed` to avoid running the same shuhffling more than once whhen trying to obtain an empirical p-value.
+If the `--shuffle` option is selected, the phenotypes values will be shuffled among all input individuals and the GWAS will be carried on as normal after that. *Make sure to change `--seed` to avoid running the same shuffling more than once when trying to obtain an empirical p-value.*
 
 ## Plotting and post-processing
-The plotting part was adjusted for publication and can be changed as desired. It can be used with the postprocess_mv.R scriptwith the output directory of run_GWAS.R as input (`--outdir` or `-o`) and the directory to put the figures in (`--plotdir` or `-p`).
+The plotting part was adjusted for publication and can be changed as desired. It can be used with the postprocess_mv.R script with the output directory of run_GWAS.R as input (`--outdir` or `-o`) and the directory to put the figures in (`--plotdir` or `-p`).
 
 ### Manhattan plots
-First, the script will plot simple Manhattan plots with the threshold for significant SNP as defined by `--pvalthr` ($-log_{10}(\tt P-value))$). To remove SNPs in the same LD blocks, correlated SNPs are removed after the bet SNP is selected, the correlation threshohld ($r^{2}$) can be changed with `--peakcorr`, width of the peak region is limited by `--ldpeakdist`.
+First, the script will plot simple Manhattan plots with the threshold for significant SNP as defined by `--pvalthr` ($-log_{10}(\tt P-value))$). To remove SNPs in the same LD blocks, correlated SNPs are removed after the best SNP is selected, the correlation threshohld ($r^{2}$) can be changed with `--peakcorr`, width of the peak region is limited by `--ldpeakdist` given as mega base-pairs (Mbp).
 
 ### Grouping parameters
-Each parameter can be assigned to a group. All phenotypes in a group can be combined together and ran as a multivariate GWAS in `run_GWAS.R` was used without `--nomv`. Another option to combine phenotypes is to take the minimal p-value of each SNP across all phenotypes in the group. This can be done by applying the `--nomv` flag when runnign `postprocess_mv.R`. It will also add a Manhattan plot that combines _all_ of the phenotypes. 
+Each parameter can be assigned a group. All phenotypes in a group can be combined together and ran as a multivariate GWAS in `run_GWAS.R` if used without `--nomv`. Another option to combine phenotypes is to take the minimal p-value of each SNP across all phenotypes in the group. This can be done by applying the `--nomv` flag when running `postprocess_mv.R`. It will also add a Manhattan plot that combines _all_ of the phenotypes. 
 
 ### clustering peaks
-After the peaks were selected for each phenotype, all the peak SNPs from all of the phenotypes are being colleted and the p-values of these SNPs in all the phenotypes are used for clustering the peaks using k-means algorithm. The number of clusters can be set using the `--clusters` option. Each cluster gets its own color, the p-values table is being plotted as a heatmap along with the cluster colors. After assigning clusters for the oeak SNPs the Manhhattan plots are being repainted with the cluster colors. Peaks correlated to the peak SNP will get the same color and the alpha will be proportional to the correlation coefficient. 
+After the peaks were selected for each phenotype, all the peak SNPs from all of the phenotypes are being collected and the p-values of these SNPs in all the phenotypes are used for clustering the peaks using k-means algorithm. The number of clusters can be set using the `--clusters` option and is defaulted for seven clusters. Each cluster gets its own color, the p-values table is being plotted as a heatmap along with the cluster colors. After assigning clusters for the peak SNPs, the Manhattan plots are being repainted with the cluster colors. NPSs correlated to the peak SNP will get the same color and their transparency will be proportional to the correlation coefficient. 

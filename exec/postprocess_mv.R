@@ -70,6 +70,10 @@ parser$add_argument("--peakcorr",
                     type = "double",
                     default = 0.25,
                     help = "SNPs R^2 correlation cutoff for peak determination")
+parser$add_argument("--loddrop",
+                    type = "double",
+                    default = 1.5,
+                    help = "LOD drop from the peak SNP for the purpose of selecting genes related to the QTL")
 parser$add_argument(
   "--external_inrich",
   action = "store_true",
@@ -762,12 +766,20 @@ ggsave(
 
 
 # Expand each peak to include the entire peak, not just the single SNP
-ext_peak_sing <- function(snps, maxdist = 500000) {
-  csum <-
-    snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
-                                                                    maxdist),
-                                                     minps = pmax(minps, ps - maxdist))
+ext_peak_sing <- function(snps, maxdist = 500000, loddrop = args$loddrop) {
+  snps$minps <- snps$ps
+  snps$maxps <- snps$ps
+  for (c in unique(snps$choose)){
+    peakps <- snps$ps[snps$ispeak & snps$choose==c]
+    lodstop <- max(snps$P[snps$ispeak & snps$choose==c]) - loddrop
+    snps$minps[snps$choose==c] <- max(snps$ps[snps$choose==c & snps$P < lodstop & snps$ps < peakps])
+    snps$maxps[snps$choose==c] <- min(snps$ps[nsps$choose==c & snps$P < lodstop & snps$ps > peakps])
+  }
+#  csum <-
+#    snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+#  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
+#                                                                    maxdist),
+#                                                     minps = pmax(minps, ps - maxdist))
   #snps %>% mutate(minps = ps - maxdist, maxps = ps + maxdist)
 }
 
