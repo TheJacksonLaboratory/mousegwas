@@ -773,8 +773,9 @@ ext_peak_sing <- function(snps, maxdist = 500000, loddrop = args$loddrop) {
     peakps <- snps$ps[snps$ispeak & snps$choose==c]
     lodstop <- max(snps$P[snps$ispeak & snps$choose==c]) - loddrop
     snps$minps[snps$choose==c] <- max(snps$ps[snps$choose==c & snps$P < lodstop & snps$ps < peakps])
-    snps$maxps[snps$choose==c] <- min(snps$ps[nsps$choose==c & snps$P < lodstop & snps$ps > peakps])
+    snps$maxps[snps$choose==c] <- min(snps$ps[snps$choose==c & snps$P < lodstop & snps$ps > peakps])
   }
+  return(snps)
 #  csum <-
 #    snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
 #  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
