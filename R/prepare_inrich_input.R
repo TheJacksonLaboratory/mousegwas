@@ -135,9 +135,23 @@ write_genes_map <- function(basedir) {
   }
 
   # Download MP mammalian phenotypes annotations from MGI:
-  system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MGI_PhenotypicAllele.rpt | awk -F\"\t\" '{split($11, sp, \",\"); for (a in sp) print $10\"\t\"sp[a]}' |grep ENS | sort -k2> tmp1"))
-  system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MP_EMAPA.rpt | cut -f 1,2 | tr \" \" \"-\" | sort -k1 | join -1 2 -2 1 tmp1 - | awk '{print $2\"\t\"$1\"\t\"$3}' >", basedir, "/MP_terms_for_INRICH.txt && rm tmp1"))
-
+  #system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MGI_PhenotypicAllele.rpt | awk -F\"\t\" '{split($11, sp, \",\"); for (a in sp) print $10\"\t\"sp[a]}' |grep ENS | sort -k2> tmp1"))
+  #system(paste0("curl -L http://www.informatics.jax.org/downloads/reports/MP_EMAPA.rpt | cut -f 1,2 | tr \" \" \"-\" | sort -k1 | join -1 2 -2 1 tmp1 - | awk '{print $2\"\t\"$1\"\t\"$3}' >", basedir, "/MP_terms_for_INRICH.txt && rm tmp1"))
+  # Download gene-phenotype relationship from Maayan lab DB
+  mgitr <- AnnotationDbi::select(org.Mm.eg.db, columns = c("MGI"), keys = genes$ensembl_gene_id, keytype="ENSEMBL")
+  mgitr$MGI <- gsub("^MGI:", "", mgitr$MGI)
+  mgitr <- unique(mgitr)
+  maypf <- system.file("extdata", "gene_attribute_edges.txt", package = "mousegwas")
+  mayphen <- read.table(maypf, skip = 1, sep = "\t", quote="\"", header=TRUE)
+  mp <- left_join(mayphen, mgitr, by=c("MGI.Accession" = "MGI")) %>% dplyr::select(ENSEMBL, MPID, Phenotype)
+  write.table(
+    as.data.frame(mp),
+    file = paste0(basedir, "/MP_terms_for_INRICH.txt"),
+    sep = "\t",
+    col.names = F,
+    row.names = F,
+    quote = 3
+  )
   return(unique(genes %>% dplyr::select(-go_id)))
 }
 
