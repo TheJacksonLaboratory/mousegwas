@@ -146,7 +146,7 @@ write_genes_map <- function(basedir) {
   mp <- left_join(mayphen, mgitr, by=c("MGI.Accession" = "MGI")) %>% dplyr::select(ENSEMBL, MPID, Phenotype)
   write.table(
     as.data.frame(mp),
-    file = paste0(basedir, "/MP_terms_for_INRICH.txt"),
+    file = paste0(basedir, "/groups_MP_terms_for_INRICH.txt"),
     sep = "\t",
     col.names = F,
     row.names = F,
