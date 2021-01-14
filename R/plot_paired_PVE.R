@@ -18,13 +18,13 @@ paired_PVE_plot <- function(PVE, var_name = "Variance", minherit=0){
     ggplot(meanPVE, aes(reorder(PaperName, -meanPVE$PVE), PVE, fill = Group, alpha = PVE>minherit)) + geom_bar(color =
                                                                                "black", stat = "identity") +
     geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) + ylim(0,1) +
-    scale_alpha_manual(values=c(0.6, 1)) +
+    scale_alpha_manual(values=c(0.4, 1)) +
     xlab("Phenotype") + coord_flip() + ggtitle("Mean")
   var_pvep <-
     ggplot(varPVE, aes(reorder(basename, -meanPVE$PVE), PVE, fill = Group, alpha = PVE>minherit)) + geom_bar(color =
                                                                                       "black", stat = "identity") +
     geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) + ylim(0,1) +
-    scale_alpha_manual(values=c(0.6, 1)) +
+    scale_alpha_manual(values=c(0.4, 1)) +
     xlab("") + coord_flip() + ggtitle("Variance")
 
   return(list(mean_plot = mean_pvep, var_plot = var_pvep))

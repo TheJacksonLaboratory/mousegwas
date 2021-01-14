@@ -86,7 +86,7 @@ write_genes_map <- function(basedir) {
       end_position,
       ensembl_gene_id,
       mgi_symbol
-    )),
+    ) %>% filter(gene_biotype == "protein_coding")),
     path = paste0(basedir, "/genes_coordinates_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
@@ -147,6 +147,17 @@ write_genes_map <- function(basedir) {
   write.table(
     as.data.frame(mp),
     file = paste0(basedir, "/groups_MP_terms_for_INRICH.txt"),
+    sep = "\t",
+    col.names = F,
+    row.names = F,
+    quote = 3
+  )
+  custmp <- system.file("extdata", "MPhenotype_MGenotype.csv", package = "mousegwas")
+  mphen <- read_csv(custmp, col_names = c("MGI", "name", "allele", "MPID","MPname"))
+  mp2 <- left_join(mphen, mgitr, by=c("MGI")) %>% dplyr::select(ENSEMBL, MPID, Phenotype)
+  write.table(
+    as.data.frame(mp2),
+    file = paste0(basedir, "/groups_MPMOTOR_terms_for_INRICH.txt"),
     sep = "\t",
     col.names = F,
     row.names = F,
@@ -213,6 +224,27 @@ run_inrich <-
         " -o ",
         name,
         "_MP_terms",
+        " -i ",
+        i,
+        " -j ",
+        j
+      )
+    )
+    system(
+      paste0(
+        "cd ",
+        basedir,
+        " && ",
+        exec,
+        " -c -a intervals",
+        name,
+        "_for_INRICH.txt",
+        " -m SNPs_map_for_INRICH.txt ",
+        " -g genes_coordinates_for_INRICH.txt",
+        " -t groups_MPMOTOR_terms_for_INRICH.txt",
+        " -o ",
+        name,
+        "_MPMOTOR_terms",
         " -i ",
         i,
         " -j ",
