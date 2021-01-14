@@ -154,7 +154,7 @@ write_genes_map <- function(basedir) {
   )
   custmp <- system.file("extdata", "MPhenotype_MGenotype.csv", package = "mousegwas")
   mphen <- read_csv(custmp, col_names = c("MGI", "name", "allele", "MPID","MPname"))
-  mp2 <- left_join(mphen, mgitr, by=c("MGI")) %>% dplyr::select(ENSEMBL, MPID, Phenotype)
+  mp2 <- left_join(mphen, mgitr, by=c("MGI")) %>% dplyr::select(ENSEMBL, MPID, MPname)
   write.table(
     as.data.frame(mp2),
     file = paste0(basedir, "/groups_MPMOTOR_terms_for_INRICH.txt"),
