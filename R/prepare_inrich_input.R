@@ -80,13 +80,13 @@ write_genes_map <- function(basedir) {
   # Write the genes map chr, staret, stop, ID, desc (mgi_symbol)
   genes <- get_genes()
   write_delim(
-    unique(genes %>% dplyr::select(
+    unique(genes %>% dplyr::filter(gene_biotype == "protein_coding") %>% dplyr::select(
       chromosome_name,
       start_position,
       end_position,
       ensembl_gene_id,
       mgi_symbol
-    ) %>% filter(gene_biotype == "protein_coding")),
+    )),
     path = paste0(basedir, "/genes_coordinates_for_INRICH.txt"),
     delim = "\t",
     col_names = FALSE
