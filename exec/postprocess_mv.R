@@ -94,6 +94,8 @@ parser$add_argument("--meanvariance", action="store_true", default=FALSE,
                     help="Plot the PVE of mean and variance phenotypes in different plots")
 parser$add_argument("--set3", action="store_true", default=FALSE,
                     help="Use Set3 color palette for groups, default is Accent")
+parser$add_argument("--minherit", type="double", default=0,
+                    help= "Heritability threshold (PVE) to include a phenotype in the aggregated reports")
 args <- parser$parse_args()
 
 # Step 1: Read the color palette
@@ -210,7 +212,7 @@ pvh <- height
 if (args$meanvariance) {
   if (dim(PVE)[1] > 40)
     pvh <- height * 2
-  pveplot <- paired_PVE_plot(PVE)
+  pveplot <- paired_PVE_plot(PVE, minherit=args$minherit)
   pvep <-
     cbind(
       ggplotGrob(pveplot$mean_plot + scale_fill_manual(values = grpcol) + theme_bw()  +
@@ -241,10 +243,11 @@ if (args$meanvariance) {
   if (dim(PVE)[1] > 40)
     pvh <- height * 2
   pvep <-
-    ggplot(PVE, aes(reorder(PaperName,-PVE), PVE, fill = Group)) + geom_bar(color =
+    ggplot(PVE, aes(reorder(PaperName,-PVE), PVE, fill = Group, alpha=PVE>args$minherit)) + geom_bar(color =
                                                                               "black", stat = "identity") +
     scale_fill_manual(values = grpcol) +
     geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
+    scale_alpha_manual(values=c(0.6,1)) +
     xlab("Phenotype") + coord_flip() +
     theme_bw()  +
     theme(text = element_text(size = 10, family = ffam),
@@ -334,6 +337,7 @@ if (args$nomv) {
     if (g == "All Variance Phenotypes"){
       plist <- pnames$PaperName[grepl("Variance", pnames$PaperName)]
     }
+    plist <- intersect(plist, PVE$PaperName[PVE$PVE >= args$minherit])
     for (p in intersect(plist, names(lilp))) {
       if (is.null(allpwas)) {
         allpwas <- lilp[[p]]$pwas %>% dplyr::select(chr, rs, ps, allele0, allele1, af, P, p_wald, BPcum)
