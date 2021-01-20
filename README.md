@@ -51,6 +51,6 @@ nextflow run TheJacksonLaboratory/mousegwas \
   --yaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/grooming_nowild.yaml \
   --shufyaml https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/grooming_shuffle.yaml \
   --input https://raw.githubusercontent.com/TheJacksonLaboratory/mousegwas/master/example/grooming_paper_strain_survey_2019_11_21.csv \ \
-  --outdir grooming_output -profile slurm,singularity
+  --outdir grooming_output --addpostp="--loddrop 0" -profile slurm,singularity
 ```
 
