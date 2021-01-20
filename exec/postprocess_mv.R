@@ -771,6 +771,7 @@ ggsave(
 
 # Expand each peak to include the entire peak, not just the single SNP
 ext_peak_sing <- function(snps, maxdist = 500000, loddrop = args$loddrop) {
+  if (loddrop){
   snps$minps <- snps$ps
   snps$maxps <- snps$ps
   for (c in unique(snps$choose)){
@@ -780,12 +781,13 @@ ext_peak_sing <- function(snps, maxdist = 500000, loddrop = args$loddrop) {
     snps$maxps[snps$choose==c] <- min(c(peakps+maxdist, snps$ps[snps$choose==c & snps$P < lodstop & snps$ps > peakps]))
   }
   return(snps)
-#  csum <-
-#    snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
-#  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
-#                                                                    maxdist),
-#                                                     minps = pmax(minps, ps - maxdist))
-  #snps %>% mutate(minps = ps - maxdist, maxps = ps + maxdist)
+  }else{
+  csum <-
+    snps %>% group_by(choose) %>% dplyr::summarize(maxps = max(ps), minps = min(ps)) %>% ungroup()
+  snps %>% left_join(csum, by = "choose") %>% mutate(maxps = pmin(maxps, ps +
+                                                                    maxdist),
+                                                     minps = pmax(minps, ps - maxdist))
+  }
 }
 
 # This tibble will accumulate all the genes for each cluster (ID and name)
