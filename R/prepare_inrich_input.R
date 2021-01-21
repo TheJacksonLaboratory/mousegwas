@@ -157,7 +157,7 @@ write_genes_map <- function(basedir) {
   mp2 <- left_join(mphen, mgitr, by=c("MGI")) %>% dplyr::select(ENSEMBL, MPID, MPname)
   write.table(
     as.data.frame(mp2),
-    file = paste0(basedir, "/groups_MPMOTOR_terms_for_INRICH.txt"),
+    file = paste0(basedir, "/groups_MPMGI_terms_for_INRICH.txt"),
     sep = "\t",
     col.names = F,
     row.names = F,
@@ -241,10 +241,10 @@ run_inrich <-
         "_for_INRICH.txt",
         " -m SNPs_map_for_INRICH.txt ",
         " -g genes_coordinates_for_INRICH.txt",
-        " -t groups_MPMOTOR_terms_for_INRICH.txt",
+        " -t groups_MPMGI_terms_for_INRICH.txt",
         " -o ",
         name,
-        "_MPMOTOR_terms",
+        "_MPMGI_terms",
         " -i ",
         i,
         " -j ",
