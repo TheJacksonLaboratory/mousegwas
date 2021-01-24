@@ -38,7 +38,8 @@ get_genes <- function(snps = NULL,
                 "start_position",
                 "end_position",
                 "gene_biotype",
-                "go_id"
+                "go_id",
+                "hgnc_symbol"
               ),
               mart = ensembl,
               useCache = FALSE
@@ -63,4 +64,23 @@ get_genes <- function(snps = NULL,
   } else{
     return(annot)
   }
+}
+
+
+# Get the genes from biomaRt and return the intersecting genes
+
+#' Retrieve genes from biomaRt and return the intersecting genes
+#'
+#' @param human_genes A list of human ensembl_gene_id
+#'
+#' @return a 2-column table with human emsembl_gene_id in the first and mouse in the second
+#' @export
+#'
+#' @examples
+#' @import biomaRt
+convert_to_mouse <- function(human_genes){
+  human = biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  mouse = biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+  genesV2 = biomaRt::getLDS(attributes = c("ensembl_gene_id"), filters = "ensembl_gene_id", values = human_genes , mart = human, attributesL = c("ensembl_gene_id"), martL = mouse, uniqueRows=T)
+  return(genesV2)
 }
