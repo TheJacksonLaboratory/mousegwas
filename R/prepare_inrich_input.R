@@ -165,10 +165,10 @@ write_genes_map <- function(basedir) {
   )
 
   sfari <- system.file("extdata", "SFARI-Gene_genes_01-13-2021release_01-22-2021export.csv", package = "mousegwas")
-  sft <- read_csv(sfari)
+  sft <- read_csv(sfari) %>% filter(!is.na(`ensembl-id`))
   s1 <- tibble(gene = sft$`ensembl-id`, trait="SFARI_all", desc="SFARI ASD 1-3 gene list")
-  s2 <- tibble(gene = sft$`ensembl-id`[sft$`gene-score`<=2], trait="SFARI_1_2", desc="SFARI ASD 1-2 gene list")
-  s3 <- tibble(gene = sft$`ensembl-id`[sft$`gene-score`==1], trait="SFARI_1", desc="SFARI ASD 1 gene list")
+  s2 <- tibble(gene = sft$`ensembl-id`[!is.na(sft$`gene-score`) & sft$`gene-score`<=2], trait="SFARI_1_2", desc="SFARI ASD 1-2 gene list")
+  s3 <- tibble(gene = sft$`ensembl-id`[!is.na(sft$`gene-score`) & sft$`gene-score`==1], trait="SFARI_1", desc="SFARI ASD 1 gene list")
   write.table(
     as.data.frame(rbind(s1, s2, s3)),
     file = paste0(basedir, "/groups_SFARI_terms_for_INRICH.txt"),
