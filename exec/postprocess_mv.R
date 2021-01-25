@@ -247,7 +247,7 @@ if (args$meanvariance) {
                                                                               "black", stat = "identity") +
     scale_fill_manual(values = grpcol) +
     geom_errorbar(aes(ymin = PVE - PVESE, ymax = PVE + PVESE), width = .2) +
-    scale_alpha_manual(values=c(0.4,1)) +
+    scale_alpha_manual(breaks = c(FALSE, TRUE), values=c(0.4,1)) + guides(alpha=FALSE)
     xlab("Phenotype") + coord_flip() +
     theme_bw()  +
     theme(text = element_text(size = 10, family = ffam),
