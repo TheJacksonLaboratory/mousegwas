@@ -42,11 +42,9 @@ F1:
       - NZB/BlNJ
       - NZW/LacJ
 translate:
-  - BTBRT...tf.J: BTBR T<+> Itpr3<tf>/J
-  - 129S1.SvImJ: 129S1/SvImJ
+  - C57BL/6NJ: C57BL/6NCrl
+  - C57BL/10SnJ: C57BL/10ScSnJ
   - C3H/HeOuJ: C3H/HeJ
-  - NON/LtJ: NON/ShiLtJ
-  - NOD/LtJ: NOD/ShiLtJ
   - CAST/EiJ: none
   - PWD/PhJ: none
   - CZECHII/EiJ: none
