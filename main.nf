@@ -46,7 +46,7 @@ process GWAS{
   script:
   def instr = infile.name != "NO_FILE" ? "-i $infile" : ''
   """
-  Rscript -e 'memory.limit(size=75000); source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' $instr -y $yamfile --basedir outdir -d ${params.downsample} ${params.genotype} ${params.addgwas}
+  Rscript -e 'memory.limit(size=75000); source(file=system.file("exec/run_GWAS.R", package="mousegwas"))' $instr -y $yamfile --basedir outdir -d ${params.downsample} --nomv ${params.genotype} ${params.addgwas}
   """
 }
 
