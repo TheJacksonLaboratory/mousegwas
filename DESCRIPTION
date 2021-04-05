@@ -40,7 +40,8 @@ Imports:
   reshape,
   gtable,
   grid,
-  rlang (>= 0.4.7)
+  rlang (>= 0.4.7),
+  ComplexHeatmap
 URL: https://github.com/TheJacksonLaboratory/mousegwas
 BugReports: https://github.com/TheJacksonLaboratory/mousegwas/issues
 RoxygenNote: 7.0.2
