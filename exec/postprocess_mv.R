@@ -96,6 +96,7 @@ parser$add_argument("--set3", action="store_true", default=FALSE,
                     help="Use Set3 color palette for groups, default is Accent")
 parser$add_argument("--minherit", type="double", default=0,
                     help= "Heritability threshold (PVE) to include a phenotype in the aggregated reports")
+parser$add_argument("--ploteffect", action="store_true", default=FALSE, help="Plot effect plots for all QTL peaks")
 args <- parser$parse_args()
 
 # Step 1: Read the color palette
@@ -954,5 +955,6 @@ ggsave(
 )
 
 # Plot the effectplots for all the peaks
-plot_effect(args$outdir, args$plotdir, allpeaks, pnames, fullw, fheight, ffam)
-
+if (args$ploteffect){
+  plot_effect(args$outdir, args$plotdir, allpeaks, pnames, fullw, fheight, ffam)
+}
