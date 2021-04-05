@@ -28,9 +28,10 @@ params.shufyaml = ""
 params.pvalue = 0.05
 params.addpostp = ""
 params.addgwas = ""
+params.addheatmap = ""
 params.input = "NO_FILE"
 input = file(params.input)
-Channel.fromPath(params.yaml).into{yaml; yaml2}
+Channel.fromPath(params.yaml).into{yaml; yaml2; yaml3}
 Channel.fromPath(params.shufyaml).set{shufyml}
 process GWAS{
   label 'mousegwas'
@@ -129,3 +130,18 @@ process runINRICH{
   """
 }
 
+//plot the heatmap of the INRICH p-values
+process plotheatmap{
+  publishDir path:params.outdir, mode:'copy'
+  label 'mousegwas'
+  label 'single_cpu'
+  input:
+    file yaml from yaml3
+    file inr from inrout.collect()
+  output:
+    file "*.pdf" into pvalout
+  script:
+  """
+    Rscript -e 'source(file=system.file("exec/plot_INRICH_pvalues.R", package="mousegwas"))' -c ${params.clusters} -y $yaml ${params.addheatmap} -f $inr
+  """
+}
