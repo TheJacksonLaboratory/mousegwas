@@ -23,11 +23,10 @@ get_genes <- function(snps = NULL,
     while (attn <= attempts && is.null(annot)) {
       attn <- attn + 1
       ensembl <- NULL
+      # Hard-coded version GRCm38 because MDA is with this version.
       try(ensembl <-
-            biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl", host = 'useast.ensembl.org'))
-      if (is.null(ensembl))
-        try(ensembl <-
-              biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl"))
+            biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl", host="nov2020.archive.ensembl.org"))
+
       try(annot <-
             biomaRt::getBM(
               c(
@@ -38,8 +37,7 @@ get_genes <- function(snps = NULL,
                 "start_position",
                 "end_position",
                 "gene_biotype",
-                "go_id",
-                "hgnc_symbol"
+                "go_id"
               ),
               mart = ensembl,
               useCache = FALSE
