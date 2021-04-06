@@ -103,7 +103,7 @@ process postp{
   """
   outval=$thr
   echo \$outval > pvalue-threshold.txt
-  Rscript -e 'source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -p postprocess_nomv -c ${params.clusters} --external_inrich -s 10000 --nomv --pvalthr \$(awk -v o=\$outval 'BEGIN{print -(log(o)/log(10))}') --peakcorr 0.2 -o $outdir -i 20 -j 200 -y $yml ${params.addpostp}
+  Rscript -e 'dir.create("libs", recursive=T); .libPaths("libs"); library(devtools); install_github("TheJacksonLaboratory/mousegwas");source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -p postprocess_nomv -c ${params.clusters} --external_inrich -s 10000 --nomv --pvalthr \$(awk -v o=\$outval 'BEGIN{print -(log(o)/log(10))}') --peakcorr 0.2 -o $outdir -i 20 -j 200 -y $yml ${params.addpostp}
   """
 }
 
