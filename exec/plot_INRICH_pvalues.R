@@ -9,6 +9,7 @@ library(yaml)
 library(RColorBrewer)
 library(argparse)
 library(tibble)
+library(grid)
 parser <- ArgumentParser()
 
 # specify our desired options
@@ -127,7 +128,11 @@ plot.group <- function(tbl){
   cvec <- setNames(cvec, rownames(plt))
   ha <- rowAnnotation(Group = rownames(plt), col=list(Group = cvec), show_legend = FALSE)
 
-  h <- Heatmap(plt, row_labels = rnames[rownames(plt)], column_title = "Terms", row_title = "Phenotypes", name = "p-value", heatmap_legend_param = list(at = lgp_range, labels = lbl_range), right_annotation = ha)
+  h <- Heatmap(plt, row_labels = rnames[rownames(plt)], column_title = "Terms", row_title = "Phenotypes", name = "adj. p-value",
+               heatmap_legend_param = list(at = lgp_range, labels = lbl_range),
+               right_annotation = ha,
+               column_names_gp = grid::gpar(fontsize = 8),
+               row_names_gp = grid::gpar(fontsize = 8))
 
   draw(h, padding = unit(c(1.5, 0.1, 0.1, 0.2), "inches"))
 }
