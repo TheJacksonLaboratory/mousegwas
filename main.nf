@@ -142,6 +142,6 @@ process plotheatmap{
     file "*.pdf" into pvalout
   script:
   """
-    Rscript -e 'source(file=system.file("exec/plot_INRICH_pvalues.R", package="mousegwas"))' -c ${params.clusters} -y $yaml ${params.addheatmap} -f $inr
+    Rscript -e 'dir.create("libs", recursive=T); .libPaths("libs"); library(devtools); install_github("TheJacksonLaboratory/mousegwas");source(file=system.file("exec/plot_INRICH_pvalues.R", package="mousegwas"))' -c ${params.clusters} -y $yaml ${params.addheatmap} -f $inr
   """
 }
