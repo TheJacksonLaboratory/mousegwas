@@ -3,238 +3,238 @@ sex: Sex
 phenotypes:
   StrideCount.10cm:
       papername: StrideCount.10cm
-      group: StrideCount
+      group: OFA
   DistanceTraveled:
       papername: DistanceTraveled
-      group: DistanceTraveled
+      group: OFA
   Speed:
       papername: Speed
-      group: DistanceTraveled
+      group: OFA
   AngularVelocity.10cm:
       papername: AngularVelocity.10cm
-      group: AngularVelocity
+      group: OFA
   AngularVelocityVariance.10cm:
       papername: AngularVelocityVariance.10cm
-      group: AngularVelocityVariance
+      group: OFAVariance
   AmplitudeTailBase.10cm:
       papername: AmplitudeTailBase.10cm
-      group: AmplitudeTailBase
+      group: Pose
   AmplitudeTailBaseVariance.10cm:
       papername: AmplitudeTailBaseVariance.10cm
-      group: AmplitudeTailBaseVariance
+      group: PoseVariance
   LimbDuty.10cm:
       papername: LimbDuty.10cm
-      group: LimbDuty
+      group: Gait
   LimbDutyVariance.10cm:
       papername: LimbDutyVariance.10cm
-      group: LimbDutyVariance
+      group: GaitVariance
   AmplitudeNose.10cm:
       papername: AmplitudeNose.10cm
-      group: AmplitudeNose
+      group: Pose
   AmplitudeNoseVariance.10cm:
       papername: AmplitudeNoseVariance.10cm
-      group: AmplitudeNoseVariance
+      group: PoseVariance
   StepLength.10cm:
       papername: StepLength.10cm
-      group: StepLength
+      group: Gait
   StepLengthVariance.10cm:
       papername: StepLengthVariance.10cm
-      group: StepLengthVariance
+      group: GaitVariance
   StepWidth.10cm:
       papername: StepWidth.10cm
-      group: StepWidth
+      group: Gait
   StepWidthVariance.10cm:
       papername: StepWidthVariance.10cm
-      group: StepWidthVariance
+      group: GaitVariance
   StrideLength.10cm:
       papername: StrideLength.10cm
-      group: StrideLength
+      group: Gait
   StrideLengthVariance.10cm:
       papername: StrideLengthVariance.10cm
-      group: StrideLengthVariance
+      group: GaitVariance
   TemporalSymmetry.10cm:
       papername: TemporalSymmetry.10cm
-      group: TemporalSymmetry
+      group: Gait
   TemporalSymmetryVariance.10cm:
       papername: TemporalSymmetryVariance.10cm
-      group: TemporalSymmetryVariance
+      group: GaitVariance
   AmplitudeTailTip.10cm:
       papername: AmplitudeTailTip.10cm
-      group: AmplitudeTailTip
+      group: Pose
   AmplitudeTailTipVariance.10cm:
       papername: AmplitudeTailTipVariance.10cm
-      group: AmplitudeTailTipVariance
+      group: PoseVariance
   StrideCount.15cm:
       papername: StrideCount.15cm
-      group: StrideCount
+      group: OFA
   AngularVelocity.15cm:
       papername: AngularVelocity.15cm
-      group: AngularVelocity
+      group: OFA
   AngularVelocityVariance.15cm:
       papername: AngularVelocityVariance.15cm
-      group: AngularVelocityVariance
+      group: OFAVariance
   AmplitudeTailBase.15cm:
       papername: AmplitudeTailBase.15cm
-      group: AmplitudeTailBase
+      group: Pose
   AmplitudeTailBaseVariance.15cm:
       papername: AmplitudeTailBaseVariance.15cm
-      group: AmplitudeTailBaseVariance
+      group: PoseVariance
   LimbDuty.15cm:
       papername: LimbDuty.15cm
-      group: LimbDuty
+      group: Gait
   LimbDutyVariance.15cm:
       papername: LimbDutyVariance.15cm
-      group: LimbDutyVariance
+      group: GaitVariance
   AmplitudeNose.15cm:
       papername: AmplitudeNose.15cm
-      group: AmplitudeNose
+      group: Pose
   AmplitudeNoseVariance.15cm:
       papername: AmplitudeNoseVariance.15cm
-      group: AmplitudeNoseVariance
+      group: PoseVariance
   StepLength.15cm:
       papername: StepLength.15cm
-      group: StepLength
+      group: Gait
   StepLengthVariance.15cm:
       papername: StepLengthVariance.15cm
-      group: StepLengthVariance
+      group: GaitVariance
   StepWidth.15cm:
       papername: StepWidth.15cm
-      group: StepWidth
+      group: Gait
   StepWidthVariance.15cm:
       papername: StepWidthVariance.15cm
-      group: StepWidthVariance
+      group: GaitVariance
   StrideLength.15cm:
       papername: StrideLength.15cm
-      group: StrideLength
+      group: Gait
   StrideLengthVariance.15cm:
       papername: StrideLengthVariance.15cm
-      group: StrideLengthVariance
+      group: GaitVariance
   TemporalSymmetry.15cm:
       papername: TemporalSymmetry.15cm
-      group: TemporalSymmetry
+      group: Gait
   TemporalSymmetryVariance.15cm:
       papername: TemporalSymmetryVariance.15cm
-      group: TemporalSymmetryVariance
+      group: GaitVariance
   AmplitudeTailTip.15cm:
       papername: AmplitudeTailTip.15cm
-      group: AmplitudeTailTip
+      group: Pose
   AmplitudeTailTipVariance.15cm:
       papername: AmplitudeTailTipVariance.15cm
-      group: AmplitudeTailTipVariance
+      group: PoseVariance
   StrideCount.20cm:
       papername: StrideCount.20cm
-      group: StrideCount
+      group: OFA
   AngularVelocity.20cm:
       papername: AngularVelocity.20cm
-      group: AngularVelocity
+      group: OFA
   AngularVelocityVariance.20cm:
       papername: AngularVelocityVariance.20cm
-      group: AngularVelocityVariance
+      group: OFAVariance
   AmplitudeTailBase.20cm:
       papername: AmplitudeTailBase.20cm
-      group: AmplitudeTailBase
+      group: Pose
   AmplitudeTailBaseVariance.20cm:
       papername: AmplitudeTailBaseVariance.20cm
-      group: AmplitudeTailBaseVariance
+      group: PoseVariance
   LimbDuty.20cm:
       papername: LimbDuty.20cm
-      group: LimbDuty
+      group: Gait
   LimbDutyVariance.20cm:
       papername: LimbDutyVariance.20cm
-      group: LimbDutyVariance
+      group: GaitVariance
   AmplitudeNose.20cm:
       papername: AmplitudeNose.20cm
-      group: AmplitudeNose
+      group: Pose
   AmplitudeNoseVariance.20cm:
       papername: AmplitudeNoseVariance.20cm
-      group: AmplitudeNoseVariance
+      group: PoseVariance
   StepLength.20cm:
       papername: StepLength.20cm
-      group: StepLength
+      group: Gait
   StepLengthVariance.20cm:
       papername: StepLengthVariance.20cm
-      group: StepLengthVariance
+      group: GaitVariance
   StepWidth.20cm:
       papername: StepWidth.20cm
-      group: StepWidth
+      group: Gait
   StepWidthVariance.20cm:
       papername: StepWidthVariance.20cm
-      group: StepWidthVariance
+      group: GaitVariance
   StrideLength.20cm:
       papername: StrideLength.20cm
-      group: StrideLength
+      group: Gait
   StrideLengthVariance.20cm:
       papername: StrideLengthVariance.20cm
-      group: StrideLengthVariance
+      group: GaitVariance
   TemporalSymmetry.20cm:
       papername: TemporalSymmetry.20cm
-      group: TemporalSymmetry
+      group: Gait
   TemporalSymmetryVariance.20cm:
       papername: TemporalSymmetryVariance.20cm
-      group: TemporalSymmetryVariance
+      group: GaitVariance
   AmplitudeTailTip.20cm:
       papername: AmplitudeTailTip.20cm
-      group: AmplitudeTailTip
+      group: Pose
   AmplitudeTailTipVariance.20cm:
       papername: AmplitudeTailTipVariance.20cm
-      group: AmplitudeTailTipVariance
+      group: PoseVariance
   StrideCount.25cm:
       papername: StrideCount.25cm
-      group: StrideCount
+      group: OFA
   AngularVelocity.25cm:
       papername: AngularVelocity.25cm
-      group: AngularVelocity
+      group: OFA
   AngularVelocityVariance.25cm:
       papername: AngularVelocityVariance.25cm
-      group: AngularVelocityVariance
+      group: OFAVariance
   AmplitudeTailBase.25cm:
       papername: AmplitudeTailBase.25cm
-      group: AmplitudeTailBase
+      group: Pose
   AmplitudeTailBaseVariance.25cm:
       papername: AmplitudeTailBaseVariance.25cm
-      group: AmplitudeTailBaseVariance
+      group: PoseVariance
   LimbDuty.25cm:
       papername: LimbDuty.25cm
-      group: LimbDuty
+      group: Gait
   LimbDutyVariance.25cm:
       papername: LimbDutyVariance.25cm
-      group: LimbDutyVariance
+      group: GaitVariance
   AmplitudeNose.25cm:
       papername: AmplitudeNose.25cm
-      group: AmplitudeNose
+      group: Pose
   AmplitudeNoseVariance.25cm:
       papername: AmplitudeNoseVariance.25cm
-      group: AmplitudeNoseVariance
+      group: PoseVariance
   StepLength.25cm:
       papername: StepLength.25cm
-      group: StepLength
+      group: Gait
   StepLengthVariance.25cm:
       papername: StepLengthVariance.25cm
-      group: StepLengthVariance
+      group: GaitVariance
   StepWidth.25cm:
       papername: StepWidth.25cm
-      group: StepWidth
+      group: Gait
   StepWidthVariance.25cm:
       papername: StepWidthVariance.25cm
-      group: StepWidthVariance
+      group: GaitVariance
   StrideLength.25cm:
       papername: StrideLength.25cm
-      group: StrideLength
+      group: Gait
   StrideLengthVariance.25cm:
       papername: StrideLengthVariance.25cm
-      group: StrideLengthVariance
+      group: GaitVariance
   TemporalSymmetry.25cm:
       papername: TemporalSymmetry.25cm
-      group: TemporalSymmetry
+      group: Gait
   TemporalSymmetryVariance.25cm:
       papername: TemporalSymmetryVariance.25cm
-      group: TemporalSymmetryVariance
+      group: GaitVariance
   AmplitudeTailTip.25cm:
       papername: AmplitudeTailTip.25cm
-      group: AmplitudeTailTip
+      group: Pose
   AmplitudeTailTipVariance.25cm:
       papername: AmplitudeTailTipVariance.25cm
-      group: AmplitudeTailTipVariance
+      group: PoseVariance
 covar:
   - Sex
   - AverageLength
@@ -273,11 +273,9 @@ F1:
       - NZB/BlNJ
       - NZW/LacJ
 translate:
-  - BTBRT...tf.J: BTBR T<+> Itpr3<tf>/J
-  - 129S1.SvImJ: 129S1/SvImJ
+  - C57BL/6NJ: none
+  - C57BL/10SnJ: C57BL/10ScSnJ
   - C3H/HeOuJ: C3H/HeJ
-  - NON/LtJ: NON/ShiLtJ
-  - NOD/LtJ: NOD/ShiLtJ
   - CAST/EiJ: none
   - PWD/PhJ: none
   - CZECHII/EiJ: none
@@ -289,23 +287,9 @@ confSNPs:
   - rs32105080
 
 groups:
-  - StrideCount
-  - DistanceTraveled
-  - AngularVelocity
-  - AngularVelocityVariance
-  - AmplitudeTailBase
-  - AmplitudeTailBaseVariance
-  - LimbDuty
-  - LimbDutyVariance
-  - AmplitudeNose
-  - AmplitudeNoseVariance
-  - StepLength
-  - StepLengthVariance
-  - StepWidth
-  - StepWidthVariance
-  - StrideLength
-  - StrideLengthVariance
-  - TemporalSymmetry
-  - TemporalSymmetryVariance
-  - AmplitudeTailTip
-  - AmplitudeTailTipVariance
+  - Pose
+  - PoseVariance
+  - Gait
+  - GaitVariance
+  - OFA
+  - OFAVariance
