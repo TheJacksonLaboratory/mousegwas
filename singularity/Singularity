@@ -3,7 +3,7 @@ from: bioconductor/bioconductor_docker:RELEASE_3_10
 
 %post
     apt-get update
-    apt-get install -y sqlite3 wget libxml2-dev
+    apt-get install -y sqlite3 wget libxml2-dev libgit2-dev
     # Install INRICH
     wget https://bitbucket.org/statgen/inrich/get/30c7f7e93e2a.zip
     unzip 30c7f7e93e2a.zip
