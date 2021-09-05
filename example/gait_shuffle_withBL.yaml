@@ -1,0 +1,56 @@
+strain: Strain
+sex: Sex
+phenotypes:
+  DistanceTraveled:
+      papername: DistanceTraveled
+      group: 20cm
+covar:
+  - Sex
+  - BodyLength
+F1:
+  - B6129SF1/J:
+      - C57BL/6J
+      - 129S1/SvImJ
+  - B6129PF1/J:
+      - C57BL/6J
+      - 129P3/J
+  - B6AF1/J:
+      - C57BL/6J
+      - A/J
+  - B6C3F1/J:
+      - C57BL/6J
+      - C3H/HeJ
+  - B6CBAF1/J:
+      - C57BL/6J
+      - CBA/J
+  - B6D2F1/J:
+      - C57BL/6J
+      - DBA/2J
+  - B6SJLF1/J:
+      - C57BL/6J
+      - SJL/J
+  - CAF1/J:
+      - BALB/cJ
+      - A/J
+  - CB6F1/J:
+      - BALB/cJ
+      - C57BL/6J
+  - CByB6F1/J:
+      - BALB/cByJ
+      - C57BL/6J
+  - NZBWF1/J:
+      - NZB/BlNJ
+      - NZW/LacJ
+translate:
+  - C57BL/6NJ: none
+  - C57BL/10SnJ: C57BL/10ScSnJ
+  - C3H/HeOuJ: C3H/HeJ
+  - CAST/EiJ: none
+  - PWD/PhJ: none
+  - CZECHII/EiJ: none
+  - PWK/PhJ: none
+  - MSM/MsJ: none
+  - MOLF/EiJ: none
+
+confSNPs:
+  - rs32105080
