@@ -41,7 +41,8 @@ Imports:
   gtable,
   grid,
   rlang (>= 0.4.7),
-  ComplexHeatmap
+  ComplexHeatmap,
+  viridis
 URL: https://github.com/TheJacksonLaboratory/mousegwas
 BugReports: https://github.com/TheJacksonLaboratory/mousegwas/issues
 RoxygenNote: 7.0.2
