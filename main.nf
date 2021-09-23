@@ -103,8 +103,7 @@ process postp{
   """
   outval=$thr
   echo \$outval > pvalue-threshold.txt
-  mkdir libs
-  Rscript -e '.libPaths("libs"); install.packages(c("viridis", "gplots")); source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -p postprocess_nomv -c ${params.clusters} --external_inrich -s 10000 --nomv --pvalthr \$(awk -v o=\$outval 'BEGIN{print -(log(o)/log(10))}') --peakcorr 0.2 -o $outdir -i 20 -j 200 -y $yml ${params.addpostp}
+  Rscript -e 'source(file=system.file("exec/postprocess_mv.R", package="mousegwas"))' -p postprocess_nomv -c ${params.clusters} --external_inrich -s 10000 --nomv --pvalthr \$(awk -v o=\$outval 'BEGIN{print -(log(o)/log(10))}') --peakcorr 0.2 -o $outdir -i 20 -j 200 -y $yml ${params.addpostp}
   """
 }
 
